@@ -1,0 +1,54 @@
+package atoms
+
+// ButtonVariant: "primary", "secondary", "danger", "ghost"
+// ButtonSize: "sm", "md", "lg"
+type ButtonProps struct {
+	Text    string
+	Variant string
+	Size    string
+	Type    string // "button", "submit", "reset"
+	Href    string // Si défini, rend un <a> au lieu d'un <button>
+}
+
+templ Button(props ButtonProps) {
+	if props.Href != "" {
+		<a 
+			href={ templ.SafeURL(props.Href) }
+			class={
+				"inline-flex items-center justify-center font-medium rounded-lg focus:ring-4 focus:outline-none transition-colors",
+				templ.KV("text-white bg-blue-700 hover:bg-blue-800 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800", props.Variant == "primary" || props.Variant == ""),
+				templ.KV("text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700", props.Variant == "secondary"),
+				templ.KV("text-white bg-red-700 hover:bg-red-800 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900", props.Variant == "danger"),
+				templ.KV("text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700", props.Variant == "ghost"),
+				templ.KV("px-3 py-2 text-sm", props.Size == "sm"),
+				templ.KV("px-5 py-2.5 text-sm", props.Size == "md" || props.Size == ""),
+				templ.KV("px-6 py-3 text-base", props.Size == "lg"),
+			}
+		>
+			{ props.Text }
+		</a>
+	} else {
+		<button 
+			type={ getButtonType(props.Type) }
+			class={
+				"inline-flex items-center justify-center font-medium rounded-lg focus:ring-4 focus:outline-none transition-colors",
+				templ.KV("text-white bg-blue-700 hover:bg-blue-800 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800", props.Variant == "primary" || props.Variant == ""),
+				templ.KV("text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700", props.Variant == "secondary"),
+				templ.KV("text-white bg-red-700 hover:bg-red-800 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900", props.Variant == "danger"),
+				templ.KV("text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700", props.Variant == "ghost"),
+				templ.KV("px-3 py-2 text-sm", props.Size == "sm"),
+				templ.KV("px-5 py-2.5 text-sm", props.Size == "md" || props.Size == ""),
+				templ.KV("px-6 py-3 text-base", props.Size == "lg"),
+			}
+		>
+			{ props.Text }
+		</button>
+	}
+}
+
+func getButtonType(t string) string {
+	if t == "" {
+		return "button"
+	}
+	return t
+}

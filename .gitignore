@@ -1,0 +1,5 @@
+# Sécurité : ne jamais commiter les clés secrètes
+.env
+bin/
+tmp/
+dev.db

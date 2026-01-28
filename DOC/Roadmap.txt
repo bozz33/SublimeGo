@@ -1,0 +1,109 @@
+📑 Titre du Projet : Gofla (Go Filament Architecture)
+
+1. Description du Projet (Vision)
+
+Gofla est un moteur de tableau de bord administratif (Admin Panel Engine) pour le langage Go. Son objectif est de reproduire l'expérience développeur "Low Code" de Filament PHP, mais en y apportant la rigueur, la performance et la sécurité de type du langage Go.
+Contrairement aux solutions classiques, Gofla n'est pas un générateur de code (scaffolder) mais une librairie de composants dynamiques. Il permet à un développeur de créer une ressource complète (CRUD Utilisateurs) en moins de 50 lignes de code Go, sans toucher au HTML, CSS ou JS.
+Les Piliers du projet :
+1.	Zero-JS (pour le dev) : Toute l'interactivité est gérée par le moteur via HTMX.
+2.	Type-Safety Absolute : Si ça compile, ça marche. Pas d'erreurs SQL ou de template au runtime.
+3.	Performance Native : Utilisation des Goroutines pour les tâches lourdes (pas de Redis).
+4.	Single Binary : Tout (assets, templates, serveur) est compilé dans un seul exécutable.
+________________________________________
+2. La Stack Technique (Choix Experts)
+•	Langage : Go 1.22+ (Pour le nouveau Router net/http et les Generics).
+•	Base de Données : Ent (ORM basé sur les Graphes et la génération de code).
+•	Moteur de Vue : Templ (HTML fortement typé compilé en Go).
+•	Interactivité : HTMX (Échanges HTML partiels via AJAX).
+•	Style : TailwindCSS (Compilé et purgé).
+•	Validation : go-playground/validator.
+•	Outillage Qualité : golangci-lint (Linting strict), Air (Hot reload), Makefile.
+________________________________________
+3. Roadmap Complète (Plan d'Exécution)
+Nous allons découper le projet en 5 phases distinctes (Sprints).
+
+🏁 Phase 0 : L'Infrastructure (Setup & Standards)
+Objectif : Mettre en place l'usine logicielle. Aucun code métier, juste de l'outillage.
+•	0.1 Initialisation du go.mod et structure de dossiers standard (cmd, internal, pkg).
+•	0.2 Configuration du Makefile (commandes dev, build, lint).
+•	0.3 Installation et config de Air (rechargement automatique).
+•	0.4 Mise en place du Linter Strict (golangci-lint.yml) pour interdire les mauvaises pratiques dès le jour 1.
+•	0.5 Setup de TailwindCSS et du pipeline de compilation des assets.
+
+🏗️ Phase 1 : Le Moteur UI (Layout & Templ)
+Objectif : Afficher une page vide mais structurée avec une Sidebar dynamique.
+•	1.1 Création du système de composants Atomic Design en Templ (Boutons, Cards, Inputs).
+•	1.2 Création du Layout Shell (Sidebar, Topbar, Flash Messages).
+•	1.3 Implémentation du routeur et du système de rendu de base.
+
+🧠 Phase 2 : L'Abstraction des Données (Engine Core)
+Objectif : Connecter la base de données sans écrire de SQL manuel.
+•	2.1 Initialisation de Ent et création du schéma User (exemple).
+•	2.2 Définition de l'interface Resource (Le contrat que chaque module devra respecter).
+•	2.3 Création du Registre (engine.RegisterResource) qui auto-génère les routes /admin/users.
+
+📊 Phase 3 : Le Table Builder (Lecture)
+Objectif : Afficher des données avec pagination et filtres sans écrire de HTML.
+•	3.1 Création du composant générique Table[T].
+•	3.2 Implémentation des colonnes (TextColumn, BadgeColumn).
+•	3.3 Gestion de la Pagination (Calcul SQL + Rendu UI).
+•	3.4 Intégration de HTMX pour le tri et la recherche en temps réel (Server-Side).
+
+📝 Phase 4 : Le Form Builder (Écriture)
+Objectif : Créer et modifier des données avec validation automatique.
+•	4.1 Création des composants de formulaire (TextInput, Select, Toggle).
+•	4.2 Mapping automatique : Struct Go <-> Champs HTML.
+•	4.3 Gestion de la Validation (Affichage des erreurs sous les champs).
+•	4.4 Implémentation des actions Save et Delete dans le contrôleur générique.
+
+🚀 Phase 5 : Fonctionnalités Avancées (Filament Parity)
+Objectif : Ajouter les fonctionnalités "Wow" qui rendent l'outil pro.
+•	5.1 Bulk Actions : Sélectionner 10 lignes et "Supprimer" ou "Exporter".
+•	5.2 Async Exports : Utilisation des Goroutines pour générer un CSV en arrière-plan et notifier l'utilisateur via un "Toast" quand c'est fini.
+•	5.3 Widgets : Graphiques et Stats sur le dashboard.
+
+
+Cette roadmap et l'architecture du moteur Engine s'alignent strictement sur les standards des projets Go dits "de production" ou "Enterprise Grade" (comme Kubernetes, Terraform ou Docker).
+Voici la preuve technique point par point, en comparant nos choix avec les "Go Proverbs" et les pratiques de l'industrie.
+________________________________________
+1. La Structure du Projet (Project Layout)
+Standard respecté : golang-standards/project-layout
+•	Notre choix : Séparation stricte entre /cmd, /internal et /pkg.
+•	Pourquoi c'est "Advanced" :
+o	Les projets juniors mettent souvent tout à la racine ou dans un dossier src.
+o	En utilisant /internal, le compilateur Go interdit physiquement aux autres projets d'importer ton code métier. C'est une sécurité architecturale utilisée par la librairie standard Go elle-même.
+o	Preuve : Regarde le repo de Kubernetes, tu verras exactement cette structure.
+2. L'Approche "Zero-Reflection" (Sécurité à la compilation)
+Standard respecté : "Clear is better than clever" (Rob Pike).
+•	Notre choix : Utiliser Ent (Code Generation) et Templ plutôt que de la réflexion au runtime (comme reflect ou GORM trop dynamique).
+•	Pourquoi c'est "Advanced" :
+o	La réflexion (deviner les types à l'exécution) est lente et dangereuse (Panic possible).
+o	Dans notre architecture, si tu changes le nom d'un champ dans la BDD, le projet ne compile pas.
+o	C'est le niveau de robustesse exigé dans la finance ou les systèmes critiques.
+3. L'Injection de Dépendances (DI)
+Standard respecté : Pas de variables globales.
+•	Notre choix : Le Resource reçoit ses dépendances via sa struct, et l'Engine est instancié proprement (New(db, config)).
+•	Pourquoi c'est "Advanced" :
+o	Les débutants utilisent souvent des variables globales (ex: une variable DB accessible partout). C'est un cauchemar à tester.
+o	Notre approche permet de faire des Tests Unitaires en isolant chaque composant. Tu pourras tester ton UserResource sans lancer de vraie base de données (en utilisant des "Mocks").
+4. La Gestion de la Concurrence
+Standard respecté : "Don't communicate by sharing memory, share memory by communicating."
+•	Notre choix : Utiliser des Goroutines et des Channels pour les tâches de fond, au lieu d'installer Redis.
+•	Pourquoi c'est "Advanced" :
+o	C'est la force native de Go. Utiliser Redis pour ça en Go serait considéré comme une "dette technique" ou de l'over-engineering inutile.
+o	Nous utilisons le runtime Go exactement pour ce pour quoi il a été conçu.
+5. L'Outillage (Quality Gates)
+Standard respecté : Shift-Left Testing.
+•	Notre choix : Imposer golangci-lint avec des règles strictes (complexité cyclomatique, longueur de fonction) dès le début via un Makefile.
+•	Pourquoi c'est "Advanced" :
+o	Sur les gros projets Open Source, aucun code n'est accepté s'il ne passe pas le linter.
+o	Cela garantit que ton code reste lisible par n'importe qui, même dans 2 ans. Cela élimine le "style personnel" au profit du "style standard".
+________________________________________
+Conclusion : Le Verdict
+Si tu présentes cette architecture à un Tech Lead Go senior, voici ce qu'il verra :
+1.	Il ne verra pas un "Clone de PHP écrit en Go" (ce qui serait une erreur).
+2.	Il verra une application Idiomatic Go qui résout le même problème que Filament (Admin Panel) mais avec la philosophie Go.
+C'est exactement ce qu'il faut faire.
+
+
+

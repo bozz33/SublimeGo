@@ -1,0 +1,60 @@
+package atoms
+
+type RadioOption struct {
+	Label string
+	Value string
+}
+
+type RadioProps struct {
+	Name     string
+	Label    string
+	Options  []RadioOption
+	Value    string
+	Inline   bool
+	Disabled bool
+	Error    string
+}
+
+templ Radio(props RadioProps) {
+	<div class="mb-5">
+		if props.Label != "" {
+			<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+				{ props.Label }
+			</label>
+		}
+		<div class={
+			"flex gap-4",
+			templ.KV("flex-col", !props.Inline),
+			templ.KV("flex-row flex-wrap", props.Inline),
+		}>
+			for _, option := range props.Options {
+				<div class="flex items-center">
+					<input 
+						id={ props.Name + "-" + option.Value }
+						type="radio" 
+						name={ props.Name }
+						value={ option.Value }
+						checked?={ option.Value == props.Value }
+						disabled?={ props.Disabled }
+						class={
+							"w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600",
+							templ.KV("cursor-not-allowed opacity-50", props.Disabled),
+						}
+					/>
+					<label 
+						for={ props.Name + "-" + option.Value }
+						class={
+							"ms-2 text-sm font-medium text-gray-900 dark:text-gray-300",
+							templ.KV("cursor-not-allowed opacity-50", props.Disabled),
+						}
+					>
+						{ option.Label }
+					</label>
+				</div>
+			}
+		</div>
+		if props.Error != "" {
+			<p class="mt-2 text-sm text-red-600 dark:text-red-500">{ props.Error }</p>
+		}
+	</div>
+}

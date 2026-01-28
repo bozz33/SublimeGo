@@ -1,0 +1,43 @@
+package atoms
+
+// Size: "xs", "sm", "md", "lg", "xl"
+type AvatarProps struct {
+	Src     string
+	Alt     string
+	Size    string
+	Rounded bool // true = cercle, false = carré arrondi
+}
+
+templ Avatar(props AvatarProps) {
+	if props.Src != "" {
+		<img 
+			src={ props.Src }
+			alt={ props.Alt }
+			class={
+				"object-cover",
+				templ.KV("rounded-full", props.Rounded),
+				templ.KV("rounded-lg", !props.Rounded),
+				templ.KV("w-6 h-6", props.Size == "xs"),
+				templ.KV("w-8 h-8", props.Size == "sm"),
+				templ.KV("w-10 h-10", props.Size == "md" || props.Size == ""),
+				templ.KV("w-14 h-14", props.Size == "lg"),
+				templ.KV("w-20 h-20", props.Size == "xl"),
+			}
+		/>
+	} else {
+		<div class={
+			"flex items-center justify-center bg-gray-100 dark:bg-gray-600",
+			templ.KV("rounded-full", props.Rounded),
+			templ.KV("rounded-lg", !props.Rounded),
+			templ.KV("w-6 h-6", props.Size == "xs"),
+			templ.KV("w-8 h-8", props.Size == "sm"),
+			templ.KV("w-10 h-10", props.Size == "md" || props.Size == ""),
+			templ.KV("w-14 h-14", props.Size == "lg"),
+			templ.KV("w-20 h-20", props.Size == "xl"),
+		}>
+			<svg class="text-gray-400 w-1/2 h-1/2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+				<path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+			</svg>
+		</div>
+	}
+}

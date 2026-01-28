@@ -1,0 +1,103 @@
+package atoms
+
+type FileUploadProps struct {
+	Name     string
+	Label    string
+	Accept   string // ex: "image/*", ".pdf,.doc"
+	Multiple bool
+	Required bool
+	Disabled bool
+	Error    string
+	HelpText string
+}
+
+templ FileUpload(props FileUploadProps) {
+	<div class="mb-5">
+		if props.Label != "" {
+			<label 
+				for={ props.Name } 
+				class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+			>
+				{ props.Label }
+				if props.Required {
+					<span class="text-red-500">*</span>
+				}
+			</label>
+		}
+		<input 
+			type="file"
+			id={ props.Name }
+			name={ props.Name }
+			accept={ props.Accept }
+			multiple?={ props.Multiple }
+			required?={ props.Required }
+			disabled?={ props.Disabled }
+			class={
+				"block w-full text-sm text-gray-900 border rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:placeholder-gray-400",
+				templ.KV("border-gray-300 dark:border-gray-600", props.Error == ""),
+				templ.KV("border-red-500 dark:border-red-500", props.Error != ""),
+				templ.KV("cursor-not-allowed opacity-50", props.Disabled),
+			}
+		/>
+		if props.HelpText != "" && props.Error == "" {
+			<p class="mt-1 text-sm text-gray-500 dark:text-gray-300">{ props.HelpText }</p>
+		}
+		if props.Error != "" {
+			<p class="mt-2 text-sm text-red-600 dark:text-red-500">{ props.Error }</p>
+		}
+	</div>
+}
+
+templ FileUploadDropzone(props FileUploadProps) {
+	<div class="mb-5">
+		if props.Label != "" {
+			<label 
+				for={ props.Name } 
+				class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+			>
+				{ props.Label }
+				if props.Required {
+					<span class="text-red-500">*</span>
+				}
+			</label>
+		}
+		<div class={
+			"flex items-center justify-center w-full",
+			templ.KV("opacity-50 cursor-not-allowed", props.Disabled),
+		}>
+			<label 
+				for={ props.Name } 
+				class={
+					"flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100",
+					templ.KV("border-gray-300 dark:border-gray-600", props.Error == ""),
+					templ.KV("border-red-500 dark:border-red-500", props.Error != ""),
+				}
+			>
+				<div class="flex flex-col items-center justify-center pt-5 pb-6">
+					<svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+					</svg>
+					<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+						<span class="font-semibold">Cliquez pour uploader</span> ou glissez-déposez
+					</p>
+					if props.HelpText != "" {
+						<p class="text-xs text-gray-500 dark:text-gray-400">{ props.HelpText }</p>
+					}
+				</div>
+				<input 
+					type="file"
+					id={ props.Name }
+					name={ props.Name }
+					accept={ props.Accept }
+					multiple?={ props.Multiple }
+					required?={ props.Required }
+					disabled?={ props.Disabled }
+					class="hidden"
+				/>
+			</label>
+		</div>
+		if props.Error != "" {
+			<p class="mt-2 text-sm text-red-600 dark:text-red-500">{ props.Error }</p>
+		}
+	</div>
+}

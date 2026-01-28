@@ -1,0 +1,39 @@
+# .air.toml - Configuration corrigée pour Windows & SublimeGo
+
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  # CORRECTION MAJEURE ICI :
+  # 1. On cible "./cmd/app" au lieu de "."
+  # 2. On ajoute .exe explicitement pour Windows
+  cmd = "go build -o ./tmp/main.exe ./cmd/app"
+  
+  # Le chemin du binaire à exécuter après la compilation
+  bin = "./tmp/main.exe"
+
+  # On surveille aussi les fichiers .templ
+  include_ext = ["go", "tpl", "tmpl", "html", "templ"]
+  
+  # On ignore les dossiers inutiles pour ne pas surcharger le processeur
+  exclude_dir = ["assets", "tmp", "vendor", "testdata", ".git"]
+
+  # Si la compilation échoue, on ne lance pas l'application (évite les erreurs en boucle)
+  stop_on_error = true
+  
+  # Délai avant rebuild (évite de compiler 10 fois si tu sauvegardes vite)
+  delay = 500
+
+[log]
+  time = true
+  main_only = false
+
+[color]
+  build = "yellow"
+  main = "magenta"
+  runner = "green"
+  watcher = "cyan"
+
+[misc]
+  # Supprime le fichier tmp/main.exe quand tu arrêtes Air (Ctrl+C)
+  clean_on_exit = true

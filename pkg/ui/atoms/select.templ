@@ -1,0 +1,53 @@
+package atoms
+
+type SelectOption struct {
+	Label string
+	Value string
+}
+
+type SelectProps struct {
+	Name     string
+	Label    string
+	Options  []SelectOption
+	Value    string
+	Error    string
+	Required bool
+	Disabled bool
+}
+
+templ Select(props SelectProps) {
+	<div class="mb-5">
+		if props.Label != "" {
+			<label 
+				for={ props.Name } 
+				class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+			>
+				{ props.Label }
+				if props.Required {
+					<span class="text-red-500">*</span>
+				}
+			</label>
+		}
+		<select 
+			id={ props.Name } 
+			name={ props.Name }
+			required?={ props.Required }
+			disabled?={ props.Disabled }
+			class={
+				"bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400 dark:text-white",
+				templ.KV("border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500", props.Error == ""),
+				templ.KV("border-red-500 focus:ring-red-500 focus:border-red-500 dark:border-red-500", props.Error != ""),
+				templ.KV("bg-gray-100 cursor-not-allowed dark:bg-gray-600", props.Disabled),
+			}
+		>
+			for _, option := range props.Options {
+				<option value={ option.Value } selected?={ option.Value == props.Value }>
+					{ option.Label }
+				</option>
+			}
+		</select>
+		if props.Error != "" {
+			<p class="mt-2 text-sm text-red-600 dark:text-red-500">{ props.Error }</p>
+		}
+	</div>
+}

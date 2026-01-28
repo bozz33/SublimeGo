@@ -1,0 +1,22 @@
+package atoms
+
+type CardProps struct {
+	Title   string
+	Padding string // "sm", "md", "lg"
+}
+
+templ Card(props CardProps) {
+	<div class={
+		"bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700",
+		templ.KV("p-4", props.Padding == "sm"),
+		templ.KV("p-6", props.Padding == "md" || props.Padding == ""),
+		templ.KV("p-8", props.Padding == "lg"),
+	}>
+		if props.Title != "" {
+			<h5 class="mb-4 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+				{ props.Title }
+			</h5>
+		}
+		{ children... }
+	</div>
+}

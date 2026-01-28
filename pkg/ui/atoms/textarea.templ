@@ -1,0 +1,58 @@
+package atoms
+
+type TextareaProps struct {
+	Name        string
+	Label       string
+	Placeholder string
+	Value       string
+	Rows        int
+	Error       string
+	Required    bool
+	Disabled    bool
+}
+
+templ Textarea(props TextareaProps) {
+	<div class="mb-5">
+		if props.Label != "" {
+			<label 
+				for={ props.Name } 
+				class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+			>
+				{ props.Label }
+				if props.Required {
+					<span class="text-red-500">*</span>
+				}
+			</label>
+		}
+		<textarea 
+			id={ props.Name } 
+			name={ props.Name } 
+			rows={ getRows(props.Rows) }
+			placeholder={ props.Placeholder }
+			required?={ props.Required }
+			disabled?={ props.Disabled }
+			class={
+				"block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border dark:bg-gray-700 dark:placeholder-gray-400 dark:text-white",
+				templ.KV("border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500", props.Error == ""),
+				templ.KV("border-red-500 focus:ring-red-500 focus:border-red-500 dark:border-red-500", props.Error != ""),
+				templ.KV("bg-gray-100 cursor-not-allowed dark:bg-gray-600", props.Disabled),
+			}
+		>
+			{ props.Value }
+		</textarea>
+		if props.Error != "" {
+			<p class="mt-2 text-sm text-red-600 dark:text-red-500">{ props.Error }</p>
+		}
+	</div>
+}
+
+func getRows(r int) string {
+	if r <= 0 {
+		return "4"
+	}
+	return intToString(r)
+}
+
+func intToString(i int) string {
+	return string(rune('0' + i))
+}

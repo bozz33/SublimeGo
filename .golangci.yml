@@ -1,0 +1,30 @@
+run:
+  timeout: 5m
+  allow-parallel-runners: true
+
+linters:
+  enable:
+    - errcheck    # Vérifie que les erreurs sont gérées (obligatoire en Go)
+    - gosimple    # Suggère des simplifications
+    - govet       # Analyse statique standard
+    - ineffassign # Détecte les assignations inutiles
+    - staticcheck # Un linter très puissant
+    - typecheck   # Vérifie la cohérence des types
+    - unused      # Détecte le code mort (variables/fonctions non utilisées)
+    - funlen      # INTERDIT les fonctions trop longues (Max 60 lignes)
+    - gocyclo     # Vérifie la complexité (Pas trop de if/else imbriqués)
+
+linters-settings:
+  funlen:
+    lines: 60           # Une fonction > 60 lignes = Erreur
+    statements: 40      # Une fonction > 40 instructions = Erreur
+  gocyclo:
+    min-complexity: 15  # Seuil de complexité
+  errcheck:
+    check-type-assertions: true
+    check-blank: true   # Interdit d'ignorer une erreur avec "_"
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0

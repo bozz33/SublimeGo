@@ -1,0 +1,85 @@
+package atoms
+
+templ Table() {
+	<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+		<table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+			{ children... }
+		</table>
+	</div>
+}
+
+templ TableHeader(headers []string) {
+	<thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+		<tr>
+			for _, h := range headers {
+				<th scope="col" class="px-6 py-3">{ h }</th>
+			}
+		</tr>
+	</thead>
+}
+
+templ TableHeaderWithCheckbox(headers []string) {
+	<thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+		<tr>
+			<th scope="col" class="p-4">
+				<div class="flex items-center">
+					<input 
+						id="checkbox-all" 
+						type="checkbox" 
+						class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+					/>
+					<label for="checkbox-all" class="sr-only">checkbox</label>
+				</div>
+			</th>
+			for _, h := range headers {
+				<th scope="col" class="px-6 py-3">{ h }</th>
+			}
+		</tr>
+	</thead>
+}
+
+templ TableBody() {
+	<tbody>
+		{ children... }
+	</tbody>
+}
+
+templ TableRow() {
+	<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+		{ children... }
+	</tr>
+}
+
+templ TableRowWithCheckbox(id string) {
+	<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+		<td class="w-4 p-4">
+			<div class="flex items-center">
+				<input 
+					id={ "checkbox-" + id }
+					type="checkbox" 
+					class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+				/>
+				<label for={ "checkbox-" + id } class="sr-only">checkbox</label>
+			</div>
+		</td>
+		{ children... }
+	</tr>
+}
+
+templ TableCell() {
+	<td class="px-6 py-4">
+		{ children... }
+	</td>
+}
+
+templ TableCellBold() {
+	<th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+		{ children... }
+	</th>
+}
+
+templ TableActions() {
+	<td class="px-6 py-4 flex items-center gap-2">
+		{ children... }
+	</td>
+}
