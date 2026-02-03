@@ -1,0 +1,56 @@
+package atoms
+
+type ButtonGroupItem struct {
+	Text     string
+	Href     string
+	Active   bool
+	Disabled bool
+}
+
+type ButtonGroupProps struct {
+	Items []ButtonGroupItem
+}
+
+// ButtonGroup - Groupe de boutons Flowbite
+templ ButtonGroup(props ButtonGroupProps) {
+	<div class="inline-flex rounded-md shadow-sm" role="group">
+		for i, item := range props.Items {
+			if item.Href != "" {
+				<a 
+					href={ templ.SafeURL(item.Href) }
+					class={ buttonGroupItemClasses(i, len(props.Items), item.Active, item.Disabled) }
+				>
+					{ item.Text }
+				</a>
+			} else {
+				<button 
+					type="button" 
+					class={ buttonGroupItemClasses(i, len(props.Items), item.Active, item.Disabled) }
+					disabled?={ item.Disabled }
+				>
+					{ item.Text }
+				</button>
+			}
+		}
+	</div>
+}
+
+func buttonGroupItemClasses(index, total int, active, disabled bool) string {
+	base := "px-4 py-2 text-sm font-medium border border-gray-200 dark:border-gray-700"
+	
+	// Position
+	if index == 0 {
+		base += " rounded-s-lg"
+	} else if index == total-1 {
+		base += " rounded-e-lg"
+	}
+	
+	// État
+	if disabled {
+		return base + " text-gray-400 bg-gray-100 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500"
+	}
+	if active {
+		return base + " text-white bg-blue-700 dark:bg-blue-600"
+	}
+	return base + " text-gray-900 bg-white hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white"
+}

@@ -8,10 +8,13 @@ package dashboard
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-// ⚠️ Vérifie bien que ce chemin correspond à ton go.mod (première ligne du fichier go.mod)
-import "github.com/bozz33/SublimeGo/pkg/ui/layouts"
+import (
+	"github.com/bozz33/SublimeGo/pkg/ui/layouts"
+	"github.com/bozz33/SublimeGo/pkg/widget"
+	"github.com/bozz33/SublimeGo/views/widgets"
+)
 
-func Index() templ.Component {
+func Index(dashboardWidgets []widget.Widget) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -44,7 +47,54 @@ func Index() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"p-10\"><h1 class=\"text-4xl font-bold text-blue-600 mb-4\">🚀 SublimeGo Fonctionne !</h1><p class=\"text-lg text-gray-700 border-l-4 border-blue-600 pl-4\">Le moteur de template est correctement configuré.<br>Ceci est le contenu injecté dans le layout de base.</p><button class=\"mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition\">Un bouton Tailwind</button></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"px-4 sm:px-6 lg:px-8 py-8\"><h1 class=\"text-2xl font-semibold text-gray-900 dark:text-white mb-8\">Tableau de bord</h1>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if len(dashboardWidgets) == 0 {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<!-- Empty state --> <div class=\"flex flex-col items-center justify-center py-16 px-4\"><div class=\"w-16 h-16 mb-4 text-gray-400 dark:text-gray-600\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-900 dark:text-white mb-2\">Bienvenue sur SublimeGo</h2><p class=\"text-gray-600 dark:text-gray-400 text-center max-w-md\">Votre tableau de bord est prêt. Ajoutez des widgets pour personnaliser cette page.</p></div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				for _, w := range dashboardWidgets {
+					if stats, ok := w.(*widget.StatsWidget); ok {
+						templ_7745c5c3_Err = widgets.Stats(stats).Render(ctx, templ_7745c5c3_Buffer)
+						if templ_7745c5c3_Err != nil {
+							return templ_7745c5c3_Err
+						}
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, " <div class=\"grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6\"><div class=\"lg:col-span-2\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				for _, w := range dashboardWidgets {
+					if chart, ok := w.(*widget.ChartWidget); ok && chart.Type == "area" {
+						templ_7745c5c3_Err = widgets.Chart(chart).Render(ctx, templ_7745c5c3_Buffer)
+						if templ_7745c5c3_Err != nil {
+							return templ_7745c5c3_Err
+						}
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><div class=\"lg:col-span-1\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				for _, w := range dashboardWidgets {
+					if chart, ok := w.(*widget.ChartWidget); ok && chart.Type == "donut" {
+						templ_7745c5c3_Err = widgets.Chart(chart).Render(ctx, templ_7745c5c3_Buffer)
+						if templ_7745c5c3_Err != nil {
+							return templ_7745c5c3_Err
+						}
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -1,0 +1,33 @@
+name: Go Quality Check
+
+on:
+  push:
+    branches: [ "main", "SublimeGo-Dev" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.24.0'
+
+    - name: Install dependencies
+      run: go mod download
+
+    - name: Verify Code Generation (Ent & Templ)
+      run: |
+        go install github.com/a-h/templ/cmd/templ@latest
+        templ generate
+        go generate ./...
+
+    - name: Build
+      run: go build -v ./cmd/sublimego
+
+    - name: Test
+      run: go test -v ./...

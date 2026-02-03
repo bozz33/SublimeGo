@@ -2,8 +2,29 @@
 
 package ent
 
+import (
+	"time"
+
+	"github.com/bozz33/SublimeGo/internal/ent/schema"
+	"github.com/bozz33/SublimeGo/internal/ent/user"
+)
+
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	userFields := schema.User{}.Fields()
+	_ = userFields
+	// userDescRole is the schema descriptor for role field.
+	userDescRole := userFields[3].Descriptor()
+	// user.DefaultRole holds the default value on creation for the role field.
+	user.DefaultRole = userDescRole.Default.(string)
+	// userDescIsSystem is the schema descriptor for is_system field.
+	userDescIsSystem := userFields[4].Descriptor()
+	// user.DefaultIsSystem holds the default value on creation for the is_system field.
+	user.DefaultIsSystem = userDescIsSystem.Default.(bool)
+	// userDescCreatedAt is the schema descriptor for created_at field.
+	userDescCreatedAt := userFields[5].Descriptor()
+	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
+	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
 }

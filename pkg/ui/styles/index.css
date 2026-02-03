@@ -1,0 +1,64 @@
+/* ============================================
+   SublimeGo UI Framework
+   Flowbite + TailAdmin Style
+   ============================================ */
+
+@import "tailwindcss";
+
+/* Sources pour le purge CSS */
+@source "../atoms/*.templ";
+@source "../layouts/*.templ";
+@source "../../../views/**/*.templ";
+
+/* ============================================
+   Theme - Couleurs TailAdmin
+   ============================================ */
+@theme inline {
+    /* Brand/Primary - TailAdmin Blue */
+    --color-brand-25: oklch(97.8% 0.014 250);
+    --color-brand-50: oklch(96% 0.02 254);
+    --color-brand-100: oklch(93% 0.04 255);
+    --color-brand-200: oklch(88% 0.07 254);
+    --color-brand-300: oklch(80% 0.12 252);
+    --color-brand-400: oklch(70% 0.17 255);
+    --color-brand-500: oklch(60% 0.22 260);
+    --color-brand-600: oklch(52% 0.24 262);
+    --color-brand-700: oklch(46% 0.22 264);
+    --color-brand-800: oklch(40% 0.18 265);
+    --color-brand-900: oklch(35% 0.14 265);
+
+    /* Success - Green */
+    --color-success-50: oklch(98% 0.02 156);
+    --color-success-100: oklch(96% 0.04 157);
+    --color-success-500: oklch(72% 0.22 150);
+    --color-success-600: oklch(63% 0.19 149);
+
+    /* Error/Danger - Red */
+    --color-error-50: oklch(97% 0.01 17);
+    --color-error-100: oklch(94% 0.03 18);
+    --color-error-500: oklch(64% 0.24 25);
+    --color-error-600: oklch(58% 0.25 27);
+
+    /* Warning - Orange */
+    --color-warning-50: oklch(99% 0.03 85);
+    --color-warning-100: oklch(97% 0.07 90);
+    --color-warning-500: oklch(80% 0.18 86);
+    --color-warning-600: oklch(70% 0.17 80);
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+@layer base {
+    :root {
+        color-scheme: light;
+    }
+    
+    :root.dark {
+        color-scheme: dark;
+    }
+    
+    body {
+        @apply antialiased;
+    }
+}

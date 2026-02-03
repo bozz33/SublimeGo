@@ -1,0 +1,162 @@
+# =============================================================================
+# SUBLIMEGO - Configuration par défaut (Development)
+# =============================================================================
+# Ce fichier contient la configuration de base pour le développement local.
+# Pour la production, créez un fichier production.yaml avec les valeurs adaptées.
+#
+# Hiérarchie de configuration (du moins prioritaire au plus prioritaire):
+# 1. Defaults (code)
+# 2. Ce fichier (config.yaml)
+# 3. Variables d'environnement (SUBLIMEGO_*)
+# 4. Flags CLI (futur)
+
+# =============================================================================
+# ENVIRONMENT
+# =============================================================================
+# Valeurs possibles: development, staging, production
+environment: development
+
+# =============================================================================
+# APPLICATION
+# =============================================================================
+app:
+  name: SublimeGo
+  version: 1.0.0
+  debug: true  # Active les logs verbeux et le mode debug
+
+# =============================================================================
+# SERVER (HTTP)
+# =============================================================================
+server:
+  host: 0.0.0.0  # Écoute sur toutes les interfaces
+  port: 8080
+  
+  # Timeouts (format: 10s, 1m, 1h)
+  read_timeout: 15s
+  write_timeout: 15s
+  idle_timeout: 60s
+  graceful_shutdown_timeout: 30s
+  
+  # Taille maximale des headers HTTP (1 MB)
+  max_header_bytes: 1048576
+  
+  # TLS/HTTPS (désactivé en dev)
+  tls:
+    enabled: false
+    # cert_file: /path/to/cert.pem
+    # key_file: /path/to/key.pem
+
+# =============================================================================
+# DATABASE
+# =============================================================================
+database:
+  # Driver: sqlite3, postgres, mysql
+  driver: sqlite3
+  
+  # URL de connexion
+  # SQLite: file:sublimego.db?_fk=1
+  # Postgres: postgres://user:pass@localhost:5432/dbname?sslmode=disable
+  # MySQL: user:pass@tcp(localhost:3306)/dbname?parseTime=true
+  url: file:sublimego.db?_fk=1
+  
+  # Pool de connexions
+  max_open_conns: 25
+  max_idle_conns: 5
+  conn_max_lifetime: 5m
+  
+  # Auto-migration (DEV ONLY - désactiver en production)
+  auto_migrate: true
+  
+  # Niveau de log SQL: debug, info, warn, error, silent
+  log_level: warn
+
+# =============================================================================
+# ENGINE (SublimeGo Admin)
+# =============================================================================
+engine:
+  # Chemin de base pour l'interface admin
+  base_path: /admin
+  
+  # Nom affiché dans l'interface
+  brand_name: SublimeGo Admin
+  
+  # Chemin vers les assets statiques
+  assets_path: /assets
+  
+  # Pagination
+  default_page_size: 15
+  max_page_size: 100
+  
+  # Auto-discovery des ressources
+  enable_auto_discovery: true
+  resources_path: internal/resources
+
+# =============================================================================
+# LOGGING
+# =============================================================================
+logging:
+  # Niveau: debug, info, warn, error
+  level: debug
+  
+  # Format: json, text
+  format: text  # text est plus lisible en dev
+  
+  # Output: stdout, stderr, file
+  output: stdout
+  
+  # Si output=file:
+  # file_path: /var/log/sublimego/app.log
+  # max_size: 100  # MB
+  # max_backups: 3
+  # max_age: 28  # days
+  
+  # Ajouter le fichier/ligne dans les logs
+  enable_caller: true
+  
+  # Ajouter la stacktrace pour les erreurs
+  enable_stacktrace: true
+
+# =============================================================================
+# SECURITY
+# =============================================================================
+security:
+  # CSRF Protection
+  enable_csrf: true
+  csrf_token_length: 32
+  
+  # CORS (Cross-Origin Resource Sharing)
+  enable_cors: true
+  allowed_origins:
+    - http://localhost:3000
+    - http://localhost:8080
+  allowed_methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - PATCH
+  
+  # Rate Limiting
+  rate_limit_enabled: true
+  rate_limit_requests: 100  # requêtes par fenêtre
+  rate_limit_window: 1m     # fenêtre de temps
+  
+  # Secret Key (CHANGER EN PRODUCTION!)
+  # Générer avec: openssl rand -hex 32
+  secret_key: dev-secret-key-change-me-in-production-min-32-chars
+
+# =============================================================================
+# FEATURES (Feature Flags)
+# =============================================================================
+features:
+  # Hot reload de la config (DEV ONLY)
+  enable_hot_reload: true
+  
+  # Métriques Prometheus
+  enable_metrics: false
+  
+  # Profiling pprof
+  enable_profiling: true
+  
+  # Documentation Swagger
+  enable_swagger: true

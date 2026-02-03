@@ -8,14 +8,13 @@ package atoms
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-// Variant: "default", "dark", "red", "green", "yellow", "indigo", "purple", "pink"
-// Size: "sm", "md"
+// Variant: "default", "primary", "danger", "success", "warning", "info", "dark"
 type BadgeProps struct {
 	Text    string
 	Variant string
-	Size    string
 }
 
+// Badge - Composant Flowbite avec style TailAdmin
 func Badge(props BadgeProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -37,18 +36,7 @@ func Badge(props BadgeProps) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var2 = []any{"font-medium rounded",
-			templ.KV("text-xs px-2.5 py-0.5", props.Size == "sm" || props.Size == ""),
-			templ.KV("text-sm px-3 py-1", props.Size == "md"),
-			templ.KV("bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300", props.Variant == "default" || props.Variant == ""),
-			templ.KV("bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300", props.Variant == "dark"),
-			templ.KV("bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300", props.Variant == "red"),
-			templ.KV("bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300", props.Variant == "green"),
-			templ.KV("bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300", props.Variant == "yellow"),
-			templ.KV("bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300", props.Variant == "indigo"),
-			templ.KV("bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300", props.Variant == "purple"),
-			templ.KV("bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300", props.Variant == "pink"),
-		}
+		var templ_7745c5c3_Var2 = []any{badgeClasses(props)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -73,7 +61,7 @@ func Badge(props BadgeProps) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(props.Text)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/ui/atoms/badge.templ`, Line: 25, Col: 14}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/ui/atoms/badge.templ`, Line: 12, Col: 14}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -85,6 +73,27 @@ func Badge(props BadgeProps) templ.Component {
 		}
 		return nil
 	})
+}
+
+func badgeClasses(props BadgeProps) string {
+	base := "text-xs font-medium px-2.5 py-0.5 rounded-full"
+
+	switch props.Variant {
+	case "primary", "blue":
+		return base + " bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+	case "danger", "red":
+		return base + " bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+	case "success", "green":
+		return base + " bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+	case "warning", "yellow":
+		return base + " bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+	case "info", "indigo":
+		return base + " bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300"
+	case "dark":
+		return base + " bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+	default:
+		return base + " bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+	}
 }
 
 var _ = templruntime.GeneratedTemplate

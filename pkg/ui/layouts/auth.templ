@@ -1,0 +1,62 @@
+package layouts
+
+// Auth est le layout pour les pages de connexion/inscription (sans sidebar)
+// Configuration hybride: Tailwind CDN + Fonts CDN + Alpine.js local
+templ Auth(title string) {
+	<!DOCTYPE html>
+	<html lang="fr" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))" :class="{ 'dark': darkMode }">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ title } - { GetPanelConfig().Name }</title>
+			
+			<!-- Favicon -->
+			if GetPanelConfig().Favicon != "" {
+				<link rel="icon" href={ GetPanelConfig().Favicon }/>
+			}
+			
+			<!-- Tailwind CSS CDN v4 -->
+			<script src="https://cdn.tailwindcss.com"></script>
+			<script>
+				tailwind.config = {
+					darkMode: 'class',
+					theme: {
+						extend: {
+							colors: {
+								primary: {
+									50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac',
+									400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d',
+									800: '#166534', 900: '#14532d'
+								}
+							},
+							fontFamily: { sans: ['Inter', 'sans-serif'] }
+						}
+					}
+				}
+			</script>
+			
+			<!-- Fonts -->
+			<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+			<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+			
+			<!-- Custom styles (local) -->
+			<link href="/assets/css/custom.css" rel="stylesheet"/>
+		
+			<!-- Alpine.js (local) -->
+			<script src="/assets/js/alpine.min.js" defer></script>
+			<style>[x-cloak] { display: none !important; }</style>
+		</head>
+		<body class="font-sans bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased min-h-screen">
+			<!-- Centered Container - Style Filament -->
+			<div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+				{ children... }
+			</div>
+			
+			<!-- Dark mode toggle -->
+			<button @click="darkMode = !darkMode" class="fixed bottom-4 right-4 p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+				<span x-show="!darkMode" class="material-icons-outlined">dark_mode</span>
+				<span x-show="darkMode" x-cloak class="material-icons-outlined">light_mode</span>
+			</button>
+		</body>
+	</html>
+}

@@ -1,0 +1,66 @@
+package atoms
+
+type RangeProps struct {
+	Name     string
+	Label    string
+	Min      string
+	Max      string
+	Value    string
+	Step     string
+	Disabled bool
+}
+
+// Range - Composant slider Flowbite
+templ Range(props RangeProps) {
+	<div class="mb-5">
+		if props.Label != "" {
+			<label for={ props.Name } class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+				{ props.Label }
+			</label>
+		}
+		<input 
+			id={ props.Name }
+			name={ props.Name }
+			type="range" 
+			min={ getDefault(props.Min, "0") }
+			max={ getDefault(props.Max, "100") }
+			value={ getDefault(props.Value, "50") }
+			step={ getDefault(props.Step, "1") }
+			disabled?={ props.Disabled }
+			class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+		/>
+	</div>
+}
+
+// RangeWithLabels - Slider avec labels min/max
+templ RangeWithLabels(props RangeProps) {
+	<div class="mb-5">
+		if props.Label != "" {
+			<label for={ props.Name } class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+				{ props.Label }
+			</label>
+		}
+		<input 
+			id={ props.Name }
+			name={ props.Name }
+			type="range" 
+			min={ getDefault(props.Min, "0") }
+			max={ getDefault(props.Max, "100") }
+			value={ getDefault(props.Value, "50") }
+			step={ getDefault(props.Step, "1") }
+			disabled?={ props.Disabled }
+			class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+		/>
+		<div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+			<span>{ getDefault(props.Min, "0") }</span>
+			<span>{ getDefault(props.Max, "100") }</span>
+		</div>
+	</div>
+}
+
+func getDefault(val, def string) string {
+	if val == "" {
+		return def
+	}
+	return val
+}

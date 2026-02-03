@@ -1,0 +1,88 @@
+package atoms
+
+type IndicatorProps struct {
+	Color    string // "gray", "blue", "green", "red", "yellow", "purple"
+	Size     string // "xs", "sm", "md", "lg", "xl"
+	Position string // "top-left", "top-right", "bottom-left", "bottom-right"
+	Ping     bool   // Animation ping
+	Count    string // Nombre à afficher (optionnel)
+}
+
+// Indicator - Composant indicateur Flowbite
+templ Indicator(props IndicatorProps) {
+	<span class={ indicatorClasses(props) }>
+		if props.Count != "" {
+			{ props.Count }
+		}
+	</span>
+}
+
+// IndicatorWithAvatar - Indicateur sur un avatar
+templ IndicatorWithAvatar(props IndicatorProps, avatarSrc string, avatarAlt string) {
+	<div class="relative">
+		<img class="w-10 h-10 rounded-full" src={ avatarSrc } alt={ avatarAlt }/>
+		<span class={ indicatorPositionClasses(props) }>
+			if props.Count != "" {
+				{ props.Count }
+			}
+		</span>
+	</div>
+}
+
+func indicatorClasses(props IndicatorProps) string {
+	base := "flex items-center justify-center rounded-full"
+	
+	// Taille
+	switch props.Size {
+	case "xs":
+		base += " w-2 h-2"
+	case "sm":
+		base += " w-2.5 h-2.5"
+	case "lg":
+		base += " w-4 h-4"
+	case "xl":
+		base += " w-5 h-5"
+	default:
+		base += " w-3 h-3"
+	}
+	
+	// Couleur
+	switch props.Color {
+	case "blue":
+		base += " bg-blue-500"
+	case "green":
+		base += " bg-green-500"
+	case "red":
+		base += " bg-red-500"
+	case "yellow":
+		base += " bg-yellow-300"
+	case "purple":
+		base += " bg-purple-500"
+	default:
+		base += " bg-gray-500"
+	}
+	
+	// Texte si count
+	if props.Count != "" {
+		base += " text-xs font-bold text-white"
+	}
+	
+	return base
+}
+
+func indicatorPositionClasses(props IndicatorProps) string {
+	base := indicatorClasses(props) + " absolute"
+	
+	switch props.Position {
+	case "top-left":
+		base += " top-0 start-0"
+	case "bottom-left":
+		base += " bottom-0 start-0"
+	case "bottom-right":
+		base += " bottom-0 end-0"
+	default:
+		base += " top-0 end-0"
+	}
+	
+	return base
+}

@@ -1,0 +1,101 @@
+package errors
+
+// Error404Data contient les données pour la page 404
+type Error404Data struct {
+	Path      string
+	RequestID string
+}
+
+// Page404 affiche la page d'erreur 404
+templ Page404(data Error404Data) {
+	<!DOCTYPE html>
+	<html lang="fr" class="h-full">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>404 - Page non trouvée</title>
+			<script src="https://cdn.tailwindcss.com"></script>
+		</head>
+		<body class="h-full bg-gray-50">
+			<div class="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+				<div class="sm:mx-auto sm:w-full sm:max-w-md">
+					<!-- Logo / Brand -->
+					<div class="flex justify-center">
+						<div class="flex items-center space-x-3">
+							<div class="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center">
+								<span class="text-white font-bold text-xl">S</span>
+							</div>
+							<span class="text-2xl font-bold text-gray-900">SublimeGo</span>
+						</div>
+					</div>
+					
+					<!-- Code d'erreur -->
+					<div class="mt-8 text-center">
+						<h1 class="text-9xl font-extrabold text-indigo-600">404</h1>
+						<h2 class="mt-4 text-3xl font-bold text-gray-900">Page non trouvée</h2>
+						<p class="mt-2 text-base text-gray-600">
+							La page que vous recherchez n'existe pas ou a été déplacée.
+						</p>
+					</div>
+					
+					<!-- Informations techniques -->
+					if data.Path != "" {
+						<div class="mt-6 bg-white rounded-lg shadow px-4 py-3">
+							<dl class="space-y-2 text-sm">
+								<div class="flex justify-between">
+									<dt class="font-medium text-gray-500">Chemin demandé:</dt>
+									<dd class="text-gray-900 font-mono">{ data.Path }</dd>
+								</div>
+								if data.RequestID != "" {
+									<div class="flex justify-between">
+										<dt class="font-medium text-gray-500">ID de requête:</dt>
+										<dd class="text-gray-900 font-mono text-xs">{ data.RequestID }</dd>
+									</div>
+								}
+							</dl>
+						</div>
+					}
+					
+					<!-- Actions -->
+					<div class="mt-8 space-y-3">
+						<a
+							href="/"
+							class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
+						>
+							<svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+								<path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+							</svg>
+							Retour à l'accueil
+						</a>
+						
+						<button
+							onclick="history.back()"
+							class="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
+						>
+							<svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+								<path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+							</svg>
+							Page précédente
+						</button>
+					</div>
+					
+					<!-- Help text -->
+					<div class="mt-6 text-center text-sm text-gray-500">
+						if data.RequestID != "" {
+							<p>
+								Si vous pensez qu'il s'agit d'une erreur,
+								<a href="/contact" class="font-medium text-indigo-600 hover:text-indigo-500">contactez le support</a>
+								avec l'ID de requête ci-dessus.
+							</p>
+						} else {
+							<p>
+								Si vous pensez qu'il s'agit d'une erreur,
+								<a href="/contact" class="font-medium text-indigo-600 hover:text-indigo-500">contactez le support</a>.
+							</p>
+						}
+					</div>
+				</div>
+			</div>
+		</body>
+	</html>
+}

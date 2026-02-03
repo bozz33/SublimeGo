@@ -1,49 +1,195 @@
 package atoms
 
-// ButtonVariant: "primary", "secondary", "danger", "ghost"
-// ButtonSize: "sm", "md", "lg"
+// ButtonVariant: "primary", "secondary", "danger", "success", "warning", "outline", "ghost", "gradient"
+// ButtonSize: "xs", "sm", "md", "lg", "xl"
 type ButtonProps struct {
-	Text    string
-	Variant string
-	Size    string
-	Type    string // "button", "submit", "reset"
-	Href    string // Si défini, rend un <a> au lieu d'un <button>
+	Text       string
+	Variant    string
+	Size       string
+	Type       string // "button", "submit", "reset"
+	Href       string // If set, renders an <a> instead of a <button>
+	Disabled   bool
+	Loading    bool   // Shows a spinner
+	Icon       string // Position: "left" or "right"
+	FullWidth  bool   // Full width
+	Class      string // Additional classes
 }
 
+// Button - Component with new design (without Flowbite)
 templ Button(props ButtonProps) {
 	if props.Href != "" {
 		<a 
 			href={ templ.SafeURL(props.Href) }
-			class={
-				"inline-flex items-center justify-center font-medium rounded-lg focus:ring-4 focus:outline-none transition-colors",
-				templ.KV("text-white bg-blue-700 hover:bg-blue-800 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800", props.Variant == "primary" || props.Variant == ""),
-				templ.KV("text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700", props.Variant == "secondary"),
-				templ.KV("text-white bg-red-700 hover:bg-red-800 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900", props.Variant == "danger"),
-				templ.KV("text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700", props.Variant == "ghost"),
-				templ.KV("px-3 py-2 text-sm", props.Size == "sm"),
-				templ.KV("px-5 py-2.5 text-sm", props.Size == "md" || props.Size == ""),
-				templ.KV("px-6 py-3 text-base", props.Size == "lg"),
-			}
+			class={ buttonClasses(props) }
 		>
+			if props.Loading {
+				@ButtonSpinner()
+			}
 			{ props.Text }
 		</a>
 	} else {
 		<button 
 			type={ getButtonType(props.Type) }
-			class={
-				"inline-flex items-center justify-center font-medium rounded-lg focus:ring-4 focus:outline-none transition-colors",
-				templ.KV("text-white bg-blue-700 hover:bg-blue-800 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800", props.Variant == "primary" || props.Variant == ""),
-				templ.KV("text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700", props.Variant == "secondary"),
-				templ.KV("text-white bg-red-700 hover:bg-red-800 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900", props.Variant == "danger"),
-				templ.KV("text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700", props.Variant == "ghost"),
-				templ.KV("px-3 py-2 text-sm", props.Size == "sm"),
-				templ.KV("px-5 py-2.5 text-sm", props.Size == "md" || props.Size == ""),
-				templ.KV("px-6 py-3 text-base", props.Size == "lg"),
-			}
+			class={ buttonClasses(props) }
+			disabled?={ props.Disabled || props.Loading }
 		>
+			if props.Loading {
+				@ButtonSpinner()
+			}
 			{ props.Text }
 		</button>
 	}
+}
+
+// ButtonWithIcon - Button with icon (slot for icon)
+templ ButtonWithIcon(props ButtonProps) {
+	if props.Href != "" {
+		<a 
+			href={ templ.SafeURL(props.Href) }
+			class={ buttonClasses(props) }
+		>
+			if props.Loading {
+				@ButtonSpinner()
+			} else {
+				{ children... }
+			}
+			<span>{ props.Text }</span>
+		</a>
+	} else {
+		<button 
+			type={ getButtonType(props.Type) }
+			class={ buttonClasses(props) }
+			disabled?={ props.Disabled || props.Loading }
+		>
+			if props.Loading {
+				@ButtonSpinner()
+			} else {
+				{ children... }
+			}
+			<span>{ props.Text }</span>
+		</button>
+	}
+}
+
+// ButtonSpinner - Spinner for loading state
+templ ButtonSpinner() {
+	<svg class="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+		<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+		<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+	</svg>
+}
+
+// SimpleIconButton - Icon-only button (simplified version)
+templ SimpleIconButton(props ButtonProps) {
+	<button 
+		type={ getButtonType(props.Type) }
+		class={ iconButtonClasses(props) }
+		disabled?={ props.Disabled }
+		title={ props.Text }
+	>
+		{ children... }
+	</button>
+}
+
+func buttonClasses(props ButtonProps) string {
+	// Base classes - new design with rounded-xl
+	base := "inline-flex items-center justify-center gap-2 font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900 btn-transition"
+	
+	// Size
+	size := ""
+	switch props.Size {
+	case "xs":
+		size = "px-3 py-1.5 text-xs"
+	case "sm":
+		size = "px-3.5 py-2 text-sm"
+	case "lg":
+		size = "px-6 py-3 text-base"
+	case "xl":
+		size = "px-8 py-4 text-lg"
+	default: // md
+		size = "px-4 py-2.5 text-sm"
+	}
+	
+	// Variant - New design with primary colors (green)
+	variant := ""
+	switch props.Variant {
+	case "secondary":
+		variant = "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:ring-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+	case "danger":
+		variant = "text-white bg-red-500 hover:bg-red-600 focus:ring-red-500 dark:bg-red-600 dark:hover:bg-red-700"
+	case "success":
+		variant = "text-white bg-green-500 hover:bg-green-600 focus:ring-green-500 dark:bg-green-600 dark:hover:bg-green-700"
+	case "warning":
+		variant = "text-white bg-amber-500 hover:bg-amber-600 focus:ring-amber-500 dark:bg-amber-600 dark:hover:bg-amber-700"
+	case "info":
+		variant = "text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 dark:bg-blue-600 dark:hover:bg-blue-700"
+	case "outline":
+		variant = "text-primary-600 bg-transparent border border-primary-500 hover:bg-primary-50 focus:ring-primary-500 dark:text-primary-400 dark:border-primary-400 dark:hover:bg-primary-900/20"
+	case "outline-danger":
+		variant = "text-red-600 bg-transparent border border-red-500 hover:bg-red-50 focus:ring-red-500 dark:text-red-400 dark:border-red-400 dark:hover:bg-red-900/20"
+	case "ghost":
+		variant = "text-gray-700 bg-transparent hover:bg-gray-100 focus:ring-gray-300 dark:text-gray-300 dark:hover:bg-gray-800"
+	case "ghost-danger":
+		variant = "text-red-600 bg-transparent hover:bg-red-50 focus:ring-red-300 dark:text-red-400 dark:hover:bg-red-900/20"
+	case "gradient":
+		variant = "text-white bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 focus:ring-primary-500 shadow-lg shadow-primary-500/25"
+	case "link":
+		variant = "text-primary-600 bg-transparent hover:text-primary-700 hover:underline focus:ring-0 dark:text-primary-400 dark:hover:text-primary-300 px-0"
+	default: // primary
+		variant = "text-white bg-primary-500 hover:bg-primary-600 focus:ring-primary-500 dark:bg-primary-600 dark:hover:bg-primary-700"
+	}
+	
+	// Full width
+	width := ""
+	if props.FullWidth {
+		width = "w-full"
+	}
+	
+	// Disabled state
+	disabled := ""
+	if props.Disabled || props.Loading {
+		disabled = "opacity-50 cursor-not-allowed pointer-events-none"
+	}
+	
+	// Custom classes
+	custom := props.Class
+	
+	return base + " " + size + " " + variant + " " + width + " " + disabled + " " + custom
+}
+
+func iconButtonClasses(props ButtonProps) string {
+	base := "inline-flex items-center justify-center rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+	
+	// Size
+	size := ""
+	switch props.Size {
+	case "xs":
+		size = "p-1"
+	case "sm":
+		size = "p-1.5"
+	case "lg":
+		size = "p-3"
+	default: // md
+		size = "p-2"
+	}
+	
+	// Variant
+	variant := ""
+	switch props.Variant {
+	case "danger":
+		variant = "text-red-500 hover:bg-red-100 focus:ring-red-500 dark:hover:bg-red-900/30"
+	case "ghost":
+		variant = "text-gray-500 hover:bg-gray-100 focus:ring-gray-300 dark:text-gray-400 dark:hover:bg-gray-800"
+	default:
+		variant = "text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:ring-primary-500 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+	}
+	
+	disabled := ""
+	if props.Disabled {
+		disabled = "opacity-50 cursor-not-allowed"
+	}
+	
+	return base + " " + size + " " + variant + " " + disabled
 }
 
 func getButtonType(t string) string {

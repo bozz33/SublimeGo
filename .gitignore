@@ -1,5 +1,39 @@
-# Sécurité : ne jamais commiter les clés secrètes
+# --- Sécurité (CRITIQUE) ---
 .env
-bin/
-tmp/
+secrets.yaml
+
+# --- Binaires et Build ---
+/bin/
+/dist/
+/tmp/
+*.exe
+*.dll
+*.so
+*.dylib
+sublimego
+main
+
+# --- Fichiers spécifiques au projet ---
+filament/
 dev.db
+sublimego.db
+*.db-journal
+test_step1.ps1
+
+# --- Tests et Logs ---
+coverage/
+*.out
+*.test
+*.prof
+*.log
+
+# --- IDE et Système (Toujours exclure ceci) ---
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# --- Documentation temporaire ---
+deploy-github.txt
+Test_guide.md

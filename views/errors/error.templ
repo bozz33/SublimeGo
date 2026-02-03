@@ -1,0 +1,106 @@
+package errors
+
+import "fmt"
+
+// ErrorPageData contient les données pour la page d'erreur générique
+type ErrorPageData struct {
+	Code       string
+	Message    string
+	StatusCode int
+	RequestID  string
+	Path       string
+	Stack      string
+	ShowStack  bool
+}
+
+// PageGeneric affiche une page d'erreur générique
+templ PageGeneric(data ErrorPageData) {
+	<!DOCTYPE html>
+	<html lang="fr" class="h-full">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ fmt.Sprintf("%d - %s", data.StatusCode, data.Code) }</title>
+			<script src="https://cdn.tailwindcss.com"></script>
+		</head>
+		<body class="h-full bg-gray-50">
+			<div class="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+				<div class="sm:mx-auto sm:w-full sm:max-w-md">
+					<!-- Logo / Brand -->
+					<div class="flex justify-center">
+						<div class="flex items-center space-x-3">
+							<div class="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center">
+								<span class="text-white font-bold text-xl">S</span>
+							</div>
+							<span class="text-2xl font-bold text-gray-900">SublimeGo</span>
+						</div>
+					</div>
+					
+					<!-- Code d'erreur -->
+					<div class="mt-8 text-center">
+						<h1 class="text-9xl font-extrabold text-gray-600">{ fmt.Sprintf("%d", data.StatusCode) }</h1>
+						<h2 class="mt-4 text-3xl font-bold text-gray-900">{ data.Code }</h2>
+						<p class="mt-2 text-base text-gray-600">
+							if data.Message != "" {
+								{ data.Message }
+							} else {
+								Une erreur s'est produite.
+							}
+						</p>
+					</div>
+					
+					<!-- Informations techniques -->
+					<div class="mt-6 bg-white rounded-lg shadow px-4 py-3">
+						<dl class="space-y-2 text-sm">
+							<div class="flex justify-between">
+								<dt class="font-medium text-gray-500">Code HTTP:</dt>
+								<dd class="text-gray-900 font-mono">{ fmt.Sprintf("%d", data.StatusCode) }</dd>
+							</div>
+							if data.Path != "" {
+								<div class="flex justify-between">
+									<dt class="font-medium text-gray-500">Chemin:</dt>
+									<dd class="text-gray-900 font-mono">{ data.Path }</dd>
+								</div>
+							}
+							if data.RequestID != "" {
+								<div class="flex justify-between">
+									<dt class="font-medium text-gray-500">ID de requête:</dt>
+									<dd class="text-gray-900 font-mono text-xs">{ data.RequestID }</dd>
+								</div>
+							}
+						</dl>
+					</div>
+					
+					<!-- Stack trace (dev only) -->
+					if data.ShowStack && data.Stack != "" {
+						<div class="mt-4 bg-gray-900 rounded-lg shadow overflow-hidden">
+							<div class="px-4 py-3 bg-gray-800">
+								<h3 class="text-sm font-semibold text-white">Stack Trace</h3>
+							</div>
+							<div class="px-4 py-3 overflow-x-auto">
+								<pre class="text-xs text-gray-300 whitespace-pre-wrap font-mono">{ data.Stack }</pre>
+							</div>
+						</div>
+					}
+					
+					<!-- Actions -->
+					<div class="mt-8 space-y-3">
+						<a
+							href="/"
+							class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition"
+						>
+							Retour à l'accueil
+						</a>
+						
+						<button
+							onclick="history.back()"
+							class="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition"
+						>
+							Page précédente
+						</button>
+					</div>
+				</div>
+			</div>
+		</body>
+	</html>
+}

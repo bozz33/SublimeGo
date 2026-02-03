@@ -1,0 +1,126 @@
+package {{.PackageName}}
+
+import (
+	"context"
+	"strconv"
+
+	"github.com/a-h/templ"
+	"github.com/bozz33/SublimeGo/internal/ent"
+	"github.com/bozz33/SublimeGo/pkg/engine"
+	"github.com/bozz33/SublimeGo/views/generics"
+)
+
+// form returns the create/edit form component
+func (r *{{.TypeName}}) form(ctx context.Context, item any) templ.Component {
+	var entity *ent.{{.EntTypeName}}
+	
+	// Cast item to typed entity
+	if item != nil {
+		entity, _ = item.(*ent.{{.EntTypeName}})
+	}
+
+	// Form configuration
+	formState := engine.FormState{
+		Title:      r.Label(),
+		BackURL:    "/" + r.Slug(),
+		SubmitURL:  "/" + r.Slug(),
+		SubmitText: "Save",
+	}
+	
+	// If editing (item exists), update URLs
+	if entity != nil {
+		formState.Title = "Edit " + r.Label()
+		formState.SubmitURL = "/" + r.Slug() + "/" + strconv.Itoa(entity.ID)
+	}
+
+	// Form fields definition
+	fields := []engine.Field{
+		{
+			Type:        "text",
+			Name:        "name",
+			Label:       "Name",
+			Required:    true,
+			Placeholder: "Enter name",
+			Value:       getStringValue(entity, func(e *ent.{{.EntTypeName}}) string { return e.Name }),
+		},
+		
+		// TODO: Add more fields here
+		// Examples:
+		
+		// Text field
+		// {
+		// 	Type:        "text",
+		// 	Name:        "email",
+		// 	Label:       "Email",
+		// 	Required:    false,
+		// 	Placeholder: "email@example.com",
+		// 	Value:       getStringValue(entity, func(e *ent.{{.EntTypeName}}) string { return e.Email }),
+		// },
+		
+		// Number field
+		// {
+		// 	Type:     "number",
+		// 	Name:     "quantity",
+		// 	Label:    "Quantity",
+		// 	Required: false,
+		// 	Value:    getIntValue(entity, func(e *ent.{{.EntTypeName}}) int { return e.Quantity }),
+		// },
+		
+		// Checkbox field
+		// {
+		// 	Type:    "checkbox",
+		// 	Name:    "is_active",
+		// 	Label:   "Active",
+		// 	Checked: getBoolValue(entity, func(e *ent.{{.EntTypeName}}) bool { return e.IsActive }),
+		// },
+		
+		// Textarea field
+		// {
+		// 	Type:        "textarea",
+		// 	Name:        "description",
+		// 	Label:       "Description",
+		// 	Placeholder: "Describe...",
+		// 	Rows:        5,
+		// 	Value:       getStringValue(entity, func(e *ent.{{.EntTypeName}}) string { return e.Description }),
+		// },
+		
+		// Select field
+		// {
+		// 	Type:    "select",
+		// 	Name:    "category",
+		// 	Label:   "Category",
+		// 	Options: []engine.Option{
+		// 		{Value: "1", Label: "Category A"},
+		// 		{Value: "2", Label: "Category B"},
+		// 	},
+		// 	Value: getIntValue(entity, func(e *ent.{{.EntTypeName}}) int { return e.CategoryID }),
+		// },
+	}
+	
+	formState.Fields = fields
+	
+	return generics.Form(formState)
+}
+
+// Helpers to extract values from entities
+
+func getStringValue(entity *ent.{{.EntTypeName}}, fn func(*ent.{{.EntTypeName}}) string) string {
+	if entity == nil {
+		return ""
+	}
+	return fn(entity)
+}
+
+func getIntValue(entity *ent.{{.EntTypeName}}, fn func(*ent.{{.EntTypeName}}) int) string {
+	if entity == nil {
+		return ""
+	}
+	return strconv.Itoa(fn(entity))
+}
+
+func getBoolValue(entity *ent.{{.EntTypeName}}, fn func(*ent.{{.EntTypeName}}) bool) bool {
+	if entity == nil {
+		return false
+	}
+	return fn(entity)
+}

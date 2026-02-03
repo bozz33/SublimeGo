@@ -1,0 +1,224 @@
+package generics
+
+import (
+	"fmt"
+	"github.com/bozz33/SublimeGo/pkg/form"
+)
+
+templ Form(f *form.Form) {
+	<form method="POST" class="space-y-6">
+		for _, component := range f.Schema {
+			@RenderComponent(component)
+		}
+		<div class="flex items-center justify-end gap-x-4 border-t border-gray-900/10 px-4 py-4 sm:px-8 bg-gray-50 dark:bg-gray-800">
+			<button type="button" class="text-sm font-semibold leading-6 text-gray-900 dark:text-white">Annuler</button>
+			<button type="submit" class="rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500">
+				Enregistrer
+			</button>
+		</div>
+	</form>
+}
+
+templ Section(s *form.Section) {
+	<div class="bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-900/5 dark:ring-gray-700 sm:rounded-xl my-6">
+		if s.Heading != "" {
+			<div class="px-4 py-6 sm:px-6 border-b border-gray-900/5 dark:border-gray-700">
+				<h2 class="text-base font-semibold leading-7 text-gray-900 dark:text-white">{ s.Heading }</h2>
+				if s.Description != "" {
+					<p class="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400">{ s.Description }</p>
+				}
+			</div>
+		}
+		<div class="px-4 py-6 sm:p-8">
+			<div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+				for _, child := range s.Components {
+					<div class="col-span-full">
+						@RenderComponent(child)
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+}
+
+templ Grid(g *form.Grid) {
+	<div class={ fmt.Sprintf("grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-%d", g.Columns) }>
+		for _, child := range g.Components {
+			<div class="col-span-1">
+				@RenderComponent(child)
+			</div>
+		}
+	</div>
+}
+
+templ Tabs(t *form.Tabs) {
+	<div class="border-b border-gray-200 dark:border-gray-700">
+		<nav class="flex space-x-8">
+			for i, tab := range t.TabItems {
+				<button 
+					type="button"
+					class={ "py-4 px-1 border-b-2 font-medium text-sm", templ.KV("border-primary-500 text-primary-600", i == 0), templ.KV("border-transparent text-gray-500 hover:text-gray-700", i != 0) }
+				>
+					{ tab.Label }
+				</button>
+			}
+		</nav>
+	</div>
+	<div class="mt-6">
+		for i, tab := range t.TabItems {
+			if i == 0 {
+				for _, child := range tab.Components {
+					@RenderComponent(child)
+				}
+			}
+		}
+	</div>
+}
+
+templ TextInput(f *form.TextInput) {
+	<div>
+		<label for={ f.Name } class="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+			{ f.LabelStr }
+			if f.BaseField.Required {
+				<span class="text-red-500">*</span>
+			}
+		</label>
+		<div class="mt-2">
+			<input 
+				type={ f.Type } 
+				name={ f.Name } 
+				id={ f.Name }
+				value={ getValueStr(f.Value) }
+				placeholder={ f.BaseField.Placeholder }
+				if f.BaseField.Required {
+					required
+				}
+				if f.BaseField.Disabled {
+					disabled
+				}
+				class="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm"
+			/>
+		</div>
+		if f.HelpText != "" {
+			<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{ f.HelpText }</p>
+		}
+	</div>
+}
+
+templ Textarea(t *form.Textarea) {
+	<div>
+		<label for={ t.Name } class="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+			{ t.LabelStr }
+			if t.BaseField.Required {
+				<span class="text-red-500">*</span>
+			}
+		</label>
+		<div class="mt-2">
+			<textarea 
+				name={ t.Name } 
+				id={ t.Name }
+				rows={ fmt.Sprintf("%d", t.RowCount) }
+				placeholder={ t.BaseField.Placeholder }
+				if t.BaseField.Required {
+					required
+				}
+				if t.BaseField.Disabled {
+					disabled
+				}
+				class="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm"
+			>
+				{ getValueStr(t.Value) }
+			</textarea>
+		</div>
+		if t.HelpText != "" {
+			<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{ t.HelpText }</p>
+		}
+	</div>
+}
+
+templ SelectField(s *form.Select) {
+	<div>
+		<label for={ s.Name } class="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+			{ s.LabelStr }
+			if s.BaseField.Required {
+				<span class="text-red-500">*</span>
+			}
+		</label>
+		<div class="mt-2">
+			<select 
+				id={ s.Name } 
+				name={ s.Name }
+				if s.BaseField.Required {
+					required
+				}
+				if s.BaseField.Disabled {
+					disabled
+				}
+				class="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm"
+			>
+				<option value="">Selectionner...</option>
+				for _, opt := range s.Options {
+					<option value={ opt.Value } selected?={ getValueStr(s.Value) == opt.Value }>{ opt.Label }</option>
+				}
+			</select>
+		</div>
+		if s.HelpText != "" {
+			<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{ s.HelpText }</p>
+		}
+	</div>
+}
+
+templ CheckboxField(c *form.Checkbox) {
+	<div class="flex items-center">
+		<input 
+			type="checkbox" 
+			id={ c.Name } 
+			name={ c.Name }
+			value="true"
+			if isChecked(c.Value) {
+				checked
+			}
+			if c.BaseField.Disabled {
+				disabled
+			}
+			class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
+		/>
+		<label for={ c.Name } class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+			{ c.LabelStr }
+		</label>
+	</div>
+}
+
+templ FileUploadField(f *form.FileUpload) {
+	<div>
+		<label for={ f.Name } class="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+			{ f.LabelStr }
+			if f.BaseField.Required {
+				<span class="text-red-500">*</span>
+			}
+		</label>
+		<div class="mt-2">
+			<input 
+				type="file" 
+				name={ f.Name } 
+				id={ f.Name }
+				if f.AcceptTypes != "" {
+					accept={ f.AcceptTypes }
+				}
+				if f.AllowMultiple {
+					multiple
+				}
+				if f.BaseField.Required {
+					required
+				}
+				if f.BaseField.Disabled {
+					disabled
+				}
+				class="block w-full text-sm text-gray-900 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700"
+			/>
+		</div>
+		if f.HelpText != "" {
+			<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{ f.HelpText }</p>
+		}
+	</div>
+}

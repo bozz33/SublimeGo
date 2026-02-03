@@ -1,34 +1,44 @@
-# Makefile
+# Makefile - SublimeGo
+# Multi-plateforme: Windows, Linux, macOS
+# Sans dependance Node.js ou npm
+
 PROJECT_NAME := SublimeGo
 
-.PHONY: all build run test clean lint audit css
+.PHONY: all build run test clean lint css css-watch tailwind-download generate dev
 
 all: build
 
-# Installation des outils (Air pour le hot reload, Templ pour les vues)
+# Installation des outils Go
 install-tools:
 	go install github.com/air-verse/air@latest
 	go install github.com/a-h/templ/cmd/templ@latest
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
-# Génération du code (Templ + Ent plus tard)
+# Telecharger Tailwind CSS Standalone CLI (une seule fois)
+tailwind-download:
+	go run ./cmd/tools/tailwind download
+
+# Compilation CSS avec Tailwind (production - minifie)
+css:
+	go run ./cmd/tools/tailwind build
+
+# Compilation CSS en mode watch (developpement)
+css-watch:
+	go run ./cmd/tools/tailwind watch
+
+# Generation du code (Templ)
 generate:
 	templ generate
-	# go generate ./internal/ent/... (on décommentera plus tard)
 
-# Compilation CSS avec Tailwind (mode développement)
-css:
-	.\tailwindcss.exe -i .\pkg\ui\assets\input.css -o .\pkg\ui\assets\output.css --watch
-
-# Lancer en mode développement (Hot Reload)
+# Lancer en mode developpement (Hot Reload)
 dev: generate
 	air
 
 # Construire le binaire final (Production)
-build: generate
-	go build -o bin/$(PROJECT_NAME) cmd/app/main.go
+build: generate css
+	go build -o bin/$(PROJECT_NAME) ./cmd/sublimego
 
-# Vérifier la qualité du code (Strict)
+# Verifier la qualite du code
 lint:
 	golangci-lint run
 
@@ -36,3 +46,4 @@ lint:
 clean:
 	rm -rf bin
 	rm -rf tmp
+	rm -rf tools

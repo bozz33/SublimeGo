@@ -1,0 +1,16 @@
+package icons
+
+// Icon component to display an SVG icon
+templ IconComponent(name string) {
+	@templ.Raw(Get(name).String())
+}
+
+// IconWithClass component with custom class
+templ IconWithClass(name string, class string) {
+	@templ.Raw(Get(name).WithClass(class))
+}
+
+// IconWithSize component with specific size (4, 5, 6, 8, etc.)
+templ IconWithSize(name string, size string) {
+	@templ.Raw(Get(name).WithSize(size))
+}

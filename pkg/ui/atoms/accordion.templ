@@ -1,0 +1,84 @@
+package atoms
+
+type AccordionItem struct {
+	ID      string
+	Title   string
+	Open    bool
+}
+
+type AccordionProps struct {
+	Items []AccordionItem
+}
+
+// Accordion - Composant accordéon Flowbite
+templ Accordion(props AccordionProps) {
+	<div id="accordion-collapse" data-accordion="collapse">
+		for i, item := range props.Items {
+			<h2 id={ "accordion-heading-" + item.ID }>
+				<button 
+					type="button" 
+					class={ accordionButtonClasses(i == 0, item.Open) }
+					data-accordion-target={ "#accordion-body-" + item.ID }
+					aria-expanded={ boolStr(item.Open) }
+					aria-controls={ "accordion-body-" + item.ID }
+				>
+					<span>{ item.Title }</span>
+					<svg 
+						data-accordion-icon 
+						class={ "w-3 h-3 shrink-0", templ.KV("rotate-180", item.Open) }
+						aria-hidden="true" 
+						xmlns="http://www.w3.org/2000/svg" 
+						fill="none" 
+						viewBox="0 0 10 6"
+					>
+						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+					</svg>
+				</button>
+			</h2>
+			<div 
+				id={ "accordion-body-" + item.ID }
+				class={ templ.KV("hidden", !item.Open) }
+				aria-labelledby={ "accordion-heading-" + item.ID }
+			>
+				<div class="p-5 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+					{ children... }
+				</div>
+			</div>
+		}
+	</div>
+}
+
+// AccordionSimple - Version simple sans JS
+templ AccordionSimple(title string, open bool) {
+	<details class="group border border-gray-200 rounded-lg dark:border-gray-700" open?={ open }>
+		<summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50 dark:bg-gray-800 rounded-t-lg group-open:rounded-b-none">
+			<span class="font-medium text-gray-900 dark:text-white">{ title }</span>
+			<svg class="w-3 h-3 text-gray-500 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 10 6">
+				<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+			</svg>
+		</summary>
+		<div class="p-4 border-t border-gray-200 dark:border-gray-700">
+			{ children... }
+		</div>
+	</details>
+}
+
+func accordionButtonClasses(isFirst bool, isOpen bool) string {
+	base := "flex items-center justify-between w-full p-5 font-medium text-gray-500 border border-gray-200 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3"
+	if isFirst {
+		base += " rounded-t-xl border-b-0"
+	} else {
+		base += " border-b-0"
+	}
+	if isOpen {
+		base += " bg-gray-100 dark:bg-gray-800"
+	}
+	return base
+}
+
+func boolStr(b bool) string {
+	if b {
+		return "true"
+	}
+	return "false"
+}

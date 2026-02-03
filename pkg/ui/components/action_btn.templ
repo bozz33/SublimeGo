@@ -1,0 +1,33 @@
+package components
+
+import (
+	"github.com/bozz33/SublimeGo/pkg/actions"
+	"fmt"
+)
+
+templ ActionButton(a *actions.Action, item any) {
+	if a.RequiresConfirmation {
+		<button 
+			type="button"
+			@click={ fmt.Sprintf("$dispatch('open-delete-modal', { url: '%s', title: '%s', desc: '%s' })", a.UrlResolver(item), a.ModalTitle, a.ModalDescription) }
+			class={ "text-sm font-medium hover:underline", getActionColorClass(a.Color) }
+		>
+			{ a.Label }
+		</button>
+	} else {
+		<a href={ templ.SafeURL(a.UrlResolver(item)) } class={ "text-sm font-medium hover:underline", getActionColorClass(a.Color) }>
+			{ a.Label }
+		</a>
+	}
+}
+
+func getActionColorClass(color string) string {
+	switch color {
+	case "danger":
+		return "text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+	case "primary":
+		return "text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300"
+	default:
+		return "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300"
+	}
+}

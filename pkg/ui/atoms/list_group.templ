@@ -1,0 +1,64 @@
+package atoms
+
+type ListGroupItem struct {
+	Text     string
+	Href     string
+	Icon     string
+	Badge    string
+	Active   bool
+	Disabled bool
+}
+
+type ListGroupProps struct {
+	Items []ListGroupItem
+}
+
+// ListGroup - Composant liste groupée Flowbite
+templ ListGroup(props ListGroupProps) {
+	<ul class="w-full text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+		for i, item := range props.Items {
+			<li class={ listGroupItemWrapperClasses(i, len(props.Items)) }>
+				if item.Href != "" && !item.Disabled {
+					<a 
+						href={ templ.SafeURL(item.Href) }
+						class={ listGroupItemClasses(item.Active, item.Disabled) }
+					>
+						{ item.Text }
+						if item.Badge != "" {
+							<span class="inline-flex items-center justify-center px-2 ms-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300">
+								{ item.Badge }
+							</span>
+						}
+					</a>
+				} else {
+					<span class={ listGroupItemClasses(item.Active, item.Disabled) }>
+						{ item.Text }
+						if item.Badge != "" {
+							<span class="inline-flex items-center justify-center px-2 ms-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300">
+								{ item.Badge }
+							</span>
+						}
+					</span>
+				}
+			</li>
+		}
+	</ul>
+}
+
+func listGroupItemWrapperClasses(index, total int) string {
+	if index == total-1 {
+		return ""
+	}
+	return "border-b border-gray-200 dark:border-gray-600"
+}
+
+func listGroupItemClasses(active, disabled bool) string {
+	base := "block w-full px-4 py-2"
+	if disabled {
+		return base + " text-gray-400 cursor-not-allowed dark:text-gray-500"
+	}
+	if active {
+		return base + " text-white bg-blue-700 dark:bg-blue-600"
+	}
+	return base + " cursor-pointer hover:bg-gray-100 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:hover:bg-gray-600 dark:hover:text-white dark:focus:ring-gray-500 dark:focus:text-white"
+}

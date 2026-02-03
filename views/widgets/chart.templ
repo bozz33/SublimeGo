@@ -1,0 +1,64 @@
+package widgets
+
+import (
+	"github.com/bozz33/SublimeGo/pkg/widget"
+)
+
+templ Chart(w *widget.ChartWidget) {
+	<div class="p-6 bg-white border border-gray-100 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+		<div class="mb-4">
+			<h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">
+				{ w.Label }
+			</h3>
+		</div>
+		<div class="relative w-full" style={ "height: " + w.Height + "px" }>
+			<div id={ w.ID }></div>
+		</div>
+		<script>
+			(function() {
+				const options = {
+					series: JSON.parse('{ w.GetSeriesJSON() }'),
+					chart: {
+						type: '{ string(w.Type) }',
+						height: { w.Height },
+						fontFamily: 'Inter, sans-serif',
+						toolbar: { show: false },
+						background: 'transparent'
+					},
+					colors: JSON.parse('{ w.GetColorsJSON() }'),
+					stroke: {
+						curve: 'smooth',
+						width: 2
+					},
+					dataLabels: { enabled: false },
+					xaxis: {
+						categories: JSON.parse('{ w.GetLabelsJSON() }'),
+						axisBorder: { show: false },
+						axisTicks: { show: false },
+						labels: {
+							style: { colors: '#6b7280', fontSize: '12px' }
+						}
+					},
+					grid: {
+						borderColor: '#e5e7eb',
+						strokeDashArray: 4,
+					},
+					plotOptions: {
+						pie: {
+							donut: {
+								size: '70%',
+								labels: { show: true, total: { show: true, label: 'Total' } }
+							}
+						}
+					},
+					labels: JSON.parse('{ w.GetLabelsJSON() }')
+				};
+
+				if (document.querySelector('#{ w.ID }')) {
+					const chart = new ApexCharts(document.querySelector('#{ w.ID }'), options);
+					chart.render();
+				}
+			})();
+		</script>
+	</div>
+}

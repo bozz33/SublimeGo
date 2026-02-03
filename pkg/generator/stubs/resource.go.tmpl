@@ -1,0 +1,156 @@
+package {{.PackageName}}
+
+import (
+	"context"
+	"net/http"
+
+	"github.com/a-h/templ"
+	"github.com/bozz33/SublimeGo/internal/ent"
+	"github.com/bozz33/SublimeGo/pkg/engine"
+)
+
+// {{.TypeName}} represents the {{.Name}} resource
+type {{.TypeName}} struct {
+	db *ent.Client
+}
+
+// New creates a new instance of {{.TypeName}}
+func New(db *ent.Client) *{{.TypeName}} {
+	return &{{.TypeName}}{
+		db: db,
+	}
+}
+
+// Slug returns the URL identifier of the resource
+func (r *{{.TypeName}}) Slug() string {
+	return "{{.Slug}}"
+}
+
+// Label returns the singular display name
+func (r *{{.TypeName}}) Label() string {
+	return "{{.Label}}"
+}
+
+// PluralLabel returns the plural display name
+func (r *{{.TypeName}}) PluralLabel() string {
+	return "{{.PluralLabel}}"
+}
+
+// Icon returns the resource icon
+func (r *{{.TypeName}}) Icon() string {
+	return "{{.Icon}}"
+}
+
+// Group returns the sidebar group
+func (r *{{.TypeName}}) Group() string {
+	return "" // Empty = root, or ex: "Administration", "E-Commerce"
+}
+
+// Sort returns the display order in the menu
+func (r *{{.TypeName}}) Sort() int {
+	return 0 // Lower = higher
+}
+
+// Badge returns the notification badge
+func (r *{{.TypeName}}) Badge(ctx context.Context) string {
+	return "" // Ex: "3" for 3 notifications
+}
+
+// BadgeColor returns the badge color
+func (r *{{.TypeName}}) BadgeColor(ctx context.Context) string {
+	return "primary" // primary, danger, success, warning
+}
+
+// List retrieves all records
+func (r *{{.TypeName}}) List(ctx context.Context) ([]any, error) {
+	items, err := r.db.{{.EntTypeName}}.Query().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]any, len(items))
+	for i, item := range items {
+		result[i] = item
+	}
+	return result, nil
+}
+
+// Get retrieves a record by its ID
+func (r *{{.TypeName}}) Get(ctx context.Context, id string) (any, error) {
+	// TODO: Convert id string to int if needed
+	return nil, nil
+}
+
+// Create creates a new record
+func (r *{{.TypeName}}) Create(ctx context.Context, req *http.Request) error {
+	// TODO: Implement creation logic
+	// Example:
+	// data := make(map[string]any)
+	// data["name"] = req.FormValue("name")
+	// _, err := r.db.{{.EntTypeName}}.
+	// 	Create().
+	// 	SetName(data["name"].(string)).
+	// 	Save(ctx)
+	// return err
+	
+	return nil
+}
+
+// Update updates a record
+func (r *{{.TypeName}}) Update(ctx context.Context, id string, req *http.Request) error {
+	// TODO: Implement update logic
+	// Example:
+	// data := make(map[string]any)
+	// data["name"] = req.FormValue("name")
+	// _, err := r.db.{{.EntTypeName}}.
+	// 	UpdateOneID(id).
+	// 	SetName(data["name"].(string)).
+	// 	Save(ctx)
+	// return err
+	
+	return nil
+}
+
+// Delete deletes a record
+func (r *{{.TypeName}}) Delete(ctx context.Context, id string) error {
+	// TODO: Convert id string to int if needed
+	return nil
+}
+
+// BulkDelete deletes multiple records
+func (r *{{.TypeName}}) BulkDelete(ctx context.Context, ids []string) error {
+	// TODO: Implement bulk delete
+	return nil
+}
+
+// Table returns the list view component
+func (r *{{.TypeName}}) Table(ctx context.Context) templ.Component {
+	// Implemented in table.templ
+	return Table(ctx)
+}
+
+// Form returns the form component
+func (r *{{.TypeName}}) Form(ctx context.Context, item any) templ.Component {
+	// Implemented in form.go
+	return r.form(ctx, item)
+}
+
+// CanCreate indicates if the user can create
+func (r *{{.TypeName}}) CanCreate(ctx context.Context) bool {
+	return true
+}
+
+// CanRead indicates if the user can read
+func (r *{{.TypeName}}) CanRead(ctx context.Context) bool {
+	return true
+}
+
+// CanUpdate indicates if the user can update
+func (r *{{.TypeName}}) CanUpdate(ctx context.Context) bool {
+	return true
+}
+
+// CanDelete indicates if the user can delete
+func (r *{{.TypeName}}) CanDelete(ctx context.Context) bool {
+	return true
+}

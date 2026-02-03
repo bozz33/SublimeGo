@@ -75,3 +75,9 @@ func intToStr(i int) string {
 	}
 	return "0"
 }
+
+// Flash - Composant vide par défaut (les messages sont injectés via HTMX/JS)
+// Ce composant est appelé dans base.templ pour le conteneur initial
+templ Flash() {
+	<!-- Flash messages seront injectés ici via HTMX ou JS Toast -->
+}

@@ -7,22 +7,27 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// User holds the schema definition for the User entity.
+// User schema
 type User struct {
 	ent.Schema
 }
 
-// Fields of the User.
+// Fields du User
 func (User) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name").NotEmpty(),
-		field.String("email").Unique().NotEmpty(),
-		field.String("password").Sensitive().NotEmpty(),
+		field.String("name"),
+		field.String("email").Unique(),
+		field.String("password").Sensitive(),
+		field.String("role").Default("user"),
+
+		// Protection systeme
+		field.Bool("is_system").Default(false).Comment("True si cet user ne peut pas etre supprime"),
+
 		field.Time("created_at").Default(time.Now).Immutable(),
 	}
 }
 
-// Edges of the User.
+// Edges du User
 func (User) Edges() []ent.Edge {
 	return nil
 }

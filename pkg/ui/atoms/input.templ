@@ -3,24 +3,27 @@ package atoms
 type InputProps struct {
 	Name        string
 	Label       string
-	Type        string // "text", "email", "password", "number", etc.
+	Type        string // "text", "email", "password", "number", "tel", "url", "search", "date", "time", "datetime-local"
 	Placeholder string
 	Value       string
 	Error       string
+	Helper      string
 	Required    bool
 	Disabled    bool
+	Readonly    bool
+	Icon        string // "left" ou "right" pour indiquer la position de l'icône (slot)
+	Size        string // "sm", "md", "lg"
+	Class       string // Classes additionnelles
 }
 
+// Input - Composant avec nouveau design (sans Flowbite)
 templ Input(props InputProps) {
-	<div class="mb-5">
+	<div class="mb-4">
 		if props.Label != "" {
-			<label 
-				for={ props.Name } 
-				class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-			>
+			<label for={ props.Name } class="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
 				{ props.Label }
 				if props.Required {
-					<span class="text-red-500">*</span>
+					<span class="text-red-500 ml-0.5">*</span>
 				}
 			</label>
 		}
@@ -32,17 +35,104 @@ templ Input(props InputProps) {
 			value={ props.Value }
 			required?={ props.Required }
 			disabled?={ props.Disabled }
-			class={
-				"bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400 dark:text-white",
-				templ.KV("border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500", props.Error == ""),
-				templ.KV("border-red-500 focus:ring-red-500 focus:border-red-500 dark:border-red-500", props.Error != ""),
-				templ.KV("bg-gray-100 cursor-not-allowed dark:bg-gray-600", props.Disabled),
-			}
+			readonly?={ props.Readonly }
+			class={ inputClasses(props) }
 		/>
 		if props.Error != "" {
-			<p class="mt-2 text-sm text-red-600 dark:text-red-500">{ props.Error }</p>
+			<p class="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+				</svg>
+				{ props.Error }
+			</p>
+		} else if props.Helper != "" {
+			<p class="mt-1.5 text-sm text-gray-500 dark:text-gray-400">{ props.Helper }</p>
 		}
 	</div>
+}
+
+// InputWithIcon - Input avec icône (slot pour l'icône)
+templ InputWithIcon(props InputProps) {
+	<div class="mb-4">
+		if props.Label != "" {
+			<label for={ props.Name } class="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+				{ props.Label }
+				if props.Required {
+					<span class="text-red-500 ml-0.5">*</span>
+				}
+			</label>
+		}
+		<div class="relative">
+			if props.Icon == "left" || props.Icon == "" {
+				<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+					{ children... }
+				</div>
+			}
+			<input 
+				type={ getInputType(props.Type) }
+				id={ props.Name }
+				name={ props.Name }
+				placeholder={ props.Placeholder }
+				value={ props.Value }
+				required?={ props.Required }
+				disabled?={ props.Disabled }
+				readonly?={ props.Readonly }
+				class={ inputWithIconClasses(props) }
+			/>
+			if props.Icon == "right" {
+				<div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
+					{ children... }
+				</div>
+			}
+		</div>
+		if props.Error != "" {
+			<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{ props.Error }</p>
+		} else if props.Helper != "" {
+			<p class="mt-1.5 text-sm text-gray-500 dark:text-gray-400">{ props.Helper }</p>
+		}
+	</div>
+}
+
+func inputClasses(props InputProps) string {
+	// Base classes - nouveau design avec rounded-xl
+	base := "block w-full rounded-xl border text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-0"
+	
+	// Size
+	size := ""
+	switch props.Size {
+	case "sm":
+		size = "px-3 py-2"
+	case "lg":
+		size = "px-4 py-3"
+	default: // md
+		size = "px-3.5 py-2.5"
+	}
+	
+	// State variants
+	if props.Error != "" {
+		return base + " " + size + " bg-red-50 border-red-300 text-red-900 placeholder-red-400 focus:ring-red-500/20 focus:border-red-500 dark:bg-red-900/10 dark:border-red-500/50 dark:text-red-400 dark:placeholder-red-400/50"
+	}
+	
+	if props.Disabled {
+		return base + " " + size + " bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-500"
+	}
+	
+	if props.Readonly {
+		return base + " " + size + " bg-gray-50 border-gray-200 text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300"
+	}
+	
+	// Default state
+	return base + " " + size + " bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:ring-primary-500/20 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500 dark:focus:border-primary-500 " + props.Class
+}
+
+func inputWithIconClasses(props InputProps) string {
+	base := inputClasses(props)
+	
+	if props.Icon == "right" {
+		return base + " pr-10"
+	}
+	// Default: icon on left
+	return base + " pl-10"
 }
 
 func getInputType(t string) string {

@@ -1,0 +1,69 @@
+package {{.PackageName}}
+
+import (
+	"context"
+	"strconv"
+
+	"github.com/a-h/templ"
+	"github.com/bozz33/SublimeGo/internal/ent"
+	"github.com/bozz33/SublimeGo/pkg/engine"
+	"github.com/bozz33/SublimeGo/views/generics"
+	"github.com/samber/lo"
+)
+
+// table retourne le composant d'affichage de la liste
+func (r *{{.TypeName}}) table(ctx context.Context, items []any) templ.Component {
+	// Cast des items en entités typées
+	entities := make([]*ent.{{.EntTypeName}}, len(items))
+	for i, item := range items {
+		if entity, ok := item.(*ent.{{.EntTypeName}}); ok {
+			entities[i] = entity
+		}
+	}
+
+	// Définition des colonnes du tableau
+	columns := []engine.Column{
+		{Key: "id", Label: "ID"},
+		{Key: "name", Label: "Nom"},
+		
+		// TODO: Ajouter d'autres colonnes ici
+		// Exemples:
+		// {Key: "email", Label: "Email"},
+		// {Key: "created_at", Label: "Créé le"},
+		// {Key: "is_active", Label: "Actif"},
+	}
+
+	// Transformation des données en lignes de tableau
+	rows := lo.Map(entities, func(item *ent.{{.EntTypeName}}, _ int) engine.Row {
+		return engine.Row{
+			ID: strconv.Itoa(item.ID),
+			Cells: []string{
+				strconv.Itoa(item.ID),
+				item.Name,
+				
+				// TODO: Ajouter d'autres cellules ici (dans le même ordre que columns)
+				// Exemples:
+				// item.Email,
+				// item.CreatedAt.Format("02/01/2006"),
+				// formatBool(item.IsActive),
+			},
+		}
+	})
+
+	return generics.List(engine.TableState{
+		Title:   r.PluralLabel(),
+		NewURL:  "/" + r.Slug() + "/create",
+		BaseURL: "/" + r.Slug(),
+		Columns: columns,
+		Rows:    rows,
+	})
+}
+
+// Helpers pour le formatage des données
+
+func formatBool(b bool) string {
+	if b {
+		return "Oui"
+	}
+	return "Non"
+}

@@ -1,0 +1,152 @@
+package auth
+
+import "github.com/bozz33/SublimeGo/pkg/ui/layouts"
+
+// RegisterPage - Page d'inscription style Filament
+// Design épuré, formulaire centré
+templ RegisterPage() {
+	@layouts.Auth("Créer un compte") {
+		<!-- Logo centré -->
+		<div class="sm:mx-auto sm:w-full sm:max-w-md">
+			<div class="flex justify-center">
+				<div class="flex items-center gap-3">
+					<div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+						<span class="material-icons-outlined text-white text-2xl">eco</span>
+					</div>
+					<span class="font-bold text-xl text-gray-800 dark:text-white">{ layouts.GetPanelConfig().Name }</span>
+				</div>
+			</div>
+			<h2 class="mt-6 text-center text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+				Créer un compte
+			</h2>
+			<p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+				Déjà inscrit ? <a href="/login" class="font-medium text-green-600 hover:text-green-500">Connectez-vous</a>
+			</p>
+		</div>
+
+		<!-- Formulaire -->
+		<div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+			<div class="bg-white dark:bg-gray-800 py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-200 dark:border-gray-700">
+				<form action="/register" method="POST" class="space-y-6" x-data="{ showPassword: false }">
+					<!-- Nom -->
+					<div>
+						<label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+							Nom complet
+						</label>
+						<div class="mt-1 relative">
+							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<span class="material-icons-outlined text-gray-400 text-xl">person</span>
+							</div>
+							<input
+								id="name"
+								name="name"
+								type="text"
+								autocomplete="name"
+								required
+								class="block w-full pl-11 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+								placeholder="Jean Dupont"
+							/>
+						</div>
+					</div>
+
+					<!-- Email -->
+					<div>
+						<label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+							Adresse email
+						</label>
+						<div class="mt-1 relative">
+							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<span class="material-icons-outlined text-gray-400 text-xl">email</span>
+							</div>
+							<input
+								id="email"
+								name="email"
+								type="email"
+								autocomplete="email"
+								required
+								class="block w-full pl-11 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+								placeholder="vous@exemple.com"
+							/>
+						</div>
+					</div>
+
+					<!-- Mot de passe -->
+					<div>
+						<label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+							Mot de passe
+						</label>
+						<div class="mt-1 relative">
+							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<span class="material-icons-outlined text-gray-400 text-xl">lock</span>
+							</div>
+							<input
+								id="password"
+								name="password"
+								:type="showPassword ? 'text' : 'password'"
+								autocomplete="new-password"
+								required
+								class="block w-full pl-11 pr-11 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+								placeholder="••••••••"
+							/>
+							<button
+								type="button"
+								@click="showPassword = !showPassword"
+								class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+							>
+								<span class="material-icons-outlined text-xl" x-text="showPassword ? 'visibility_off' : 'visibility'"></span>
+							</button>
+						</div>
+						<p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+							Minimum 8 caractères avec majuscule, minuscule et chiffre
+						</p>
+					</div>
+
+					<!-- Confirmer mot de passe -->
+					<div>
+						<label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+							Confirmer le mot de passe
+						</label>
+						<div class="mt-1 relative">
+							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<span class="material-icons-outlined text-gray-400 text-xl">lock</span>
+							</div>
+							<input
+								id="password_confirmation"
+								name="password_confirmation"
+								:type="showPassword ? 'text' : 'password'"
+								autocomplete="new-password"
+								required
+								class="block w-full pl-11 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+								placeholder="••••••••"
+							/>
+						</div>
+					</div>
+
+					<!-- Terms -->
+					<div class="flex items-start">
+						<input
+							id="terms"
+							name="terms"
+							type="checkbox"
+							required
+							class="h-4 w-4 mt-0.5 text-green-500 focus:ring-green-500 border-gray-300 dark:border-gray-600 rounded"
+						/>
+						<label for="terms" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+							J'accepte les <a href="/terms" class="text-green-600 hover:text-green-500">conditions d'utilisation</a> et la <a href="/privacy" class="text-green-600 hover:text-green-500">politique de confidentialité</a>
+						</label>
+					</div>
+
+					<!-- Submit Button -->
+					<div>
+						<button
+							type="submit"
+							class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+						>
+							Créer mon compte
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	}
+}

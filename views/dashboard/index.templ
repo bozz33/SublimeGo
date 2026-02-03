@@ -1,25 +1,53 @@
 package dashboard
 
-// ⚠️ Vérifie bien que ce chemin correspond à ton go.mod (première ligne du fichier go.mod)
-import "github.com/bozz33/SublimeGo/pkg/ui/layouts"
+import (
+	"github.com/bozz33/SublimeGo/pkg/ui/layouts"
+	"github.com/bozz33/SublimeGo/pkg/widget"
+	"github.com/bozz33/SublimeGo/views/widgets"
+)
 
-templ Index() {
-	// Ici, on utilise la syntaxe @ pour appeler le composant Base.
-	// Tout ce qui est entre les accolades { ... } sera injecté à la place de { children... }
+templ Index(dashboardWidgets []widget.Widget) {
 	@layouts.Base("Tableau de bord") {
-		<div class="p-10">
-			<h1 class="text-4xl font-bold text-blue-600 mb-4">
-				🚀 SublimeGo Fonctionne !
-			</h1>
-			<p class="text-lg text-gray-700 border-l-4 border-blue-600 pl-4">
-				Le moteur de template est correctement configuré.
-				<br/>
-				Ceci est le contenu injecté dans le layout de base.
-			</p>
+		<div class="px-4 sm:px-6 lg:px-8 py-8">
+			<h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-8">Tableau de bord</h1>
 			
-			<button class="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-				Un bouton Tailwind
-			</button>
+			if len(dashboardWidgets) == 0 {
+				<!-- Empty state -->
+				<div class="flex flex-col items-center justify-center py-16 px-4">
+					<div class="w-16 h-16 mb-4 text-gray-400 dark:text-gray-600">
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+						</svg>
+					</div>
+					<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Bienvenue sur SublimeGo</h2>
+					<p class="text-gray-600 dark:text-gray-400 text-center max-w-md">
+						Votre tableau de bord est prêt. Ajoutez des widgets pour personnaliser cette page.
+					</p>
+				</div>
+			} else {
+				for _, w := range dashboardWidgets {
+					if stats, ok := w.(*widget.StatsWidget); ok {
+						@widgets.Stats(stats)
+					}
+				}
+
+				<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+					<div class="lg:col-span-2">
+						for _, w := range dashboardWidgets {
+							if chart, ok := w.(*widget.ChartWidget); ok && chart.Type == "area" {
+								@widgets.Chart(chart)
+							}
+						}
+					</div>
+					<div class="lg:col-span-1">
+						for _, w := range dashboardWidgets {
+							if chart, ok := w.(*widget.ChartWidget); ok && chart.Type == "donut" {
+								@widgets.Chart(chart)
+							}
+						}
+					</div>
+				</div>
+			}
 		</div>
 	}
 }

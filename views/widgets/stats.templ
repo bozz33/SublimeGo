@@ -1,0 +1,89 @@
+package widgets
+
+import (
+	"fmt"
+	"github.com/bozz33/SublimeGo/pkg/widget"
+)
+
+templ Stats(w *widget.StatsWidget) {
+	<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+		for _, stat := range w.Stats {
+			<div class="p-6 bg-white border border-gray-100 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+				<div class="flex justify-between items-start">
+					<div>
+						<p class="text-sm font-medium text-gray-500 truncate dark:text-gray-400">
+							{ stat.Label }
+						</p>
+						<h3 class="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
+							{ stat.Value }
+						</h3>
+					</div>
+					if stat.Icon != "" {
+						<div class={ "p-2 rounded-lg", getIconBgColor(stat.Color) }>
+							@renderIcon(stat.Icon, stat.Color)
+						</div>
+					}
+				</div>
+				if stat.Description != "" {
+					<div class="mt-4 flex items-center">
+						if stat.Increase {
+							<svg class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+							</svg>
+							<span class="ml-1 text-sm font-medium text-green-500">
+								{ stat.Description }
+							</span>
+						} else {
+							<span class="text-sm font-medium text-gray-500 dark:text-gray-400">
+								{ stat.Description }
+							</span>
+						}
+					</div>
+				}
+				if len(stat.Chart) > 0 {
+					<div class="mt-4 h-10 w-full bg-gray-50 dark:bg-gray-700 rounded overflow-hidden relative">
+						<div class="absolute bottom-0 left-0 right-0 h-full flex items-end justify-between px-1">
+							for _, val := range stat.Chart {
+								<div class={ "w-1 mx-0.5 rounded-t-sm", getBarColor(stat.Color) } style={ fmt.Sprintf("height: %d%%", val) }></div>
+							}
+						</div>
+					</div>
+				}
+			</div>
+		}
+	</div>
+}
+
+func getIconBgColor(color string) string {
+	switch color {
+	case "primary": return "bg-primary-50 dark:bg-primary-900/20"
+	case "success": return "bg-green-50 dark:bg-green-900/20"
+	case "danger":  return "bg-red-50 dark:bg-red-900/20"
+	case "warning": return "bg-yellow-50 dark:bg-yellow-900/20"
+	default:        return "bg-gray-50 dark:bg-gray-700"
+	}
+}
+
+func getBarColor(color string) string {
+	switch color {
+	case "primary": return "bg-primary-500"
+	case "success": return "bg-green-500"
+	case "danger":  return "bg-red-500"
+	default:        return "bg-gray-400"
+	}
+}
+
+templ renderIcon(name, color string) {
+	<svg class={ "w-6 h-6", getTextClass(color) } fill="none" viewBox="0 0 24 24" stroke="currentColor">
+		<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+	</svg>
+}
+
+func getTextClass(color string) string {
+	switch color {
+	case "primary": return "text-primary-600 dark:text-primary-400"
+	case "success": return "text-green-600 dark:text-green-400"
+	case "danger":  return "text-red-600 dark:text-red-400"
+	default:        return "text-gray-600 dark:text-gray-400"
+	}
+}
