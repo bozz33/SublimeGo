@@ -1,6 +1,8 @@
-# SublimeGo Framework
+# SublimeGo Starter
 
-SublimeGo is a modern Go framework inspired by Laravel Filament, designed to accelerate web application development with a clean, maintainable architecture.
+A complete starter kit for building admin panels with Go, powered by [Sublime Admin](https://github.com/bozz33/sublime-admin).
+
+> **Note**: This is the **starter project**. For the reusable framework, see [sublime-admin](https://github.com/bozz33/sublime-admin).
 
 ## Tech Stack
 
@@ -22,32 +24,70 @@ SublimeGo is a modern Go framework inspired by Laravel Filament, designed to acc
 - **Authentication**: Built-in auth with bcrypt and sessions
 - **Multi-Panel**: Support for multiple admin panels
 
-## Installation
+## Architecture
 
-```bash
-# Install SublimeGo in your Go project
-go get github.com/bozz33/SublimeGo@v1.0.0
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    SUBLIMEGO ECOSYSTEM                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  sublime-admin (Framework)         SublimeGo (This Repo)   │
+│  ─────────────────────────         ─────────────────────   │
+│  github.com/bozz33/sublime-admin   Starter project         │
+│                                                             │
+│  • engine/    • form/              • Your resources        │
+│  • table/     • auth/              • Your views            │
+│  • middleware/• validation/        • Your config           │
+│  • ui/        • widget/            • CLI tools             │
+│                                                             │
+│  go get sublime-admin@v1.0.0       git clone SublimeGo     │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-## Quick Start
+## Installation
 
-### Option 1: Use as a library in your existing project
+### Option 1: Start a new project (Recommended)
+
+```bash
+# Clone this starter
+git clone https://github.com/bozz33/SublimeGo.git myproject
+cd myproject
+
+# Install dependencies
+go mod download
+
+# Initialize (DB, migrations, admin user)
+go run cmd/sublimego/main.go init
+
+# Start the server
+go run cmd/sublimego/main.go serve
+```
+
+### Option 2: Use the framework in an existing project
+
+```bash
+# Install the framework
+go get github.com/bozz33/sublime-admin@v1.0.0
+```
 
 ```go
 package main
 
 import (
-    "github.com/bozz33/SublimeGo/pkg/engine"
-    "github.com/bozz33/SublimeGo/pkg/form"
-    "github.com/bozz33/SublimeGo/pkg/table"
+    "github.com/bozz33/sublime-admin/engine"
+    "github.com/bozz33/sublime-admin/form"
+    "github.com/bozz33/sublime-admin/table"
 )
 
 func main() {
     // Create your admin panel
-    panel := engine.NewPanel("admin", "/admin")
+    panel := engine.NewPanel("admin").
+        SetPath("/admin").
+        SetBrandName("My App")
     
     // Register resources
-    panel.RegisterResources(
+    panel.AddResources(
         &ProductResource{},
         &UserResource{},
     )
@@ -57,24 +97,15 @@ func main() {
 }
 ```
 
-### Option 2: Clone and customize
+Server starts at `http://localhost:8080`
+
+## Updating the Framework
+
+To receive updates from the `sublime-admin` framework:
 
 ```bash
-# Clone the repository
-git clone https://github.com/bozz33/SublimeGo.git
-cd SublimeGo
-
-# Install dependencies
-go mod download
-
-# Initialize project (DB, migrations, admin user)
-go run cmd/sublimego/main.go init
-
-# Start the server
-go run cmd/sublimego/main.go serve
+go get -u github.com/bozz33/sublime-admin@latest
 ```
-
-Server starts at `http://localhost:8080`
 
 ## CLI Commands
 
