@@ -1,6 +1,6 @@
 package components
 
-// getBadgeClasses retourne les classes CSS pour un badge selon sa couleur
+// getBadgeClasses returns the CSS classes for a badge based on its color
 func getBadgeClasses(color string) string {
 	classes := "px-2.5 py-0.5 text-xs font-medium rounded-full "
 	switch color {
@@ -17,7 +17,7 @@ func getBadgeClasses(color string) string {
 	}
 }
 
-// getActionClasses retourne les classes CSS pour une action selon sa couleur
+// getActionClasses returns the CSS classes for an action based on its color
 func getActionClasses(color string) string {
 	base := "inline-flex items-center justify-center w-8 h-8 rounded-lg transition-colors "
 	switch color {

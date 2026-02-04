@@ -44,7 +44,7 @@ func Form(f *form.Form) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"flex items-center justify-end gap-x-4 border-t border-gray-900/10 px-4 py-4 sm:px-8 bg-gray-50 dark:bg-gray-800\"><button type=\"button\" class=\"text-sm font-semibold leading-6 text-gray-900 dark:text-white\">Annuler</button> <button type=\"submit\" class=\"rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500\">Enregistrer</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"flex items-center justify-end gap-x-4 border-t border-gray-900/10 px-4 py-4 sm:px-8 bg-gray-50 dark:bg-gray-800\"><button type=\"button\" class=\"text-sm font-semibold leading-6 text-gray-900 dark:text-white\">Cancel</button> <button type=\"submit\" class=\"rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500\">Save</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

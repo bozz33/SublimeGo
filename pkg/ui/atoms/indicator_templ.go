@@ -79,7 +79,7 @@ func Indicator(props IndicatorProps) templ.Component {
 	})
 }
 
-// IndicatorWithAvatar - Indicateur sur un avatar
+// IndicatorWithAvatar - Indicator on an avatar
 func IndicatorWithAvatar(props IndicatorProps, avatarSrc string, avatarAlt string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context

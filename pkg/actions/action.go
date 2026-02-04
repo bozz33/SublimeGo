@@ -68,7 +68,7 @@ func (a *Action) RequiresDialog(title, desc string) *Action {
 	a.RequiresConfirmation = true
 	a.ModalTitle = title
 	a.ModalDescription = desc
-	a.ConfirmLabel = "Confirmer"
+	a.ConfirmLabel = "Confirm"
 	a.Type = Button
 	return a
 }

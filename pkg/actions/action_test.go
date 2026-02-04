@@ -52,15 +52,15 @@ func TestFluentAPI(t *testing.T) {
 }
 
 func TestRequiresDialog(t *testing.T) {
-	action := New("delete").RequiresDialog("Supprimer?", "Cette action est irreversible")
+	action := New("delete").RequiresDialog("Delete?", "This action is irreversible")
 
 	if !action.RequiresConfirmation {
 		t.Error("Expected RequiresConfirmation to be true")
 	}
-	if action.ModalTitle != "Supprimer?" {
-		t.Errorf("Expected ModalTitle 'Supprimer?', got '%s'", action.ModalTitle)
+	if action.ModalTitle != "Delete?" {
+		t.Errorf("Expected ModalTitle 'Delete?', got '%s'", action.ModalTitle)
 	}
-	if action.ModalDescription != "Cette action est irreversible" {
+	if action.ModalDescription != "This action is irreversible" {
 		t.Errorf("Expected ModalDescription, got '%s'", action.ModalDescription)
 	}
 	if action.Type != Button {

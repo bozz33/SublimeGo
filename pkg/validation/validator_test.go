@@ -193,24 +193,24 @@ func TestCountErrors(t *testing.T) {
 
 func TestGetError(t *testing.T) {
 	errors := map[string]string{
-		"email":    "Email invalide",
-		"password": "Mot de passe trop court",
+		"email":    "Invalid email",
+		"password": "Password too short",
 	}
 
-	assert.Equal(t, "Email invalide", GetError(errors, "email"))
-	assert.Equal(t, "Mot de passe trop court", GetError(errors, "password"))
+	assert.Equal(t, "Invalid email", GetError(errors, "email"))
+	assert.Equal(t, "Password too short", GetError(errors, "password"))
 	assert.Equal(t, "", GetError(errors, "name"))
 }
 
 func TestFirstError(t *testing.T) {
 	errors := map[string]string{
-		"email":    "Email invalide",
-		"password": "Mot de passe trop court",
+		"email":    "Invalid email",
+		"password": "Password too short",
 	}
 
 	// Order is not guaranteed, but we should get one of the errors
 	first := FirstError(errors)
-	assert.True(t, first == "Email invalide" || first == "Mot de passe trop court")
+	assert.True(t, first == "Invalid email" || first == "Password too short")
 
 	assert.Equal(t, "", FirstError(nil))
 	assert.Equal(t, "", FirstError(map[string]string{}))
@@ -218,52 +218,52 @@ func TestFirstError(t *testing.T) {
 
 func TestAllErrors(t *testing.T) {
 	errors := map[string]string{
-		"email":    "Email invalide",
-		"password": "Mot de passe trop court",
+		"email":    "Invalid email",
+		"password": "Password too short",
 	}
 
 	all := AllErrors(errors)
 	assert.Len(t, all, 2)
-	assert.Contains(t, all, "Email invalide")
-	assert.Contains(t, all, "Mot de passe trop court")
+	assert.Contains(t, all, "Invalid email")
+	assert.Contains(t, all, "Password too short")
 }
 
 func TestErrorsAsString(t *testing.T) {
 	errors := map[string]string{
-		"email":    "Email invalide",
-		"password": "Mot de passe trop court",
+		"email":    "Invalid email",
+		"password": "Password too short",
 	}
 
 	result := ErrorsAsString(errors, ", ")
-	assert.Contains(t, result, "Email invalide")
-	assert.Contains(t, result, "Mot de passe trop court")
+	assert.Contains(t, result, "Invalid email")
+	assert.Contains(t, result, "Password too short")
 	assert.Contains(t, result, ", ")
 }
 
 func TestMergeErrors(t *testing.T) {
 	errors1 := map[string]string{
-		"email": "Email invalide",
-		"name":  "Nom requis",
+		"email": "Invalid email",
+		"name":  "Name required",
 	}
 
 	errors2 := map[string]string{
-		"password": "Mot de passe trop court",
-		"email":    "Email déjà utilisé", // Should overwrite
+		"password": "Password too short",
+		"email":    "Email already used", // Should overwrite
 	}
 
 	merged := MergeErrors(errors1, errors2)
 
 	assert.Len(t, merged, 3)
-	assert.Equal(t, "Email déjà utilisé", merged["email"]) // Overwritten
-	assert.Equal(t, "Nom requis", merged["name"])
-	assert.Equal(t, "Mot de passe trop court", merged["password"])
+	assert.Equal(t, "Email already used", merged["email"]) // Overwritten
+	assert.Equal(t, "Name required", merged["name"])
+	assert.Equal(t, "Password too short", merged["password"])
 }
 
 func TestFilterErrors(t *testing.T) {
 	errors := map[string]string{
-		"email":    "Email invalide",
-		"password": "Mot de passe trop court",
-		"name":     "Nom requis",
+		"email":    "Invalid email",
+		"password": "Password too short",
+		"name":     "Name required",
 	}
 
 	filtered := FilterErrors(errors, "email", "password")
@@ -276,8 +276,8 @@ func TestFilterErrors(t *testing.T) {
 
 func TestOnlyErrors(t *testing.T) {
 	errors := map[string]string{
-		"email":    "Email invalide",
-		"password": "Mot de passe trop court",
+		"email":    "Invalid email",
+		"password": "Password too short",
 	}
 
 	fields := OnlyErrors(errors)
@@ -286,7 +286,7 @@ func TestOnlyErrors(t *testing.T) {
 	assert.Contains(t, fields, "password")
 }
 
-// Tests validators custom
+// Tests custom validators
 
 func TestValidatePhoneFR_Valid(t *testing.T) {
 	validPhones := []string{
@@ -530,7 +530,7 @@ func TestCompany_Invalid(t *testing.T) {
 	assert.Contains(t, errors["siren"], "valid SIREN number")
 }
 
-// Tests helpers globaux
+// Tests global helpers
 
 func TestCheck(t *testing.T) {
 	validUser := User{

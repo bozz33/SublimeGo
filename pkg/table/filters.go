@@ -1,13 +1,13 @@
 package table
 
-// SelectFilter represente un filtre de type select
+// SelectFilter represents a select type filter
 type SelectFilter struct {
 	Key      string
 	LabelStr string
 	Options  []FilterOption
 }
 
-// Select cree un nouveau filtre select
+// Select creates a new select filter
 func Select(key string) *SelectFilter {
 	return &SelectFilter{
 		Key:      key,
@@ -16,31 +16,31 @@ func Select(key string) *SelectFilter {
 	}
 }
 
-// Label definit le label du filtre
+// Label sets the filter label
 func (f *SelectFilter) Label(label string) *SelectFilter {
 	f.LabelStr = label
 	return f
 }
 
-// WithOptions definit les options du filtre
+// WithOptions sets the filter options
 func (f *SelectFilter) WithOptions(options []FilterOption) *SelectFilter {
 	f.Options = options
 	return f
 }
 
-// Implementation de l'interface Filter
-func (f *SelectFilter) GetKey() string            { return f.Key }
-func (f *SelectFilter) GetLabel() string          { return f.LabelStr }
-func (f *SelectFilter) GetType() string           { return "select" }
+// Implementation of the Filter interface
+func (f *SelectFilter) GetKey() string             { return f.Key }
+func (f *SelectFilter) GetLabel() string           { return f.LabelStr }
+func (f *SelectFilter) GetType() string            { return "select" }
 func (f *SelectFilter) GetOptions() []FilterOption { return f.Options }
 
-// BooleanFilter represente un filtre booleen
+// BooleanFilter represents a boolean filter
 type BooleanFilter struct {
 	Key      string
 	LabelStr string
 }
 
-// Boolean cree un nouveau filtre booleen
+// Boolean creates a new boolean filter
 func Boolean(key string) *BooleanFilter {
 	return &BooleanFilter{
 		Key:      key,
@@ -48,19 +48,19 @@ func Boolean(key string) *BooleanFilter {
 	}
 }
 
-// Label definit le label du filtre
+// Label sets the filter label
 func (f *BooleanFilter) Label(label string) *BooleanFilter {
 	f.LabelStr = label
 	return f
 }
 
-// Implementation de l'interface Filter
+// Implementation of the Filter interface
 func (f *BooleanFilter) GetKey() string   { return f.Key }
 func (f *BooleanFilter) GetLabel() string { return f.LabelStr }
 func (f *BooleanFilter) GetType() string  { return "boolean" }
 func (f *BooleanFilter) GetOptions() []FilterOption {
 	return []FilterOption{
-		{Value: "true", Label: "Oui"},
-		{Value: "false", Label: "Non"},
+		{Value: "true", Label: "Yes"},
+		{Value: "false", Label: "No"},
 	}
 }

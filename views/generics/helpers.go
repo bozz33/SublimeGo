@@ -2,7 +2,7 @@ package generics
 
 import "fmt"
 
-// getValueStr retourne la valeur sous forme de string
+// getValueStr returns the value as a string
 func getValueStr(v any) string {
 	if v == nil {
 		return ""
@@ -10,7 +10,7 @@ func getValueStr(v any) string {
 	return fmt.Sprintf("%v", v)
 }
 
-// isChecked retourne true si la valeur est un bool true
+// isChecked returns true if the value is a bool true
 func isChecked(v any) bool {
 	if v == nil {
 		return false
@@ -21,7 +21,7 @@ func isChecked(v any) bool {
 	return false
 }
 
-// hasValue retourne true si la valeur n'est pas nil
+// hasValue returns true if the value is not nil
 func hasValue(v any) bool {
 	return v != nil
 }

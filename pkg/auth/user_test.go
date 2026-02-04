@@ -21,14 +21,14 @@ func TestNewUser(t *testing.T) {
 func TestUserHasPermission(t *testing.T) {
 	user := NewUser(1, "test@example.com", "Test")
 
-	// Pas de permission
+	// No permission
 	assert.False(t, user.HasPermission("users.create"))
 
-	// Ajouter permission
+	// Add permission
 	user.AddPermission("users.create")
 	assert.True(t, user.HasPermission("users.create"))
 
-	// Super admin a toutes les permissions
+	// Super admin has all permissions
 	user.AddRole(RoleSuperAdmin)
 	assert.True(t, user.HasPermission("anything"))
 }
@@ -56,7 +56,7 @@ func TestUserAddPermission(t *testing.T) {
 	user.AddPermission("users.create")
 	assert.Len(t, user.Permissions, 1)
 
-	// Ne doit pas ajouter en double
+	// Should not add duplicate
 	user.AddPermission("users.create")
 	assert.Len(t, user.Permissions, 1)
 }
@@ -97,7 +97,7 @@ func TestUserAddRole(t *testing.T) {
 	user.AddRole(RoleAdmin)
 	assert.Len(t, user.Roles, 1)
 
-	// Ne doit pas ajouter en double
+	// Should not add duplicate
 	user.AddRole(RoleAdmin)
 	assert.Len(t, user.Roles, 1)
 }
@@ -169,7 +169,7 @@ func TestUserClone(t *testing.T) {
 	assert.Equal(t, user.Permissions, clone.Permissions)
 	assert.Equal(t, user.Roles, clone.Roles)
 
-	// Modifier le clone ne doit pas affecter l'original
+	// Modifying the clone should not affect the original
 	clone.AddPermission("users.delete")
 	assert.True(t, clone.HasPermission("users.delete"))
 	assert.False(t, user.HasPermission("users.delete"))

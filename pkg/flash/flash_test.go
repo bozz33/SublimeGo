@@ -271,7 +271,7 @@ func BenchmarkManagerGet(b *testing.B) {
 	manager := NewManager(session)
 	ctx, _ := session.Load(context.Background(), "")
 
-	// Ajouter quelques messages
+	// Add some messages
 	for i := 0; i < 10; i++ {
 		manager.Success(ctx, "Test")
 	}

@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	// Parser les flags de ligne de commande
+	// Parse command line flags
 	var (
 		outputPath    = flag.String("output", "internal/registry/provider_gen.go", "Output file path")
 		resourcesPath = flag.String("resources", "internal/resources", "Resources directory path")
@@ -30,10 +30,10 @@ func main() {
 	config.AutoFix = *autoFix
 	config.StrictMode = *strict
 
-	// Créer le scanner
+	// Create the scanner
 	s := scanner.NewWithConfig(config)
 
-	// Scanner les resources
+	// Scan resources
 	fmt.Printf("Scanning %s...\n", config.ResourcesPath)
 	result := s.Scan()
 	if !result.Success {
@@ -52,7 +52,7 @@ func main() {
 		}
 	}
 
-	// Afficher les conflits
+	// Display conflicts
 	if len(result.Conflicts) > 0 {
 		detector := scanner.NewDetector(result.Resources)
 		warnings := detector.FilterBySeverity(result.Conflicts, "warning")

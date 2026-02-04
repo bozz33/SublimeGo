@@ -7,10 +7,10 @@ import (
 	"fmt"
 )
 
-// Table affiche un tableau avec la configuration fournie
+// Table displays a table with the provided configuration
 templ Table(ctx context.Context, t *table.Table, data []any) {
 	<div class="relative overflow-x-auto shadow-md sm:rounded-lg bg-white dark:bg-gray-800">
-		<!-- Header avec recherche et filtres -->
+		<!-- Header with search and filters -->
 		<div class="p-4 bg-white dark:bg-gray-900 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
 			if t.Searchable {
 				<div class="relative">
@@ -98,14 +98,14 @@ templ Table(ctx context.Context, t *table.Table, data []any) {
 	</div>
 }
 
-// RenderCell affiche une cellule selon son type
+// RenderCell renders a cell according to its type
 templ RenderCell(ctx context.Context, col table.Column, item any) {
 	switch col.GetType() {
 		case "text":
 			<div class="text-gray-900 dark:text-white">
 				{ col.GetValue(item) }
 				if col.IsCopyable() {
-					<button class="ml-2 text-gray-400 hover:text-gray-600" title="Copier">
+					<button class="ml-2 text-gray-400 hover:text-gray-600" title="Copy">
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
 						</svg>
@@ -129,14 +129,14 @@ templ RenderCell(ctx context.Context, col table.Column, item any) {
 	}
 }
 
-// RenderBadge affiche un badge colore
+// RenderBadge renders a colored badge
 templ RenderBadge(value, color string) {
 	<span class={ getBadgeClasses(color) }>
 		{ value }
 	</span>
 }
 
-// RenderAction affiche un bouton d'action (interface table.Action)
+// RenderAction renders an action button (table.Action interface)
 templ RenderAction(action table.Action, item any) {
 	<a 
 		href={ templ.SafeURL(action.GetURL(item)) }
@@ -147,7 +147,7 @@ templ RenderAction(action table.Action, item any) {
 	</a>
 }
 
-// RenderActionButton affiche un bouton d'action (pkg/actions)
+// RenderActionButton renders an action button (pkg/actions)
 templ RenderActionButton(action *actions.Action, item any) {
 	if action.RequiresConfirmation {
 		<button 
@@ -169,7 +169,7 @@ templ RenderActionButton(action *actions.Action, item any) {
 	}
 }
 
-// RenderFilter affiche un filtre
+// RenderFilter renders a filter
 templ RenderFilter(filter table.Filter) {
 	switch filter.GetType() {
 		case "select":
@@ -189,7 +189,7 @@ templ RenderFilter(filter table.Filter) {
 	}
 }
 
-// ActionIcon affiche l'icone d'une action
+// ActionIcon renders the icon of an action
 templ ActionIcon(icon string) {
 	switch icon {
 		case "edit":
@@ -212,18 +212,18 @@ templ ActionIcon(icon string) {
 	}
 }
 
-// Pagination affiche la pagination
+// Pagination displays the pagination
 templ Pagination(currentPage, totalPages, total int) {
 	<div class="flex items-center justify-between">
 		<div class="text-sm text-gray-700 dark:text-gray-400">
-			Affichage des resultats
+			Showing results
 		</div>
 		<div class="flex gap-2">
 			<button class="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700">
-				Precedent
+				Previous
 			</button>
 			<button class="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700">
-				Suivant
+				Next
 			</button>
 		</div>
 	</div>

@@ -15,7 +15,7 @@ import (
 	"github.com/bozz33/SublimeGo/pkg/table"
 )
 
-// Table affiche un tableau avec la configuration fournie
+// Table displays a table with the provided configuration
 func Table(ctx context.Context, t *table.Table, data []any) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -37,7 +37,7 @@ func Table(ctx context.Context, t *table.Table, data []any) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"relative overflow-x-auto shadow-md sm:rounded-lg bg-white dark:bg-gray-800\"><!-- Header avec recherche et filtres --><div class=\"p-4 bg-white dark:bg-gray-900 flex justify-between items-center border-b border-gray-200 dark:border-gray-700\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"relative overflow-x-auto shadow-md sm:rounded-lg bg-white dark:bg-gray-800\"><!-- Header with search and filters --><div class=\"p-4 bg-white dark:bg-gray-900 flex justify-between items-center border-b border-gray-200 dark:border-gray-700\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -192,7 +192,7 @@ func Table(ctx context.Context, t *table.Table, data []any) templ.Component {
 	})
 }
 
-// RenderCell affiche une cellule selon son type
+// RenderCell renders a cell according to its type
 func RenderCell(ctx context.Context, col table.Column, item any) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -234,7 +234,7 @@ func RenderCell(ctx context.Context, col table.Column, item any) templ.Component
 				return templ_7745c5c3_Err
 			}
 			if col.IsCopyable() {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<button class=\"ml-2 text-gray-400 hover:text-gray-600\" title=\"Copier\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z\"></path></svg></button>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<button class=\"ml-2 text-gray-400 hover:text-gray-600\" title=\"Copy\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z\"></path></svg></button>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -324,7 +324,7 @@ func RenderCell(ctx context.Context, col table.Column, item any) templ.Component
 	})
 }
 
-// RenderBadge affiche un badge colore
+// RenderBadge renders a colored badge
 func RenderBadge(value, color string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -385,7 +385,7 @@ func RenderBadge(value, color string) templ.Component {
 	})
 }
 
-// RenderAction affiche un bouton d'action (interface table.Action)
+// RenderAction renders an action button (table.Action interface)
 func RenderAction(action table.Action, item any) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -467,7 +467,7 @@ func RenderAction(action table.Action, item any) templ.Component {
 	})
 }
 
-// RenderActionButton affiche un bouton d'action (pkg/actions)
+// RenderActionButton renders an action button (pkg/actions)
 func RenderActionButton(action *actions.Action, item any) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -608,7 +608,7 @@ func RenderActionButton(action *actions.Action, item any) templ.Component {
 	})
 }
 
-// RenderFilter affiche un filtre
+// RenderFilter renders a filter
 func RenderFilter(filter table.Filter) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -744,7 +744,7 @@ func RenderFilter(filter table.Filter) templ.Component {
 	})
 }
 
-// ActionIcon affiche l'icone d'une action
+// ActionIcon renders the icon of an action
 func ActionIcon(icon string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -792,7 +792,7 @@ func ActionIcon(icon string) templ.Component {
 	})
 }
 
-// Pagination affiche la pagination
+// Pagination displays the pagination
 func Pagination(currentPage, totalPages, total int) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -814,7 +814,7 @@ func Pagination(currentPage, totalPages, total int) templ.Component {
 			templ_7745c5c3_Var37 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "<div class=\"flex items-center justify-between\"><div class=\"text-sm text-gray-700 dark:text-gray-400\">Affichage des resultats</div><div class=\"flex gap-2\"><button class=\"px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700\">Precedent</button> <button class=\"px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700\">Suivant</button></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "<div class=\"flex items-center justify-between\"><div class=\"text-sm text-gray-700 dark:text-gray-400\">Showing results</div><div class=\"flex gap-2\"><button class=\"px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700\">Previous</button> <button class=\"px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700\">Next</button></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

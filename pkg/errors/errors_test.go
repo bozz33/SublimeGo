@@ -32,11 +32,11 @@ func TestWrap(t *testing.T) {
 }
 
 func TestAppErrorError(t *testing.T) {
-	// Sans erreur originale
+	// Without original error
 	err := New("TEST", "Test message", 400)
 	assert.Equal(t, "TEST: Test message", err.Error())
 
-	// Avec erreur originale
+	// With original error
 	originalErr := fmt.Errorf("db error")
 	err = Wrap(originalErr, "TEST", "Test message", 500)
 	assert.Contains(t, err.Error(), "TEST: Test message")
@@ -246,18 +246,18 @@ func TestIsValidation(t *testing.T) {
 
 func TestGetValidationErrors(t *testing.T) {
 	fields := map[string]string{
-		"email":    "Email invalide",
-		"password": "Trop court",
+		"email":    "Invalid email",
+		"password": "Too short",
 	}
 
 	err := ValidationError(fields)
 	validationErrs := GetValidationErrors(err)
 
 	assert.NotNil(t, validationErrs)
-	assert.Equal(t, "Email invalide", validationErrs["email"])
-	assert.Equal(t, "Trop court", validationErrs["password"])
+	assert.Equal(t, "Invalid email", validationErrs["email"])
+	assert.Equal(t, "Too short", validationErrs["password"])
 
-	// Erreur non-validation
+	// Non-validation error
 	err = NotFound("test")
 	validationErrs = GetValidationErrors(err)
 	assert.Nil(t, validationErrs)
