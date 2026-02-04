@@ -1,15 +1,15 @@
 package atoms
 
-// MetricCardProps définit les propriétés d'une carte de métrique
+// MetricCardProps defines the properties for a metric card
 type MetricCardProps struct {
 	Title      string
 	Value      string
-	Change     string  // ex: "+11.01%" ou "-9.05%"
-	IsPositive bool    // true = vert, false = rouge
+	Change     string  // e.g., "+11.01%" or "-9.05%"
+	IsPositive bool    // true = green, false = red
 	Icon       string  // "users", "orders", "revenue", "growth"
 }
 
-// MetricCard - Composant Flowbite avec style TailAdmin
+// MetricCard - Flowbite component with TailAdmin style
 templ MetricCard(props MetricCardProps) {
 	<div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 md:p-6">
 		<!-- Icon -->

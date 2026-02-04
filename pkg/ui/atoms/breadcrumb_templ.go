@@ -11,7 +11,7 @@ import templruntime "github.com/a-h/templ/runtime"
 type BreadcrumbItem struct {
 	Label string
 	Href  string
-	Icon  string // optionnel, pour le premier élément
+	Icon  string // optional, for the first element
 }
 
 type BreadcrumbProps struct {

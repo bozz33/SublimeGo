@@ -8,8 +8,8 @@ package layouts
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-// Base est le squelette principal de l'application SublimeGo
-// Configuration hybride: Tailwind CDN + assets locaux (Alpine.js, HTMX, app.js, custom.css)
+// Base is the main skeleton of the SublimeGo application.
+// Hybrid configuration: Tailwind CDN + local assets (Alpine.js, HTMX, app.js, custom.css)
 func Base(title string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -31,7 +31,7 @@ func Base(title string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"fr\" class=\"h-full\" x-data=\"{ \n\t\t\tdarkMode: localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches),\n\t\t\tsidebarOpen: window.innerWidth >= 1024\n\t\t}\" x-init=\"$watch('darkMode', val => localStorage.setItem('theme', val ? 'dark' : 'light'))\" :class=\"{ 'dark': darkMode }\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta name=\"color-scheme\" content=\"light dark\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"h-full\" x-data=\"{ \n\t\t\tdarkMode: localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches),\n\t\t\tsidebarOpen: window.innerWidth >= 1024\n\t\t}\" x-init=\"$watch('darkMode', val => localStorage.setItem('theme', val ? 'dark' : 'light'))\" :class=\"{ 'dark': darkMode }\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta name=\"color-scheme\" content=\"light dark\"><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -130,7 +130,7 @@ func Base(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, ". Tous droits réservés.</p></footer></div><!-- Toast Container --><div id=\"toast-container\" class=\"fixed bottom-4 right-4 z-[9999] space-y-2 pointer-events-none\"></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, ". All rights reserved.</p></footer></div><!-- Toast Container --><div id=\"toast-container\" class=\"fixed bottom-4 right-4 z-[9999] space-y-2 pointer-events-none\"></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

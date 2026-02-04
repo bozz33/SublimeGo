@@ -6,24 +6,24 @@ import (
 	"github.com/bozz33/SublimeGo/pkg/ui/atoms"
 )
 
-// List est le template universel pour tous les tableaux.
+// List is the universal template for all tables.
 templ List(state engine.TableState) {
 	<div class="space-y-4">
-		// En-tête de page
+		// Page header
 		<div class="flex justify-between items-center">
 			<h1 class="text-2xl font-bold text-gray-900 dark:text-white">{ state.Title }</h1>
 			if state.NewURL != "" {
 				@atoms.Button(atoms.ButtonProps{
-					Text:    "Nouveau",
+					Text:    "New",
 					Variant: "primary",
 					Href:    state.NewURL,
 				})
 			}
 		</div>
 
-		// Le Tableau avec recherche et filtres
+		// Table with search and filters
 		<div class="relative overflow-x-auto bg-white shadow-sm rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-			// Barre de recherche et filtres
+			// Search bar and filters
 			<div class="p-4 flex items-center justify-between space-x-4">
 				<label for="input-group-1" class="sr-only">Search</label>
 				<div class="relative">

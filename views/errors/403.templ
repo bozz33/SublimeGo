@@ -1,20 +1,20 @@
 package errors
 
-// Error403Data contient les données pour la page 403
+// Error403Data contains data for the 403 page
 type Error403Data struct {
 	Message   string
 	RequestID string
 	Path      string
 }
 
-// Page403 affiche la page d'erreur 403
+// Page403 displays the 403 error page
 templ Page403(data Error403Data) {
 	<!DOCTYPE html>
-	<html lang="fr" class="h-full">
+	<html lang="en" class="h-full">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<title>403 - Accès refusé</title>
+			<title>403 - Access Denied</title>
 			<script src="https://cdn.tailwindcss.com"></script>
 		</head>
 		<body class="h-full bg-gray-50">
@@ -32,32 +32,32 @@ templ Page403(data Error403Data) {
 						</div>
 					</div>
 					
-					<!-- Code d'erreur -->
+					<!-- Error code -->
 					<div class="mt-8 text-center">
 						<h1 class="text-9xl font-extrabold text-amber-600">403</h1>
-						<h2 class="mt-4 text-3xl font-bold text-gray-900">Accès refusé</h2>
+						<h2 class="mt-4 text-3xl font-bold text-gray-900">Access Denied</h2>
 						<p class="mt-2 text-base text-gray-600">
 							if data.Message != "" {
 								{ data.Message }
 							} else {
-								Vous n'avez pas la permission d'accéder à cette ressource.
+								You do not have permission to access this resource.
 							}
 						</p>
 					</div>
 					
-					<!-- Informations techniques -->
+					<!-- Technical information -->
 					if data.Path != "" || data.RequestID != "" {
 						<div class="mt-6 bg-white rounded-lg shadow px-4 py-3">
 							<dl class="space-y-2 text-sm">
 								if data.Path != "" {
 									<div class="flex justify-between">
-										<dt class="font-medium text-gray-500">Ressource:</dt>
+										<dt class="font-medium text-gray-500">Resource:</dt>
 										<dd class="text-gray-900 font-mono">{ data.Path }</dd>
 									</div>
 								}
 								if data.RequestID != "" {
 									<div class="flex justify-between">
-										<dt class="font-medium text-gray-500">ID de requête:</dt>
+										<dt class="font-medium text-gray-500">Request ID:</dt>
 										<dd class="text-gray-900 font-mono text-xs">{ data.RequestID }</dd>
 									</div>
 								}
@@ -65,14 +65,14 @@ templ Page403(data Error403Data) {
 						</div>
 					}
 					
-					<!-- Raisons possibles -->
+					<!-- Possible reasons -->
 					<div class="mt-6 bg-amber-50 border border-amber-200 rounded-lg px-4 py-4">
-						<h3 class="text-sm font-semibold text-amber-900 mb-2">Raisons possibles</h3>
+						<h3 class="text-sm font-semibold text-amber-900 mb-2">Possible reasons</h3>
 						<ul class="text-sm text-amber-700 space-y-1 list-disc list-inside">
-							<li>Vous n'êtes pas connecté</li>
-							<li>Votre session a expiré</li>
-							<li>Vous n'avez pas les droits nécessaires</li>
-							<li>La ressource est restreinte</li>
+							<li>You are not logged in</li>
+							<li>Your session has expired</li>
+							<li>You do not have the required permissions</li>
+							<li>The resource is restricted</li>
 						</ul>
 					</div>
 					
@@ -85,7 +85,7 @@ templ Page403(data Error403Data) {
 							<svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
 								<path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clip-rule="evenodd"></path>
 							</svg>
-							Se connecter
+							Sign in
 						</a>
 						
 						<a
@@ -95,16 +95,16 @@ templ Page403(data Error403Data) {
 							<svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
 								<path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
 							</svg>
-							Retour à l'accueil
+							Back to home
 						</a>
 					</div>
 					
 					<!-- Help text -->
 					<div class="mt-6 text-center text-sm text-gray-500">
 						<p>
-							Besoin d'aide ? 
-							<a href="/support" class="font-medium text-amber-600 hover:text-amber-500">Contactez le support</a>
-							pour demander l'accès.
+							Need help? 
+							<a href="/support" class="font-medium text-amber-600 hover:text-amber-500">Contact support</a>
+							to request access.
 						</p>
 					</div>
 				</div>

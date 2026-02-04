@@ -19,12 +19,12 @@ type InputProps struct {
 	Required    bool
 	Disabled    bool
 	Readonly    bool
-	Icon        string // "left" ou "right" pour indiquer la position de l'icône (slot)
+	Icon        string // "left" or "right" to indicate icon position (slot)
 	Size        string // "sm", "md", "lg"
-	Class       string // Classes additionnelles
+	Class       string // Additional classes
 }
 
-// Input - Composant avec nouveau design (sans Flowbite)
+// Input - Component with new design (without Flowbite)
 func Input(props InputProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -246,7 +246,7 @@ func Input(props InputProps) templ.Component {
 	})
 }
 
-// InputWithIcon - Input avec icône (slot pour l'icône)
+// InputWithIcon - Input with icon (slot for icon)
 func InputWithIcon(props InputProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context

@@ -7,11 +7,11 @@ import (
 	"github.com/bozz33/SublimeGo/pkg/widget"
 )
 
-// GetDashboardStats genere les widgets pour la page d'accueil
-// Par defaut, le dashboard est vide. Les developpeurs peuvent ajouter leurs propres widgets ici.
+// GetDashboardStats generates widgets for the dashboard page.
+// By default, the dashboard is empty. Developers can add their own widgets here.
 func GetDashboardStats(ctx context.Context, client *ent.Client) []widget.Widget {
-	// Dashboard vide par defaut
-	// Pour ajouter des widgets, decommentez et personnalisez le code ci-dessous:
+	// Empty dashboard by default.
+	// To add widgets, uncomment and customize the code below:
 
 	/*
 		var widgets []widget.Widget
@@ -23,9 +23,9 @@ func GetDashboardStats(ctx context.Context, client *ent.Client) []widget.Widget 
 
 		stats := widget.NewStats(
 			widget.Stat{
-				Label:       "Utilisateurs Totaux",
+				Label:       "Total Users",
 				Value:       fmt.Sprintf("%d", userCount),
-				Description: "+12% ce mois-ci",
+				Description: "+12% this month",
 				Icon:        "users",
 				Color:       "primary",
 				Increase:    true,

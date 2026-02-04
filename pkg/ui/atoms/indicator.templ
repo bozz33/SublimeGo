@@ -5,10 +5,10 @@ type IndicatorProps struct {
 	Size     string // "xs", "sm", "md", "lg", "xl"
 	Position string // "top-left", "top-right", "bottom-left", "bottom-right"
 	Ping     bool   // Animation ping
-	Count    string // Nombre à afficher (optionnel)
+	Count    string // Number to display (optional)
 }
 
-// Indicator - Composant indicateur Flowbite
+// Indicator - Flowbite indicator component
 templ Indicator(props IndicatorProps) {
 	<span class={ indicatorClasses(props) }>
 		if props.Count != "" {

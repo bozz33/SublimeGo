@@ -2,12 +2,12 @@ package auth
 
 import "github.com/bozz33/SublimeGo/pkg/ui/layouts"
 
-// LoginPage - Page de connexion style Filament
-// Design épuré, formulaire centré
-// basePath est optionnel, par défaut "" (racine)
+// LoginPage - Login page with Filament-style design.
+// Clean design, centered form.
+// basePath is optional, defaults to "" (root)
 templ LoginPage(basePath ...string) {
-	@layouts.Auth("Connexion") {
-		<!-- Logo centré -->
+	@layouts.Auth("Login") {
+		<!-- Centered Logo -->
 		<div class="sm:mx-auto sm:w-full sm:max-w-md">
 			<div class="flex justify-center">
 				<div class="flex items-center gap-3">
@@ -18,21 +18,21 @@ templ LoginPage(basePath ...string) {
 				</div>
 			</div>
 			<h2 class="mt-6 text-center text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-				Connexion à votre compte
+				Sign in to your account
 			</h2>
 			<p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-				Ou <a href={ templ.SafeURL(getBasePath(basePath...) + "/register") } class="font-medium text-green-600 hover:text-green-500">créer un nouveau compte</a>
+				Or <a href={ templ.SafeURL(getBasePath(basePath...) + "/register") } class="font-medium text-green-600 hover:text-green-500">create a new account</a>
 			</p>
 		</div>
 
-		<!-- Formulaire -->
+		<!-- Form -->
 		<div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
 			<div class="bg-white dark:bg-gray-800 py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-200 dark:border-gray-700">
 				<form action={ templ.SafeURL(getBasePath(basePath...) + "/login") } method="POST" class="space-y-6" x-data="{ showPassword: false }">
 					<!-- Email -->
 					<div>
 						<label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-							Adresse email
+							Email address
 						</label>
 						<div class="mt-1 relative">
 							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -45,15 +45,15 @@ templ LoginPage(basePath ...string) {
 								autocomplete="email"
 								required
 								class="block w-full pl-11 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
-								placeholder="vous@exemple.com"
+								placeholder="you@example.com"
 							/>
 						</div>
 					</div>
 
-					<!-- Mot de passe -->
+					<!-- Password -->
 					<div>
 						<label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-							Mot de passe
+							Password
 						</label>
 						<div class="mt-1 relative">
 							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -88,11 +88,11 @@ templ LoginPage(basePath ...string) {
 								class="h-4 w-4 text-green-500 focus:ring-green-500 border-gray-300 dark:border-gray-600 rounded"
 							/>
 							<label for="remember" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-								Se souvenir de moi
+								Remember me
 							</label>
 						</div>
 						<a href="/forgot-password" class="text-sm font-medium text-green-600 hover:text-green-500">
-							Mot de passe oublié ?
+							Forgot password?
 						</a>
 					</div>
 
@@ -102,7 +102,7 @@ templ LoginPage(basePath ...string) {
 							type="submit"
 							class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
 						>
-							Se connecter
+							Sign in
 						</button>
 					</div>
 				</form>

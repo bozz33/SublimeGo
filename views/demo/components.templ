@@ -6,13 +6,13 @@ import (
 )
 
 templ Components() {
-	@layouts.Base("Démo Composants") {
+	@layouts.Base("Components Demo") {
 		<div class="space-y-8">
-			<h1 class="text-3xl font-bold text-gray-900 dark:text-white">🧪 Test des Composants Phase 1</h1>
+			<h1 class="text-3xl font-bold text-gray-900 dark:text-white">Phase 1 Components Test</h1>
 			
 			// Section Boutons
 			<section>
-				@atoms.Card(atoms.CardProps{Title: "Boutons"}) {
+				@atoms.Card(atoms.CardProps{Title: "Buttons"}) {
 					<div class="flex flex-wrap gap-4">
 						@atoms.Button(atoms.ButtonProps{Text: "Primary", Variant: "primary"})
 						@atoms.Button(atoms.ButtonProps{Text: "Secondary", Variant: "secondary"})
@@ -26,31 +26,31 @@ templ Components() {
 
 			// Section Inputs
 			<section>
-				@atoms.Card(atoms.CardProps{Title: "Champs de formulaire"}) {
+				@atoms.Card(atoms.CardProps{Title: "Form Fields"}) {
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 						@atoms.Input(atoms.InputProps{
 							Name: "email",
 							Label: "Email",
 							Type: "email",
-							Placeholder: "exemple@email.com",
+							Placeholder: "example@email.com",
 							Required: true,
 						})
 						@atoms.Input(atoms.InputProps{
 							Name: "password",
-							Label: "Mot de passe",
+							Label: "Password",
 							Type: "password",
 							Placeholder: "••••••••",
 						})
 						@atoms.Input(atoms.InputProps{
 							Name: "error_field",
-							Label: "Champ avec erreur",
-							Value: "valeur invalide",
-							Error: "Ce champ contient une erreur",
+							Label: "Field with error",
+							Value: "invalid value",
+							Error: "This field contains an error",
 						})
 						@atoms.Input(atoms.InputProps{
 							Name: "disabled_field",
-							Label: "Champ désactivé",
-							Value: "Non modifiable",
+							Label: "Disabled field",
+							Value: "Not editable",
 							Disabled: true,
 						})
 					</div>
@@ -63,21 +63,21 @@ templ Components() {
 					<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 						@atoms.Select(atoms.SelectProps{
 							Name: "role",
-							Label: "Rôle",
+							Label: "Role",
 							Options: []atoms.SelectOption{
-								{Label: "Administrateur", Value: "admin"},
-								{Label: "Utilisateur", Value: "user"},
-								{Label: "Invité", Value: "guest"},
+								{Label: "Administrator", Value: "admin"},
+								{Label: "User", Value: "user"},
+								{Label: "Guest", Value: "guest"},
 							},
 							Value: "user",
 						})
 						<div>
 							<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Toggle</label>
-							@atoms.Toggle(atoms.ToggleProps{Name: "active", Label: "Actif", Checked: true})
+							@atoms.Toggle(atoms.ToggleProps{Name: "active", Label: "Active", Checked: true})
 						</div>
 						<div>
 							<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Checkbox</label>
-							@atoms.Checkbox(atoms.CheckboxProps{Name: "terms", Label: "J'accepte les conditions", Checked: true})
+							@atoms.Checkbox(atoms.CheckboxProps{Name: "terms", Label: "I accept the terms", Checked: true})
 						</div>
 					</div>
 				}
@@ -89,9 +89,9 @@ templ Components() {
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 						@atoms.Radio(atoms.RadioProps{
 							Name: "plan",
-							Label: "Choisir un plan",
+							Label: "Choose a plan",
 							Options: []atoms.RadioOption{
-								{Label: "Gratuit", Value: "free"},
+								{Label: "Free", Value: "free"},
 								{Label: "Pro", Value: "pro"},
 								{Label: "Enterprise", Value: "enterprise"},
 							},
@@ -99,7 +99,7 @@ templ Components() {
 						})
 						@atoms.Radio(atoms.RadioProps{
 							Name: "size",
-							Label: "Taille (inline)",
+							Label: "Size (inline)",
 							Options: []atoms.RadioOption{
 								{Label: "S", Value: "s"},
 								{Label: "M", Value: "m"},
@@ -119,7 +119,7 @@ templ Components() {
 					@atoms.Textarea(atoms.TextareaProps{
 						Name: "description",
 						Label: "Description",
-						Placeholder: "Entrez une description...",
+						Placeholder: "Enter a description...",
 						Rows: 4,
 					})
 				}
@@ -131,14 +131,14 @@ templ Components() {
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 						@atoms.DatePicker(atoms.DatePickerProps{
 							Name: "birthdate",
-							Label: "Date de naissance",
+							Label: "Date of birth",
 							Type: "date",
 						})
 						@atoms.FileUpload(atoms.FileUploadProps{
 							Name: "avatar",
-							Label: "Photo de profil",
+							Label: "Profile picture",
 							Accept: "image/*",
-							HelpText: "PNG, JPG ou GIF (max 2MB)",
+							HelpText: "PNG, JPG or GIF (max 2MB)",
 						})
 					</div>
 				}
@@ -166,10 +166,10 @@ templ Components() {
 			<section>
 				@atoms.Card(atoms.CardProps{Title: "Alerts"}) {
 					<div class="space-y-2">
-						@atoms.Alert(atoms.AlertProps{Type: "info", Message: "Ceci est une alerte d'information.", Dismissible: true})
-						@atoms.Alert(atoms.AlertProps{Type: "success", Message: "Opération réussie !", Dismissible: true})
-						@atoms.Alert(atoms.AlertProps{Type: "warning", Message: "Attention, action requise.", Dismissible: true})
-						@atoms.Alert(atoms.AlertProps{Type: "error", Message: "Une erreur s'est produite.", Dismissible: true})
+						@atoms.Alert(atoms.AlertProps{Type: "info", Message: "This is an information alert.", Dismissible: true})
+						@atoms.Alert(atoms.AlertProps{Type: "success", Message: "Operation successful!", Dismissible: true})
+						@atoms.Alert(atoms.AlertProps{Type: "warning", Message: "Warning, action required.", Dismissible: true})
+						@atoms.Alert(atoms.AlertProps{Type: "error", Message: "An error occurred.", Dismissible: true})
 					</div>
 				}
 			</section>
@@ -181,9 +181,9 @@ templ Components() {
 						@atoms.Spinner(atoms.SpinnerProps{Size: "sm"})
 						@atoms.Spinner(atoms.SpinnerProps{Size: "md"})
 						@atoms.Spinner(atoms.SpinnerProps{Size: "lg", Color: "green"})
-						@atoms.Spinner(atoms.SpinnerProps{Size: "md", Color: "red", Text: "Chargement..."})
-						@atoms.SpinnerButton("Envoyer", false)
-						@atoms.SpinnerButton("Envoi en cours...", true)
+						@atoms.Spinner(atoms.SpinnerProps{Size: "md", Color: "red", Text: "Loading..."})
+						@atoms.SpinnerButton("Submit", false)
+						@atoms.SpinnerButton("Submitting...", true)
 					</div>
 				}
 			</section>
@@ -192,11 +192,11 @@ templ Components() {
 			<section>
 				@atoms.Card(atoms.CardProps{Title: "Table"}) {
 					@atoms.Table() {
-						@atoms.TableHeader([]string{"Nom", "Email", "Rôle", "Statut", "Actions"})
+						@atoms.TableHeader([]string{"Name", "Email", "Role", "Status", "Actions"})
 						@atoms.TableBody() {
 							@atoms.TableRow() {
 								@atoms.TableCellBold() {
-									Jean Dupont
+									John Doe
 								}
 								@atoms.TableCell() {
 									jean@example.com
@@ -205,16 +205,16 @@ templ Components() {
 									@atoms.Badge(atoms.BadgeProps{Text: "Admin", Variant: "purple"})
 								}
 								@atoms.TableCell() {
-									@atoms.Badge(atoms.BadgeProps{Text: "Actif", Variant: "green"})
+									@atoms.Badge(atoms.BadgeProps{Text: "Active", Variant: "green"})
 								}
 								@atoms.TableActions() {
-									@atoms.Button(atoms.ButtonProps{Text: "Éditer", Variant: "secondary", Size: "sm"})
-									@atoms.Button(atoms.ButtonProps{Text: "Supprimer", Variant: "danger", Size: "sm"})
+									@atoms.Button(atoms.ButtonProps{Text: "Edit", Variant: "secondary", Size: "sm"})
+									@atoms.Button(atoms.ButtonProps{Text: "Delete", Variant: "danger", Size: "sm"})
 								}
 							}
 							@atoms.TableRow() {
 								@atoms.TableCellBold() {
-									Marie Martin
+									Jane Smith
 								}
 								@atoms.TableCell() {
 									marie@example.com
@@ -223,11 +223,11 @@ templ Components() {
 									@atoms.Badge(atoms.BadgeProps{Text: "User", Variant: "default"})
 								}
 								@atoms.TableCell() {
-									@atoms.Badge(atoms.BadgeProps{Text: "Inactif", Variant: "red"})
+									@atoms.Badge(atoms.BadgeProps{Text: "Inactive", Variant: "red"})
 								}
 								@atoms.TableActions() {
-									@atoms.Button(atoms.ButtonProps{Text: "Éditer", Variant: "secondary", Size: "sm"})
-									@atoms.Button(atoms.ButtonProps{Text: "Supprimer", Variant: "danger", Size: "sm"})
+									@atoms.Button(atoms.ButtonProps{Text: "Edit", Variant: "secondary", Size: "sm"})
+									@atoms.Button(atoms.ButtonProps{Text: "Delete", Variant: "danger", Size: "sm"})
 								}
 							}
 						}
@@ -243,16 +243,16 @@ templ Components() {
 				@atoms.Card(atoms.CardProps{Title: "Modal"}) {
 					<div class="flex gap-4">
 						@atoms.ModalTrigger("demo-modal") {
-							@atoms.Button(atoms.ButtonProps{Text: "Ouvrir Modal", Variant: "primary"})
+							@atoms.Button(atoms.ButtonProps{Text: "Open Modal", Variant: "primary"})
 						}
 					</div>
-					@atoms.Modal(atoms.ModalProps{ID: "demo-modal", Title: "Exemple de Modal", Size: "md"}) {
+					@atoms.Modal(atoms.ModalProps{ID: "demo-modal", Title: "Modal Example", Size: "md"}) {
 						<p class="text-gray-500 dark:text-gray-400">
-							Ceci est le contenu de la modal. Vous pouvez y mettre n'importe quel composant.
+							This is the modal content. You can put any component here.
 						</p>
 						<div class="mt-4 flex justify-end gap-2">
-							@atoms.Button(atoms.ButtonProps{Text: "Annuler", Variant: "secondary"})
-							@atoms.Button(atoms.ButtonProps{Text: "Confirmer", Variant: "primary"})
+							@atoms.Button(atoms.ButtonProps{Text: "Cancel", Variant: "secondary"})
+							@atoms.Button(atoms.ButtonProps{Text: "Confirm", Variant: "primary"})
 						</div>
 					}
 				}
@@ -265,9 +265,9 @@ templ Components() {
 						ID: "demo-dropdown",
 						ButtonText: "Actions",
 						Items: []atoms.DropdownItem{
-							{Label: "Éditer", Href: "#"},
-							{Label: "Dupliquer", Href: "#"},
-							{Label: "Supprimer", Href: "#"},
+							{Label: "Edit", Href: "#"},
+							{Label: "Duplicate", Href: "#"},
+							{Label: "Delete", Href: "#"},
 						},
 					})
 				}

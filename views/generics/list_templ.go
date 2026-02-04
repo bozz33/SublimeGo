@@ -14,7 +14,7 @@ import (
 	"github.com/bozz33/SublimeGo/pkg/ui/atoms"
 )
 
-// List est le template universel pour tous les tableaux.
+// List is the universal template for all tables.
 func List(state engine.TableState) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -55,7 +55,7 @@ func List(state engine.TableState) templ.Component {
 		}
 		if state.NewURL != "" {
 			templ_7745c5c3_Err = atoms.Button(atoms.ButtonProps{
-				Text:    "Nouveau",
+				Text:    "New",
 				Variant: "primary",
 				Href:    state.NewURL,
 			}).Render(ctx, templ_7745c5c3_Buffer)

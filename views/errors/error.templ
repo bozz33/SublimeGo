@@ -2,7 +2,7 @@ package errors
 
 import "fmt"
 
-// ErrorPageData contient les données pour la page d'erreur générique
+// ErrorPageData contains data for the generic error page
 type ErrorPageData struct {
 	Code       string
 	Message    string
@@ -13,10 +13,10 @@ type ErrorPageData struct {
 	ShowStack  bool
 }
 
-// PageGeneric affiche une page d'erreur générique
+// PageGeneric displays a generic error page
 templ PageGeneric(data ErrorPageData) {
 	<!DOCTYPE html>
-	<html lang="fr" class="h-full">
+	<html lang="en" class="h-full">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -36,7 +36,7 @@ templ PageGeneric(data ErrorPageData) {
 						</div>
 					</div>
 					
-					<!-- Code d'erreur -->
+					<!-- Error code -->
 					<div class="mt-8 text-center">
 						<h1 class="text-9xl font-extrabold text-gray-600">{ fmt.Sprintf("%d", data.StatusCode) }</h1>
 						<h2 class="mt-4 text-3xl font-bold text-gray-900">{ data.Code }</h2>
@@ -44,27 +44,27 @@ templ PageGeneric(data ErrorPageData) {
 							if data.Message != "" {
 								{ data.Message }
 							} else {
-								Une erreur s'est produite.
+								An error occurred.
 							}
 						</p>
 					</div>
 					
-					<!-- Informations techniques -->
+					<!-- Technical information -->
 					<div class="mt-6 bg-white rounded-lg shadow px-4 py-3">
 						<dl class="space-y-2 text-sm">
 							<div class="flex justify-between">
-								<dt class="font-medium text-gray-500">Code HTTP:</dt>
+								<dt class="font-medium text-gray-500">HTTP Code:</dt>
 								<dd class="text-gray-900 font-mono">{ fmt.Sprintf("%d", data.StatusCode) }</dd>
 							</div>
 							if data.Path != "" {
 								<div class="flex justify-between">
-									<dt class="font-medium text-gray-500">Chemin:</dt>
+									<dt class="font-medium text-gray-500">Path:</dt>
 									<dd class="text-gray-900 font-mono">{ data.Path }</dd>
 								</div>
 							}
 							if data.RequestID != "" {
 								<div class="flex justify-between">
-									<dt class="font-medium text-gray-500">ID de requête:</dt>
+									<dt class="font-medium text-gray-500">Request ID:</dt>
 									<dd class="text-gray-900 font-mono text-xs">{ data.RequestID }</dd>
 								</div>
 							}
@@ -89,14 +89,14 @@ templ PageGeneric(data ErrorPageData) {
 							href="/"
 							class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition"
 						>
-							Retour à l'accueil
+							Back to home
 						</a>
 						
 						<button
 							onclick="history.back()"
 							class="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition"
 						>
-							Page précédente
+							Previous page
 						</button>
 					</div>
 				</div>

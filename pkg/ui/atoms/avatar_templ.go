@@ -13,7 +13,7 @@ type AvatarProps struct {
 	Src     string
 	Alt     string
 	Size    string
-	Rounded bool // true = cercle, false = carré arrondi
+	Rounded bool // true = circle, false = rounded square
 }
 
 func Avatar(props AvatarProps) templ.Component {

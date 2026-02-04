@@ -8,7 +8,7 @@ package icons
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-// Icon component pour afficher une icône SVG
+// Icon component to display an SVG icon
 func IconComponent(name string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -38,7 +38,7 @@ func IconComponent(name string) templ.Component {
 	})
 }
 
-// IconWithClass component avec classe personnalisée
+// IconWithClass component with custom class
 func IconWithClass(name string, class string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -68,7 +68,7 @@ func IconWithClass(name string, class string) templ.Component {
 	})
 }
 
-// IconWithSize component avec taille spécifique (4, 5, 6, 8, etc.)
+// IconWithSize component with specific size (4, 5, 6, 8, etc.)
 func IconWithSize(name string, size string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context

@@ -8,8 +8,8 @@ package layouts
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-// Auth est le layout pour les pages de connexion/inscription (sans sidebar)
-// Configuration hybride: Tailwind CDN + Fonts CDN + Alpine.js local
+// Auth is the layout for login/register pages (without sidebar).
+// Hybrid configuration: Tailwind CDN + Fonts CDN + local Alpine.js
 func Auth(title string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -31,7 +31,7 @@ func Auth(title string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"fr\" x-data=\"{ darkMode: localStorage.getItem('darkMode') === 'true' }\" x-init=\"$watch('darkMode', val => localStorage.setItem('darkMode', val))\" :class=\"{ 'dark': darkMode }\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" x-data=\"{ darkMode: localStorage.getItem('darkMode') === 'true' }\" x-init=\"$watch('darkMode', val => localStorage.setItem('darkMode', val))\" :class=\"{ 'dark': darkMode }\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

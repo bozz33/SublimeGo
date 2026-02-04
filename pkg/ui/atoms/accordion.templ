@@ -10,7 +10,7 @@ type AccordionProps struct {
 	Items []AccordionItem
 }
 
-// Accordion - Composant accordéon Flowbite
+// Accordion - Flowbite accordion component
 templ Accordion(props AccordionProps) {
 	<div id="accordion-collapse" data-accordion="collapse">
 		for i, item := range props.Items {

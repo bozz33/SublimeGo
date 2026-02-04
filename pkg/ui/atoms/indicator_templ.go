@@ -13,10 +13,10 @@ type IndicatorProps struct {
 	Size     string // "xs", "sm", "md", "lg", "xl"
 	Position string // "top-left", "top-right", "bottom-left", "bottom-right"
 	Ping     bool   // Animation ping
-	Count    string // Nombre à afficher (optionnel)
+	Count    string // Number to display (optional)
 }
 
-// Indicator - Composant indicateur Flowbite
+// Indicator - Flowbite indicator component
 func Indicator(props IndicatorProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context

@@ -15,15 +15,15 @@ type ButtonProps struct {
 	Variant   string
 	Size      string
 	Type      string // "button", "submit", "reset"
-	Href      string // Si défini, rend un <a> au lieu d'un <button>
+	Href      string // If set, renders an <a> instead of a <button>
 	Disabled  bool
-	Loading   bool   // Affiche un spinner
-	Icon      string // Position: "left" ou "right"
-	FullWidth bool   // Pleine largeur
-	Class     string // Classes additionnelles
+	Loading   bool   // Shows a spinner
+	Icon      string // Position: "left" or "right"
+	FullWidth bool   // Full width
+	Class     string // Additional classes
 }
 
-// Button - Composant avec nouveau design (sans Flowbite)
+// Button - Component with new design (without Flowbite)
 func Button(props ButtonProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -170,7 +170,7 @@ func Button(props ButtonProps) templ.Component {
 	})
 }
 
-// ButtonWithIcon - Bouton avec icône (slot pour l'icône)
+// ButtonWithIcon - Button with icon (slot for icon)
 func ButtonWithIcon(props ButtonProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -335,7 +335,7 @@ func ButtonWithIcon(props ButtonProps) templ.Component {
 	})
 }
 
-// ButtonSpinner - Spinner pour état de chargement
+// ButtonSpinner - Spinner for loading state
 func ButtonSpinner() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -365,7 +365,7 @@ func ButtonSpinner() templ.Component {
 	})
 }
 
-// SimpleIconButton - Bouton avec icône uniquement (version simplifiée)
+// SimpleIconButton - Icon-only button (simplified version)
 func SimpleIconButton(props ButtonProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -458,7 +458,7 @@ func SimpleIconButton(props ButtonProps) templ.Component {
 }
 
 func buttonClasses(props ButtonProps) string {
-	// Base classes - nouveau design avec rounded-xl
+	// Base classes - new design with rounded-xl
 	base := "inline-flex items-center justify-center gap-2 font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900 btn-transition"
 
 	// Size
@@ -476,7 +476,7 @@ func buttonClasses(props ButtonProps) string {
 		size = "px-4 py-2.5 text-sm"
 	}
 
-	// Variant - Nouveau design avec couleurs primary (vert)
+	// Variant - New design with primary colors (green)
 	variant := ""
 	switch props.Variant {
 	case "secondary":

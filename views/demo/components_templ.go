@@ -46,7 +46,7 @@ func Components() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"space-y-8\"><h1 class=\"text-3xl font-bold text-gray-900 dark:text-white\">🧪 Test des Composants Phase 1</h1><section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"space-y-8\"><h1 class=\"text-3xl font-bold text-gray-900 dark:text-white\">Phase 1 Components Test</h1><section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -96,7 +96,7 @@ func Components() templ.Component {
 				}
 				return nil
 			})
-			templ_7745c5c3_Err = atoms.Card(atoms.CardProps{Title: "Boutons"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = atoms.Card(atoms.CardProps{Title: "Buttons"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -124,7 +124,7 @@ func Components() templ.Component {
 					Name:        "email",
 					Label:       "Email",
 					Type:        "email",
-					Placeholder: "exemple@email.com",
+					Placeholder: "example@email.com",
 					Required:    true,
 				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
@@ -132,7 +132,7 @@ func Components() templ.Component {
 				}
 				templ_7745c5c3_Err = atoms.Input(atoms.InputProps{
 					Name:        "password",
-					Label:       "Mot de passe",
+					Label:       "Password",
 					Type:        "password",
 					Placeholder: "••••••••",
 				}).Render(ctx, templ_7745c5c3_Buffer)
@@ -141,17 +141,17 @@ func Components() templ.Component {
 				}
 				templ_7745c5c3_Err = atoms.Input(atoms.InputProps{
 					Name:  "error_field",
-					Label: "Champ avec erreur",
-					Value: "valeur invalide",
-					Error: "Ce champ contient une erreur",
+					Label: "Field with error",
+					Value: "invalid value",
+					Error: "This field contains an error",
 				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				templ_7745c5c3_Err = atoms.Input(atoms.InputProps{
 					Name:     "disabled_field",
-					Label:    "Champ désactivé",
-					Value:    "Non modifiable",
+					Label:    "Disabled field",
+					Value:    "Not editable",
 					Disabled: true,
 				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
@@ -163,7 +163,7 @@ func Components() templ.Component {
 				}
 				return nil
 			})
-			templ_7745c5c3_Err = atoms.Card(atoms.CardProps{Title: "Champs de formulaire"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = atoms.Card(atoms.CardProps{Title: "Form Fields"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -189,11 +189,11 @@ func Components() templ.Component {
 				}
 				templ_7745c5c3_Err = atoms.Select(atoms.SelectProps{
 					Name:  "role",
-					Label: "Rôle",
+					Label: "Role",
 					Options: []atoms.SelectOption{
-						{Label: "Administrateur", Value: "admin"},
-						{Label: "Utilisateur", Value: "user"},
-						{Label: "Invité", Value: "guest"},
+						{Label: "Administrator", Value: "admin"},
+						{Label: "User", Value: "user"},
+						{Label: "Guest", Value: "guest"},
 					},
 					Value: "user",
 				}).Render(ctx, templ_7745c5c3_Buffer)
@@ -204,7 +204,7 @@ func Components() templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = atoms.Toggle(atoms.ToggleProps{Name: "active", Label: "Actif", Checked: true}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = atoms.Toggle(atoms.ToggleProps{Name: "active", Label: "Active", Checked: true}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -212,7 +212,7 @@ func Components() templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = atoms.Checkbox(atoms.CheckboxProps{Name: "terms", Label: "J'accepte les conditions", Checked: true}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = atoms.Checkbox(atoms.CheckboxProps{Name: "terms", Label: "I accept the terms", Checked: true}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -248,9 +248,9 @@ func Components() templ.Component {
 				}
 				templ_7745c5c3_Err = atoms.Radio(atoms.RadioProps{
 					Name:  "plan",
-					Label: "Choisir un plan",
+					Label: "Choose a plan",
 					Options: []atoms.RadioOption{
-						{Label: "Gratuit", Value: "free"},
+						{Label: "Free", Value: "free"},
 						{Label: "Pro", Value: "pro"},
 						{Label: "Enterprise", Value: "enterprise"},
 					},
@@ -261,7 +261,7 @@ func Components() templ.Component {
 				}
 				templ_7745c5c3_Err = atoms.Radio(atoms.RadioProps{
 					Name:  "size",
-					Label: "Taille (inline)",
+					Label: "Size (inline)",
 					Options: []atoms.RadioOption{
 						{Label: "S", Value: "s"},
 						{Label: "M", Value: "m"},
@@ -303,7 +303,7 @@ func Components() templ.Component {
 				templ_7745c5c3_Err = atoms.Textarea(atoms.TextareaProps{
 					Name:        "description",
 					Label:       "Description",
-					Placeholder: "Entrez une description...",
+					Placeholder: "Enter a description...",
 					Rows:        4,
 				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
@@ -337,7 +337,7 @@ func Components() templ.Component {
 				}
 				templ_7745c5c3_Err = atoms.DatePicker(atoms.DatePickerProps{
 					Name:  "birthdate",
-					Label: "Date de naissance",
+					Label: "Date of birth",
 					Type:  "date",
 				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
@@ -345,9 +345,9 @@ func Components() templ.Component {
 				}
 				templ_7745c5c3_Err = atoms.FileUpload(atoms.FileUploadProps{
 					Name:     "avatar",
-					Label:    "Photo de profil",
+					Label:    "Profile picture",
 					Accept:   "image/*",
-					HelpText: "PNG, JPG ou GIF (max 2MB)",
+					HelpText: "PNG, JPG or GIF (max 2MB)",
 				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -448,19 +448,19 @@ func Components() templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = atoms.Alert(atoms.AlertProps{Type: "info", Message: "Ceci est une alerte d'information.", Dismissible: true}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = atoms.Alert(atoms.AlertProps{Type: "info", Message: "This is an information alert.", Dismissible: true}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = atoms.Alert(atoms.AlertProps{Type: "success", Message: "Opération réussie !", Dismissible: true}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = atoms.Alert(atoms.AlertProps{Type: "success", Message: "Operation successful!", Dismissible: true}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = atoms.Alert(atoms.AlertProps{Type: "warning", Message: "Attention, action requise.", Dismissible: true}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = atoms.Alert(atoms.AlertProps{Type: "warning", Message: "Warning, action required.", Dismissible: true}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = atoms.Alert(atoms.AlertProps{Type: "error", Message: "Une erreur s'est produite.", Dismissible: true}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = atoms.Alert(atoms.AlertProps{Type: "error", Message: "An error occurred.", Dismissible: true}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -506,15 +506,15 @@ func Components() templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = atoms.Spinner(atoms.SpinnerProps{Size: "md", Color: "red", Text: "Chargement..."}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = atoms.Spinner(atoms.SpinnerProps{Size: "md", Color: "red", Text: "Loading..."}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = atoms.SpinnerButton("Envoyer", false).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = atoms.SpinnerButton("Submit", false).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = atoms.SpinnerButton("Envoi en cours...", true).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = atoms.SpinnerButton("Submitting...", true).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -556,7 +556,7 @@ func Components() templ.Component {
 						}()
 					}
 					ctx = templ.InitializeContext(ctx)
-					templ_7745c5c3_Err = atoms.TableHeader([]string{"Nom", "Email", "Rôle", "Statut", "Actions"}).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = atoms.TableHeader([]string{"Name", "Email", "Role", "Status", "Actions"}).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -600,7 +600,7 @@ func Components() templ.Component {
 									}()
 								}
 								ctx = templ.InitializeContext(ctx)
-								templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "Jean Dupont")
+								templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "John Doe")
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
@@ -678,7 +678,7 @@ func Components() templ.Component {
 									}()
 								}
 								ctx = templ.InitializeContext(ctx)
-								templ_7745c5c3_Err = atoms.Badge(atoms.BadgeProps{Text: "Actif", Variant: "green"}).Render(ctx, templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = atoms.Badge(atoms.BadgeProps{Text: "Active", Variant: "green"}).Render(ctx, templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
@@ -704,7 +704,7 @@ func Components() templ.Component {
 									}()
 								}
 								ctx = templ.InitializeContext(ctx)
-								templ_7745c5c3_Err = atoms.Button(atoms.ButtonProps{Text: "Éditer", Variant: "secondary", Size: "sm"}).Render(ctx, templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = atoms.Button(atoms.ButtonProps{Text: "Edit", Variant: "secondary", Size: "sm"}).Render(ctx, templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
@@ -712,7 +712,7 @@ func Components() templ.Component {
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
-								templ_7745c5c3_Err = atoms.Button(atoms.ButtonProps{Text: "Supprimer", Variant: "danger", Size: "sm"}).Render(ctx, templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = atoms.Button(atoms.ButtonProps{Text: "Delete", Variant: "danger", Size: "sm"}).Render(ctx, templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
@@ -756,7 +756,7 @@ func Components() templ.Component {
 									}()
 								}
 								ctx = templ.InitializeContext(ctx)
-								templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "Marie Martin")
+								templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "Jane Smith")
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
@@ -834,7 +834,7 @@ func Components() templ.Component {
 									}()
 								}
 								ctx = templ.InitializeContext(ctx)
-								templ_7745c5c3_Err = atoms.Badge(atoms.BadgeProps{Text: "Inactif", Variant: "red"}).Render(ctx, templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = atoms.Badge(atoms.BadgeProps{Text: "Inactive", Variant: "red"}).Render(ctx, templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
@@ -860,7 +860,7 @@ func Components() templ.Component {
 									}()
 								}
 								ctx = templ.InitializeContext(ctx)
-								templ_7745c5c3_Err = atoms.Button(atoms.ButtonProps{Text: "Éditer", Variant: "secondary", Size: "sm"}).Render(ctx, templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = atoms.Button(atoms.ButtonProps{Text: "Edit", Variant: "secondary", Size: "sm"}).Render(ctx, templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
@@ -868,7 +868,7 @@ func Components() templ.Component {
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
-								templ_7745c5c3_Err = atoms.Button(atoms.ButtonProps{Text: "Supprimer", Variant: "danger", Size: "sm"}).Render(ctx, templ_7745c5c3_Buffer)
+								templ_7745c5c3_Err = atoms.Button(atoms.ButtonProps{Text: "Delete", Variant: "danger", Size: "sm"}).Render(ctx, templ_7745c5c3_Buffer)
 								if templ_7745c5c3_Err != nil {
 									return templ_7745c5c3_Err
 								}
@@ -946,7 +946,7 @@ func Components() templ.Component {
 						}()
 					}
 					ctx = templ.InitializeContext(ctx)
-					templ_7745c5c3_Err = atoms.Button(atoms.ButtonProps{Text: "Ouvrir Modal", Variant: "primary"}).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = atoms.Button(atoms.ButtonProps{Text: "Open Modal", Variant: "primary"}).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -972,15 +972,15 @@ func Components() templ.Component {
 						}()
 					}
 					ctx = templ.InitializeContext(ctx)
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "<p class=\"text-gray-500 dark:text-gray-400\">Ceci est le contenu de la modal. Vous pouvez y mettre n'importe quel composant.</p><div class=\"mt-4 flex justify-end gap-2\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "<p class=\"text-gray-500 dark:text-gray-400\">This is the modal content. You can put any component here.</p><div class=\"mt-4 flex justify-end gap-2\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = atoms.Button(atoms.ButtonProps{Text: "Annuler", Variant: "secondary"}).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = atoms.Button(atoms.ButtonProps{Text: "Cancel", Variant: "secondary"}).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = atoms.Button(atoms.ButtonProps{Text: "Confirmer", Variant: "primary"}).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = atoms.Button(atoms.ButtonProps{Text: "Confirm", Variant: "primary"}).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -990,7 +990,7 @@ func Components() templ.Component {
 					}
 					return nil
 				})
-				templ_7745c5c3_Err = atoms.Modal(atoms.ModalProps{ID: "demo-modal", Title: "Exemple de Modal", Size: "md"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var29), templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = atoms.Modal(atoms.ModalProps{ID: "demo-modal", Title: "Modal Example", Size: "md"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var29), templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1020,9 +1020,9 @@ func Components() templ.Component {
 					ID:         "demo-dropdown",
 					ButtonText: "Actions",
 					Items: []atoms.DropdownItem{
-						{Label: "Éditer", Href: "#"},
-						{Label: "Dupliquer", Href: "#"},
-						{Label: "Supprimer", Href: "#"},
+						{Label: "Edit", Href: "#"},
+						{Label: "Duplicate", Href: "#"},
+						{Label: "Delete", Href: "#"},
 					},
 				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
@@ -1040,7 +1040,7 @@ func Components() templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = layouts.Base("Démo Composants").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = layouts.Base("Components Demo").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

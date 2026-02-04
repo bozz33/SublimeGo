@@ -8,37 +8,37 @@ package layouts
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-// NavItem représente un élément de navigation
+// NavItem represents a navigation item
 type NavItem struct {
 	Slug     string
 	Label    string
-	Icon     string    // Nom de l'icône (ex: "users", "settings")
-	Badge    string    // Badge optionnel (ex: "12", "Nouveau")
-	Children []NavItem // Sous-menu optionnel
+	Icon     string    // Icon name (ex: "users", "settings")
+	Badge    string    // Optional badge (ex: "12", "New")
+	Children []NavItem // Optional submenu
 	Active   bool
 }
 
-// NavGroup représente un groupe de navigation
+// NavGroup represents a navigation group
 type NavGroup struct {
 	Label string
 	Items []NavItem
 }
 
-// navItems stocke les items de navigation (injecté par le moteur)
+// navItems stores navigation items (injected by the engine)
 var navItems []NavItem
 var navGroups []NavGroup
 
-// SetNavItems permet au moteur d'injecter les items de navigation
+// SetNavItems allows the engine to inject navigation items
 func SetNavItems(items []NavItem) {
 	navItems = items
 }
 
-// SetNavGroups permet de définir des groupes de navigation
+// SetNavGroups sets navigation groups
 func SetNavGroups(groups []NavGroup) {
 	navGroups = groups
 }
 
-// Sidebar - Version 2.0 avec Alpine.js et nouveau design
+// Sidebar - Version 2.0 with Alpine.js and new design
 func Sidebar() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -195,7 +195,7 @@ func Sidebar() templ.Component {
 	})
 }
 
-// SidebarNavItem - Item de navigation avec support sous-menu
+// SidebarNavItem - Navigation item with submenu support
 func SidebarNavItem(item NavItem) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -218,7 +218,7 @@ func SidebarNavItem(item NavItem) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		if len(item.Children) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<!-- Item avec sous-menu --> <li x-data=\"{ open: false }\"><button @click=\"open = !open\" class=\"w-full flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors\"><span class=\"flex items-center gap-3\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<!-- Item with submenu --> <li x-data=\"{ open: false }\"><button @click=\"open = !open\" class=\"w-full flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors\"><span class=\"flex items-center gap-3\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -391,7 +391,7 @@ func SidebarNavItem(item NavItem) templ.Component {
 	})
 }
 
-// SidebarIcon - Affiche l'icône appropriée basée sur le nom
+// SidebarIcon - Displays the appropriate icon based on name
 func SidebarIcon(iconName string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context

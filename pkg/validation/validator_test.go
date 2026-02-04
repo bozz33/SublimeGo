@@ -70,10 +70,10 @@ func TestValidateStruct_Invalid(t *testing.T) {
 	assert.Contains(t, errors, "password")
 	assert.Contains(t, errors, "age")
 
-	// Verify French messages
-	assert.Contains(t, errors["email"], "adresse email valide")
-	assert.Contains(t, errors["password"], "au minimum 8 caractères")
-	assert.Contains(t, errors["age"], "supérieur ou égal à 18")
+	// Verify English messages
+	assert.Contains(t, errors["email"], "valid email address")
+	assert.Contains(t, errors["password"], "at least 8 characters")
+	assert.Contains(t, errors["age"], "greater than or equal to 18")
 }
 
 func TestValidateStruct_Empty(t *testing.T) {
@@ -86,10 +86,10 @@ func TestValidateStruct_Empty(t *testing.T) {
 	assert.Contains(t, errors, "password")
 	assert.Contains(t, errors, "age")
 
-	// Messages "obligatoire"
-	assert.Contains(t, errors["email"], "obligatoire")
-	assert.Contains(t, errors["password"], "obligatoire")
-	assert.Contains(t, errors["age"], "obligatoire")
+	// Messages "required"
+	assert.Contains(t, errors["email"], "required")
+	assert.Contains(t, errors["password"], "required")
+	assert.Contains(t, errors["age"], "required")
 }
 
 func TestValidateForm_Valid(t *testing.T) {
@@ -501,8 +501,8 @@ func TestFrenchContact_Invalid(t *testing.T) {
 
 	assert.Contains(t, errors, "phone")
 	assert.Contains(t, errors, "postal_code")
-	assert.Contains(t, errors["phone"], "téléphone français valide")
-	assert.Contains(t, errors["postal_code"], "code postal français valide")
+	assert.Contains(t, errors["phone"], "valid French phone number")
+	assert.Contains(t, errors["postal_code"], "valid French postal code")
 }
 
 func TestCompany_Validation(t *testing.T) {
@@ -526,8 +526,8 @@ func TestCompany_Invalid(t *testing.T) {
 
 	assert.Contains(t, errors, "siret")
 	assert.Contains(t, errors, "siren")
-	assert.Contains(t, errors["siret"], "numéro SIRET valide")
-	assert.Contains(t, errors["siren"], "numéro SIREN valide")
+	assert.Contains(t, errors["siret"], "valid SIRET number")
+	assert.Contains(t, errors["siren"], "valid SIREN number")
 }
 
 // Tests helpers globaux
@@ -556,12 +556,12 @@ func TestMust(t *testing.T) {
 		Age:      25,
 	}
 
-	// Ne doit pas panic
+	// Should not panic
 	assert.NotPanics(t, func() {
 		Must(validUser)
 	})
 
-	// Doit panic avec utilisateur invalide
+	// Should panic with invalid user
 	assert.Panics(t, func() {
 		invalidUser := User{
 			Email:    "invalid-email",

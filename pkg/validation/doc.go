@@ -1,12 +1,12 @@
 // Package validation provides data validation using go-playground/validator.
 //
-// It wraps the validator library with French error messages and adds
-// custom validators for French-specific data (phone, postal code, SIRET/SIREN).
+// It wraps the validator library with English error messages by default and adds
+// custom validators for specific data types (phone, postal code, SIRET/SIREN).
 // The package supports struct validation, form validation, and JSON validation.
 //
 // Features:
 //   - Struct validation with tags
-//   - French error messages
+//   - English error messages (French messages available)
 //   - Custom validators (phone_fr, postal_code_fr, siret, siren, slug)
 //   - Strong password validation
 //   - Form and JSON validation helpers

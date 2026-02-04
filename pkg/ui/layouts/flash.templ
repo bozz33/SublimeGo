@@ -56,7 +56,7 @@ templ FlashItem(msg FlashMessage, index int) {
 			type="button" 
 			class="ms-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 inline-flex items-center justify-center h-8 w-8 text-gray-500 hover:text-gray-900 hover:bg-white/50 dark:hover:bg-gray-700"
 			data-dismiss-target={ "#" + getFlashID(index) }
-			aria-label="Fermer"
+			aria-label="Close"
 		>
 			<svg class="w-3 h-3" fill="none" viewBox="0 0 14 14">
 				<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
@@ -76,8 +76,8 @@ func intToStr(i int) string {
 	return "0"
 }
 
-// Flash - Composant vide par défaut (les messages sont injectés via HTMX/JS)
-// Ce composant est appelé dans base.templ pour le conteneur initial
+// Flash - Empty component by default (messages are injected via HTMX/JS).
+// This component is called in base.templ for the initial container
 templ Flash() {
-	<!-- Flash messages seront injectés ici via HTMX ou JS Toast -->
+	<!-- Flash messages will be injected here via HTMX or JS Toast -->
 }

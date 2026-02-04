@@ -11,7 +11,7 @@ import templruntime "github.com/a-h/templ/runtime"
 type DropdownItem struct {
 	Label string
 	Href  string
-	Icon  string // optionnel
+	Icon  string // optional
 }
 
 type DropdownProps struct {

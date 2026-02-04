@@ -161,7 +161,7 @@ func buttonGroupItemClasses(index, total int, active, disabled bool) string {
 		base += " rounded-e-lg"
 	}
 
-	// État
+	// State
 	if disabled {
 		return base + " text-gray-400 bg-gray-100 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500"
 	}

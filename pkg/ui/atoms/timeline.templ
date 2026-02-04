@@ -4,14 +4,14 @@ type TimelineItem struct {
 	Title       string
 	Date        string
 	Description string
-	Icon        string // optionnel
+	Icon        string // optional
 }
 
 type TimelineProps struct {
 	Items []TimelineItem
 }
 
-// Timeline - Composant timeline Flowbite
+// Timeline - Flowbite timeline component
 templ Timeline(props TimelineProps) {
 	<ol class="relative border-s border-gray-200 dark:border-gray-700">
 		for _, item := range props.Items {

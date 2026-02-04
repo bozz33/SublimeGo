@@ -12,14 +12,14 @@ type TimelineItem struct {
 	Title       string
 	Date        string
 	Description string
-	Icon        string // optionnel
+	Icon        string // optional
 }
 
 type TimelineProps struct {
 	Items []TimelineItem
 }
 
-// Timeline - Composant timeline Flowbite
+// Timeline - Flowbite timeline component
 func Timeline(props TimelineProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context

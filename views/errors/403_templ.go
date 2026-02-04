@@ -8,14 +8,14 @@ package errors
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-// Error403Data contient les données pour la page 403
+// Error403Data contains data for the 403 page
 type Error403Data struct {
 	Message   string
 	RequestID string
 	Path      string
 }
 
-// Page403 affiche la page d'erreur 403
+// Page403 displays the 403 error page
 func Page403(data Error403Data) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -37,7 +37,7 @@ func Page403(data Error403Data) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"fr\" class=\"h-full\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>403 - Accès refusé</title><script src=\"https://cdn.tailwindcss.com\"></script></head><body class=\"h-full bg-gray-50\"><div class=\"min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8\"><div class=\"sm:mx-auto sm:w-full sm:max-w-md\"><!-- Logo / Brand --><div class=\"flex justify-center\"><div class=\"flex items-center space-x-3\"><div class=\"w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center\"><svg class=\"w-8 h-8 text-white\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z\"></path></svg></div><span class=\"text-2xl font-bold text-gray-900\">SublimeGo</span></div></div><!-- Code d'erreur --><div class=\"mt-8 text-center\"><h1 class=\"text-9xl font-extrabold text-amber-600\">403</h1><h2 class=\"mt-4 text-3xl font-bold text-gray-900\">Accès refusé</h2><p class=\"mt-2 text-base text-gray-600\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"h-full\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>403 - Access Denied</title><script src=\"https://cdn.tailwindcss.com\"></script></head><body class=\"h-full bg-gray-50\"><div class=\"min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8\"><div class=\"sm:mx-auto sm:w-full sm:max-w-md\"><!-- Logo / Brand --><div class=\"flex justify-center\"><div class=\"flex items-center space-x-3\"><div class=\"w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center\"><svg class=\"w-8 h-8 text-white\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z\"></path></svg></div><span class=\"text-2xl font-bold text-gray-900\">SublimeGo</span></div></div><!-- Error code --><div class=\"mt-8 text-center\"><h1 class=\"text-9xl font-extrabold text-amber-600\">403</h1><h2 class=\"mt-4 text-3xl font-bold text-gray-900\">Access Denied</h2><p class=\"mt-2 text-base text-gray-600\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -52,12 +52,12 @@ func Page403(data Error403Data) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "Vous n'avez pas la permission d'accéder à cette ressource.")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "You do not have permission to access this resource.")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p></div><!-- Informations techniques -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p></div><!-- Technical information -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -67,7 +67,7 @@ func Page403(data Error403Data) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if data.Path != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"flex justify-between\"><dt class=\"font-medium text-gray-500\">Ressource:</dt><dd class=\"text-gray-900 font-mono\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"flex justify-between\"><dt class=\"font-medium text-gray-500\">Resource:</dt><dd class=\"text-gray-900 font-mono\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -86,7 +86,7 @@ func Page403(data Error403Data) templ.Component {
 				}
 			}
 			if data.RequestID != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"flex justify-between\"><dt class=\"font-medium text-gray-500\">ID de requête:</dt><dd class=\"text-gray-900 font-mono text-xs\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"flex justify-between\"><dt class=\"font-medium text-gray-500\">Request ID:</dt><dd class=\"text-gray-900 font-mono text-xs\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -109,7 +109,7 @@ func Page403(data Error403Data) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<!-- Raisons possibles --><div class=\"mt-6 bg-amber-50 border border-amber-200 rounded-lg px-4 py-4\"><h3 class=\"text-sm font-semibold text-amber-900 mb-2\">Raisons possibles</h3><ul class=\"text-sm text-amber-700 space-y-1 list-disc list-inside\"><li>Vous n'êtes pas connecté</li><li>Votre session a expiré</li><li>Vous n'avez pas les droits nécessaires</li><li>La ressource est restreinte</li></ul></div><!-- Actions --><div class=\"mt-8 space-y-3\"><a href=\"/login\" class=\"w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition\"><svg class=\"-ml-1 mr-2 h-5 w-5\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path fill-rule=\"evenodd\" d=\"M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z\" clip-rule=\"evenodd\"></path></svg> Se connecter</a> <a href=\"/\" class=\"w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition\"><svg class=\"-ml-1 mr-2 h-5 w-5\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path d=\"M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z\"></path></svg> Retour à l'accueil</a></div><!-- Help text --><div class=\"mt-6 text-center text-sm text-gray-500\"><p>Besoin d'aide ?  <a href=\"/support\" class=\"font-medium text-amber-600 hover:text-amber-500\">Contactez le support</a> pour demander l'accès.</p></div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<!-- Possible reasons --><div class=\"mt-6 bg-amber-50 border border-amber-200 rounded-lg px-4 py-4\"><h3 class=\"text-sm font-semibold text-amber-900 mb-2\">Possible reasons</h3><ul class=\"text-sm text-amber-700 space-y-1 list-disc list-inside\"><li>You are not logged in</li><li>Your session has expired</li><li>You do not have the required permissions</li><li>The resource is restricted</li></ul></div><!-- Actions --><div class=\"mt-8 space-y-3\"><a href=\"/login\" class=\"w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition\"><svg class=\"-ml-1 mr-2 h-5 w-5\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path fill-rule=\"evenodd\" d=\"M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z\" clip-rule=\"evenodd\"></path></svg> Sign in</a> <a href=\"/\" class=\"w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition\"><svg class=\"-ml-1 mr-2 h-5 w-5\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path d=\"M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z\"></path></svg> Back to home</a></div><!-- Help text --><div class=\"mt-6 text-center text-sm text-gray-500\"><p>Need help?  <a href=\"/support\" class=\"font-medium text-amber-600 hover:text-amber-500\">Contact support</a> to request access.</p></div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

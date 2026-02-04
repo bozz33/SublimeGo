@@ -12,12 +12,12 @@ type CardProps struct {
 	Title       string
 	Description string
 	Padding     string // "none", "sm", "md", "lg" - default "md"
-	Hover       bool   // Effet hover
+	Hover       bool   // Hover effect
 	Shadow      string // "none", "sm", "md", "lg" - default "sm"
-	Class       string // Classes additionnelles
+	Class       string // Additional classes
 }
 
-// Card - Composant avec nouveau design (sans Flowbite)
+// Card - Component with new design (without Flowbite)
 func Card(props CardProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -508,7 +508,7 @@ func StatCard(title string, value string, change string, changeType string, icon
 	})
 }
 
-// EmptyCard - Card pour état vide
+// EmptyCard - Card for empty state
 func EmptyCard(title string, description string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context

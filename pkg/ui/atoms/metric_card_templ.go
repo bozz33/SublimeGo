@@ -8,16 +8,16 @@ package atoms
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-// MetricCardProps définit les propriétés d'une carte de métrique
+// MetricCardProps defines the properties for a metric card
 type MetricCardProps struct {
 	Title      string
 	Value      string
-	Change     string // ex: "+11.01%" ou "-9.05%"
-	IsPositive bool   // true = vert, false = rouge
+	Change     string // e.g., "+11.01%" or "-9.05%"
+	IsPositive bool   // true = green, false = red
 	Icon       string // "users", "orders", "revenue", "growth"
 }
 
-// MetricCard - Composant Flowbite avec style TailAdmin
+// MetricCard - Flowbite component with TailAdmin style
 func MetricCard(props MetricCardProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context

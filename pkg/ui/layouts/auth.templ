@@ -1,10 +1,10 @@
 package layouts
 
-// Auth est le layout pour les pages de connexion/inscription (sans sidebar)
-// Configuration hybride: Tailwind CDN + Fonts CDN + Alpine.js local
+// Auth is the layout for login/register pages (without sidebar).
+// Hybrid configuration: Tailwind CDN + Fonts CDN + local Alpine.js
 templ Auth(title string) {
 	<!DOCTYPE html>
-	<html lang="fr" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))" :class="{ 'dark': darkMode }">
+	<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))" :class="{ 'dark': darkMode }">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>

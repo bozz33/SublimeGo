@@ -15,7 +15,7 @@ type PopoverProps struct {
 	TriggerText string
 }
 
-// Popover - Composant popover Flowbite
+// Popover - Flowbite popover component
 func Popover(props PopoverProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context

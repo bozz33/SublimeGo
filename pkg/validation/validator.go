@@ -21,7 +21,7 @@ type Validator struct {
 func New() *Validator {
 	v := &Validator{
 		validate: validator.New(),
-		messages: frenchMessages(),
+		messages: defaultMessages(),
 	}
 
 	v.validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
@@ -218,7 +218,7 @@ func (d *FormDecoder) Decode(dest interface{}, data map[string][]string) error {
 		if values, exists := data[fieldName]; exists && len(values) > 0 {
 			value := values[0]
 
-			// Assigner la valeur selon le type
+			// Assign value based on type
 			if field.CanSet() {
 				switch field.Kind() {
 				case reflect.String:
@@ -239,14 +239,14 @@ func (d *FormDecoder) Decode(dest interface{}, data map[string][]string) error {
 	return nil
 }
 
-// parseInt convertit string en int
+// parseInt converts string to int
 func parseInt(s string) (int, error) {
 	var result int
 	_, err := fmt.Sscanf(s, "%d", &result)
 	return result, err
 }
 
-// parseFloat convertit string en float64
+// parseFloat converts string to float64
 func parseFloat(s string) (float64, error) {
 	var result float64
 	_, err := fmt.Sscanf(s, "%f", &result)

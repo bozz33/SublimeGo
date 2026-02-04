@@ -18,7 +18,7 @@ type RangeProps struct {
 	Disabled bool
 }
 
-// Range - Composant slider Flowbite
+// Range - Flowbite slider component
 func Range(props RangeProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context

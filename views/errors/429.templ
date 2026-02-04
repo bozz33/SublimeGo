@@ -6,10 +6,10 @@ import (
 )
 
 templ TooManyRequests(requestID string, retryAfter int) {
-	@layouts.Base("429 - Trop de requêtes") {
+	@layouts.Base("429 - Too Many Requests") {
 		<div class="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
 			<div class="w-full max-w-md text-center">
-				<!-- Icône d'erreur -->
+				<!-- Error icon -->
 				<div class="mb-8 flex justify-center">
 					<div class="flex h-24 w-24 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/20">
 						<svg class="h-12 w-12 text-yellow-600 dark:text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -18,32 +18,32 @@ templ TooManyRequests(requestID string, retryAfter int) {
 					</div>
 				</div>
 
-				<!-- Code d'erreur -->
+				<!-- Error code -->
 				<h1 class="mb-4 text-6xl font-bold text-gray-900 dark:text-white">429</h1>
 
 				<!-- Message -->
 				<h2 class="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
-					Trop de requêtes
+					Too Many Requests
 				</h2>
 
 				<p class="mb-8 text-gray-600 dark:text-gray-400">
-					Vous avez dépassé la limite de requêtes autorisées.
+					You have exceeded the allowed request limit.
 					if retryAfter > 0 {
 						<br/>
-						<span class="font-medium">Veuillez réessayer dans { formatRetryAfter(retryAfter) }.</span>
+						<span class="font-medium">Please try again in { formatRetryAfter(retryAfter) }.</span>
 					}
 				</p>
 
-				<!-- Informations supplémentaires -->
+				<!-- Additional information -->
 				<div class="mb-8 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
 					<div class="flex items-start">
 						<svg class="mr-3 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
 							<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
 						</svg>
 						<div class="text-left text-sm text-yellow-700 dark:text-yellow-400">
-							<p class="font-medium">Pourquoi cette limitation ?</p>
+							<p class="font-medium">Why this limitation?</p>
 							<p class="mt-1">
-								Cette limite protège nos serveurs et garantit un service équitable pour tous les utilisateurs.
+								This limit protects our servers and ensures fair service for all users.
 							</p>
 						</div>
 					</div>
@@ -58,7 +58,7 @@ templ TooManyRequests(requestID string, retryAfter int) {
 						<svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
 						</svg>
-						Retour à l'accueil
+						Back to home
 					</a>
 					<button
 						onclick="window.location.reload()"
@@ -67,7 +67,7 @@ templ TooManyRequests(requestID string, retryAfter int) {
 						<svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
 						</svg>
-						Réessayer
+						Retry
 					</button>
 				</div>
 
@@ -84,7 +84,7 @@ templ TooManyRequests(requestID string, retryAfter int) {
 
 func formatRetryAfter(seconds int) string {
 	if seconds < 60 {
-		return templ.EscapeString(fmt.Sprintf("%d seconde(s)", seconds))
+		return templ.EscapeString(fmt.Sprintf("%d second(s)", seconds))
 	}
 	minutes := seconds / 60
 	return templ.EscapeString(fmt.Sprintf("%d minute(s)", minutes))

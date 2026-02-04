@@ -1,5 +1,99 @@
 package validation
 
+// defaultMessages returns validation messages in English (default)
+func defaultMessages() map[string]string {
+	return map[string]string{
+		// Required & Presence
+		"required":         "The {field} field is required",
+		"required_if":      "The {field} field is required when {param} is set",
+		"required_unless":  "The {field} field is required unless {param} is set",
+		"required_with":    "The {field} field is required with {param}",
+		"required_without": "The {field} field is required without {param}",
+
+		// String Length
+		"min": "The {field} field must be at least {param} characters",
+		"max": "The {field} field must be at most {param} characters",
+		"len": "The {field} field must be exactly {param} characters",
+
+		// Numeric Comparison
+		"eq":  "The {field} field must be equal to {param}",
+		"ne":  "The {field} field must not be equal to {param}",
+		"lt":  "The {field} field must be less than {param}",
+		"lte": "The {field} field must be less than or equal to {param}",
+		"gt":  "The {field} field must be greater than {param}",
+		"gte": "The {field} field must be greater than or equal to {param}",
+
+		// Numeric Types
+		"numeric": "The {field} field must be a number",
+		"number":  "The {field} field must be a number",
+		"integer": "The {field} field must be an integer",
+
+		// String Format
+		"alpha":        "The {field} field must contain only letters",
+		"alphanum":     "The {field} field must contain only letters and numbers",
+		"alphaunicode": "The {field} field must contain only unicode letters",
+		"ascii":        "The {field} field must contain only ASCII characters",
+		"lowercase":    "The {field} field must be lowercase",
+		"uppercase":    "The {field} field must be uppercase",
+		"startswith":   "The {field} field must start with {param}",
+		"endswith":     "The {field} field must end with {param}",
+		"contains":     "The {field} field must contain {param}",
+		"excludes":     "The {field} field must not contain {param}",
+
+		// Email & URL
+		"email":    "The {field} field must be a valid email address",
+		"url":      "The {field} field must be a valid URL",
+		"uri":      "The {field} field must be a valid URI",
+		"hostname": "The {field} field must be a valid hostname",
+		"fqdn":     "The {field} field must be a fully qualified domain name",
+
+		// IP
+		"ip":   "The {field} field must be a valid IP address",
+		"ipv4": "The {field} field must be a valid IPv4 address",
+		"ipv6": "The {field} field must be a valid IPv6 address",
+		"mac":  "The {field} field must be a valid MAC address",
+
+		// UUID
+		"uuid":  "The {field} field must be a valid UUID",
+		"uuid3": "The {field} field must be a valid UUID v3",
+		"uuid4": "The {field} field must be a valid UUID v4",
+		"uuid5": "The {field} field must be a valid UUID v5",
+
+		// Date & Time
+		"datetime": "The {field} field must be a valid date/time",
+
+		// Boolean
+		"boolean": "The {field} field must be a boolean (true/false)",
+
+		// JSON
+		"json": "The {field} field must be valid JSON",
+
+		// Base64
+		"base64":    "The {field} field must be base64 encoded",
+		"base64url": "The {field} field must be base64url encoded",
+
+		// Field Comparison
+		"eqfield":  "The {field} field must be equal to {param}",
+		"nefield":  "The {field} field must not be equal to {param}",
+		"gtfield":  "The {field} field must be greater than {param}",
+		"gtefield": "The {field} field must be greater than or equal to {param}",
+		"ltfield":  "The {field} field must be less than {param}",
+		"ltefield": "The {field} field must be less than or equal to {param}",
+
+		// Array/Slice
+		"unique": "The {field} field must not contain duplicates",
+		"dive":   "Each element of {field}",
+
+		// Custom Validators
+		"phone_fr":        "The {field} field must be a valid French phone number",
+		"postal_code_fr":  "The {field} field must be a valid French postal code (e.g., 75001)",
+		"slug":            "The {field} field must be a valid slug (e.g., my-article-123)",
+		"siret":           "The {field} field must be a valid SIRET number (14 digits)",
+		"siren":           "The {field} field must be a valid SIREN number (9 digits)",
+		"strong_password": "The {field} field must contain at least 8 characters with uppercase, lowercase and number",
+	}
+}
+
 // frenchMessages returns validation messages in French
 func frenchMessages() map[string]string {
 	return map[string]string{

@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-// Topbar - Version 2.0 avec Alpine.js et nouveau design
+// Topbar - Version 2.0 with Alpine.js and new design
 func Topbar(ctx context.Context) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -39,11 +39,11 @@ func Topbar(ctx context.Context) templ.Component {
 		userEmail := "guest@example.com"
 		userInitials := "GU"
 
-		// Récupérer l'utilisateur depuis le contexte
+		// Get user from context
 		user := auth.UserFromContext(ctx)
 		if user != nil && user.IsAuthenticated() {
 			userEmail = user.Email
-			// Générer les initiales depuis l'email
+			// Generate initials from email
 			if len(user.Email) > 0 {
 				emailParts := strings.Split(user.Email, "@")
 				if len(emailParts) > 0 && len(emailParts[0]) >= 2 {
@@ -51,7 +51,7 @@ func Topbar(ctx context.Context) templ.Component {
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<header class=\"sticky top-0 z-40 h-16 flex items-center border-b border-gray-200 bg-white/80 backdrop-blur-lg dark:border-gray-700 dark:bg-gray-800/80\"><div class=\"flex flex-1 items-center justify-between px-4 lg:px-6\"><!-- Left: Mobile Menu Button --><div class=\"flex items-center gap-4\"><!-- Mobile Menu Toggle --><button @click=\"sidebarOpen = !sidebarOpen\" class=\"lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors\"><svg class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5\"></path></svg></button></div><!-- Right: Actions --><div class=\"flex items-center gap-2\"><!-- Dark Mode Toggle --><button @click=\"darkMode = !darkMode\" class=\"p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors\" title=\"Changer le thème\"><svg x-show=\"!darkMode\" class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z\"></path></svg> <svg x-show=\"darkMode\" x-cloak class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z\"></path></svg></button><!-- User Menu --><div x-data=\"{ open: false }\" class=\"relative\"><button @click=\"open = !open\" class=\"flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors\"><div class=\"w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center\"><span class=\"text-sm font-semibold text-primary-600 dark:text-primary-400\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<header class=\"sticky top-0 z-40 h-16 flex items-center border-b border-gray-200 bg-white/80 backdrop-blur-lg dark:border-gray-700 dark:bg-gray-800/80\"><div class=\"flex flex-1 items-center justify-between px-4 lg:px-6\"><!-- Left: Mobile Menu Button --><div class=\"flex items-center gap-4\"><!-- Mobile Menu Toggle --><button @click=\"sidebarOpen = !sidebarOpen\" class=\"lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors\"><svg class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5\"></path></svg></button></div><!-- Right: Actions --><div class=\"flex items-center gap-2\"><!-- Dark Mode Toggle --><button @click=\"darkMode = !darkMode\" class=\"p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors\" title=\"Toggle theme\"><svg x-show=\"!darkMode\" class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z\"></path></svg> <svg x-show=\"darkMode\" x-cloak class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z\"></path></svg></button><!-- User Menu --><div x-data=\"{ open: false }\" class=\"relative\"><button @click=\"open = !open\" class=\"flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors\"><div class=\"w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center\"><span class=\"text-sm font-semibold text-primary-600 dark:text-primary-400\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -77,7 +77,7 @@ func Topbar(ctx context.Context) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p></div><!-- Logout --><div class=\"border-t border-gray-200 dark:border-gray-700 py-1\"><a href=\"/logout\" class=\"flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75\"></path></svg> Déconnexion</a></div></div></div></div></div></header>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p></div><!-- Logout --><div class=\"border-t border-gray-200 dark:border-gray-700 py-1\"><a href=\"/logout\" class=\"flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75\"></path></svg> Logout</a></div></div></div></div></div></header>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

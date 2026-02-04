@@ -1,11 +1,11 @@
 package layouts
 
-// Base est le squelette principal de l'application SublimeGo
-// Configuration hybride: Tailwind CDN + assets locaux (Alpine.js, HTMX, app.js, custom.css)
+// Base is the main skeleton of the SublimeGo application.
+// Hybrid configuration: Tailwind CDN + local assets (Alpine.js, HTMX, app.js, custom.css)
 templ Base(title string) {
 	<!DOCTYPE html>
 	<html 
-		lang="fr" 
+		lang="en" 
 		class="h-full"
 		x-data="{ 
 			darkMode: localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches),
@@ -108,7 +108,7 @@ templ Base(title string) {
 			
 			<!-- Footer -->
 			<footer class="px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-800">
-				<p>© 2024 { GetPanelConfig().Name }. Tous droits réservés.</p>
+				<p>© 2024 { GetPanelConfig().Name }. All rights reserved.</p>
 			</footer>
 		</div>
 

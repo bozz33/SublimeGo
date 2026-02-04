@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "fmt"
 
-// ErrorPageData contient les données pour la page d'erreur générique
+// ErrorPageData contains data for the generic error page
 type ErrorPageData struct {
 	Code       string
 	Message    string
@@ -21,7 +21,7 @@ type ErrorPageData struct {
 	ShowStack  bool
 }
 
-// PageGeneric affiche une page d'erreur générique
+// PageGeneric displays a generic error page
 func PageGeneric(data ErrorPageData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -43,7 +43,7 @@ func PageGeneric(data ErrorPageData) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"fr\" class=\"h-full\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"h-full\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -56,7 +56,7 @@ func PageGeneric(data ErrorPageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><script src=\"https://cdn.tailwindcss.com\"></script></head><body class=\"h-full bg-gray-50\"><div class=\"min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8\"><div class=\"sm:mx-auto sm:w-full sm:max-w-md\"><!-- Logo / Brand --><div class=\"flex justify-center\"><div class=\"flex items-center space-x-3\"><div class=\"w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center\"><span class=\"text-white font-bold text-xl\">S</span></div><span class=\"text-2xl font-bold text-gray-900\">SublimeGo</span></div></div><!-- Code d'erreur --><div class=\"mt-8 text-center\"><h1 class=\"text-9xl font-extrabold text-gray-600\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><script src=\"https://cdn.tailwindcss.com\"></script></head><body class=\"h-full bg-gray-50\"><div class=\"min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8\"><div class=\"sm:mx-auto sm:w-full sm:max-w-md\"><!-- Logo / Brand --><div class=\"flex justify-center\"><div class=\"flex items-center space-x-3\"><div class=\"w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center\"><span class=\"text-white font-bold text-xl\">S</span></div><span class=\"text-2xl font-bold text-gray-900\">SublimeGo</span></div></div><!-- Error code --><div class=\"mt-8 text-center\"><h1 class=\"text-9xl font-extrabold text-gray-600\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -97,12 +97,12 @@ func PageGeneric(data ErrorPageData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "Une erreur s'est produite.")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "An error occurred.")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</p></div><!-- Informations techniques --><div class=\"mt-6 bg-white rounded-lg shadow px-4 py-3\"><dl class=\"space-y-2 text-sm\"><div class=\"flex justify-between\"><dt class=\"font-medium text-gray-500\">Code HTTP:</dt><dd class=\"text-gray-900 font-mono\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</p></div><!-- Technical information --><div class=\"mt-6 bg-white rounded-lg shadow px-4 py-3\"><dl class=\"space-y-2 text-sm\"><div class=\"flex justify-between\"><dt class=\"font-medium text-gray-500\">HTTP Code:</dt><dd class=\"text-gray-900 font-mono\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -120,7 +120,7 @@ func PageGeneric(data ErrorPageData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if data.Path != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"flex justify-between\"><dt class=\"font-medium text-gray-500\">Chemin:</dt><dd class=\"text-gray-900 font-mono\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"flex justify-between\"><dt class=\"font-medium text-gray-500\">Path:</dt><dd class=\"text-gray-900 font-mono\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -139,7 +139,7 @@ func PageGeneric(data ErrorPageData) templ.Component {
 			}
 		}
 		if data.RequestID != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"flex justify-between\"><dt class=\"font-medium text-gray-500\">ID de requête:</dt><dd class=\"text-gray-900 font-mono text-xs\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"flex justify-between\"><dt class=\"font-medium text-gray-500\">Request ID:</dt><dd class=\"text-gray-900 font-mono text-xs\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -180,7 +180,7 @@ func PageGeneric(data ErrorPageData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<!-- Actions --><div class=\"mt-8 space-y-3\"><a href=\"/\" class=\"w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition\">Retour à l'accueil</a> <button onclick=\"history.back()\" class=\"w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition\">Page précédente</button></div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<!-- Actions --><div class=\"mt-8 space-y-3\"><a href=\"/\" class=\"w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition\">Back to home</a> <button onclick=\"history.back()\" class=\"w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition\">Previous page</button></div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

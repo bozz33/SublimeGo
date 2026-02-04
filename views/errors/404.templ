@@ -1,19 +1,19 @@
 package errors
 
-// Error404Data contient les données pour la page 404
+// Error404Data contains data for the 404 page
 type Error404Data struct {
 	Path      string
 	RequestID string
 }
 
-// Page404 affiche la page d'erreur 404
+// Page404 displays the 404 error page
 templ Page404(data Error404Data) {
 	<!DOCTYPE html>
-	<html lang="fr" class="h-full">
+	<html lang="en" class="h-full">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<title>404 - Page non trouvée</title>
+			<title>404 - Page Not Found</title>
 			<script src="https://cdn.tailwindcss.com"></script>
 		</head>
 		<body class="h-full bg-gray-50">
@@ -29,26 +29,26 @@ templ Page404(data Error404Data) {
 						</div>
 					</div>
 					
-					<!-- Code d'erreur -->
+					<!-- Error code -->
 					<div class="mt-8 text-center">
 						<h1 class="text-9xl font-extrabold text-indigo-600">404</h1>
-						<h2 class="mt-4 text-3xl font-bold text-gray-900">Page non trouvée</h2>
+						<h2 class="mt-4 text-3xl font-bold text-gray-900">Page Not Found</h2>
 						<p class="mt-2 text-base text-gray-600">
-							La page que vous recherchez n'existe pas ou a été déplacée.
+							The page you are looking for does not exist or has been moved.
 						</p>
 					</div>
 					
-					<!-- Informations techniques -->
+					<!-- Technical information -->
 					if data.Path != "" {
 						<div class="mt-6 bg-white rounded-lg shadow px-4 py-3">
 							<dl class="space-y-2 text-sm">
 								<div class="flex justify-between">
-									<dt class="font-medium text-gray-500">Chemin demandé:</dt>
+									<dt class="font-medium text-gray-500">Requested path:</dt>
 									<dd class="text-gray-900 font-mono">{ data.Path }</dd>
 								</div>
 								if data.RequestID != "" {
 									<div class="flex justify-between">
-										<dt class="font-medium text-gray-500">ID de requête:</dt>
+										<dt class="font-medium text-gray-500">Request ID:</dt>
 										<dd class="text-gray-900 font-mono text-xs">{ data.RequestID }</dd>
 									</div>
 								}
@@ -65,7 +65,7 @@ templ Page404(data Error404Data) {
 							<svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
 								<path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
 							</svg>
-							Retour à l'accueil
+							Back to home
 						</a>
 						
 						<button
@@ -75,7 +75,7 @@ templ Page404(data Error404Data) {
 							<svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
 								<path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
 							</svg>
-							Page précédente
+							Previous page
 						</button>
 					</div>
 					
@@ -83,14 +83,14 @@ templ Page404(data Error404Data) {
 					<div class="mt-6 text-center text-sm text-gray-500">
 						if data.RequestID != "" {
 							<p>
-								Si vous pensez qu'il s'agit d'une erreur,
-								<a href="/contact" class="font-medium text-indigo-600 hover:text-indigo-500">contactez le support</a>
-								avec l'ID de requête ci-dessus.
+								If you think this is an error,
+								<a href="/contact" class="font-medium text-indigo-600 hover:text-indigo-500">contact support</a>
+								with the request ID above.
 							</p>
 						} else {
 							<p>
-								Si vous pensez qu'il s'agit d'une erreur,
-								<a href="/contact" class="font-medium text-indigo-600 hover:text-indigo-500">contactez le support</a>.
+								If you think this is an error,
+								<a href="/contact" class="font-medium text-indigo-600 hover:text-indigo-500">contact support</a>.
 							</p>
 						}
 					</div>

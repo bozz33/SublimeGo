@@ -11,12 +11,12 @@ type InputProps struct {
 	Required    bool
 	Disabled    bool
 	Readonly    bool
-	Icon        string // "left" ou "right" pour indiquer la position de l'icône (slot)
+	Icon        string // "left" or "right" to indicate icon position (slot)
 	Size        string // "sm", "md", "lg"
-	Class       string // Classes additionnelles
+	Class       string // Additional classes
 }
 
-// Input - Composant avec nouveau design (sans Flowbite)
+// Input - Component with new design (without Flowbite)
 templ Input(props InputProps) {
 	<div class="mb-4">
 		if props.Label != "" {
@@ -51,7 +51,7 @@ templ Input(props InputProps) {
 	</div>
 }
 
-// InputWithIcon - Input avec icône (slot pour l'icône)
+// InputWithIcon - Input with icon (slot for icon)
 templ InputWithIcon(props InputProps) {
 	<div class="mb-4">
 		if props.Label != "" {

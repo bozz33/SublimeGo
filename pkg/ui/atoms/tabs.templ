@@ -3,7 +3,7 @@ package atoms
 type TabItem struct {
 	ID       string
 	Label    string
-	Icon     string // optionnel
+	Icon     string // optional
 	Active   bool
 	Disabled bool
 }
@@ -13,7 +13,7 @@ type TabsProps struct {
 	Style   string // "default", "underline", "pills"
 }
 
-// Tabs - Composant onglets Flowbite
+// Tabs - Flowbite tabs component
 templ Tabs(props TabsProps) {
 	<div class="mb-4 border-b border-gray-200 dark:border-gray-700">
 		<ul class={ tabsClasses(props.Style) } role="tablist">
