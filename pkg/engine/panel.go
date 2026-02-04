@@ -20,6 +20,7 @@ type Panel struct {
 	BrandName   string
 	DB          *ent.Client
 	Resources   []Resource
+	Pages       []Page
 	AuthManager *auth.Manager
 	Session     *scs.SessionManager
 }
@@ -30,6 +31,7 @@ func NewPanel(id string) *Panel {
 		ID:        id,
 		BrandName: "SublimeGo",
 		Resources: make([]Resource, 0),
+		Pages:     make([]Page, 0),
 	}
 }
 
@@ -67,29 +69,69 @@ func (p *Panel) AddResources(rs ...Resource) *Panel {
 	return p
 }
 
+// AddPages adds custom pages to the panel.
+// Pages are standalone views (reports, settings, analytics, etc.)
+func (p *Panel) AddPages(pages ...Page) *Panel {
+	p.Pages = append(p.Pages, pages...)
+	p.registerNavItems()
+	return p
+}
+
+// navItem is a unified type for navigation items (resources and pages)
+type navItem struct {
+	slug  string
+	label string
+	icon  string
+	group string
+	sort  int
+}
+
 // registerNavItems injects navigation items into the sidebar.
 func (p *Panel) registerNavItems() {
-	sortedResources := make([]Resource, len(p.Resources))
-	copy(sortedResources, p.Resources)
-	sort.Slice(sortedResources, func(i, j int) bool {
-		return sortedResources[i].Sort() < sortedResources[j].Sort()
+	// Collect all nav items from resources and pages
+	var allItems []navItem
+
+	for _, r := range p.Resources {
+		allItems = append(allItems, navItem{
+			slug:  r.Slug(),
+			label: r.PluralLabel(),
+			icon:  r.Icon(),
+			group: r.Group(),
+			sort:  r.Sort(),
+		})
+	}
+
+	for _, pg := range p.Pages {
+		allItems = append(allItems, navItem{
+			slug:  pg.Slug(),
+			label: pg.Label(),
+			icon:  pg.Icon(),
+			group: pg.Group(),
+			sort:  pg.Sort(),
+		})
+	}
+
+	// Sort by sort order
+	sort.Slice(allItems, func(i, j int) bool {
+		return allItems[i].sort < allItems[j].sort
 	})
-	grouped := lo.GroupBy(sortedResources, func(r Resource) string {
-		group := r.Group()
-		if group == "" {
+
+	// Group items
+	grouped := lo.GroupBy(allItems, func(item navItem) string {
+		if item.group == "" {
 			return "_root"
 		}
-		return group
+		return item.group
 	})
 
 	var navGroups []layouts.NavGroup
 
 	if rootItems, ok := grouped["_root"]; ok {
-		items := lo.Map(rootItems, func(r Resource, _ int) layouts.NavItem {
+		items := lo.Map(rootItems, func(item navItem, _ int) layouts.NavItem {
 			return layouts.NavItem{
-				Slug:  r.Slug(),
-				Label: r.PluralLabel(),
-				Icon:  r.Icon(),
+				Slug:  item.slug,
+				Label: item.label,
+				Icon:  item.icon,
 			}
 		})
 		navGroups = append(navGroups, layouts.NavGroup{
@@ -98,20 +140,20 @@ func (p *Panel) registerNavItems() {
 		})
 	}
 
-	for groupName, resources := range grouped {
+	for groupName, items := range grouped {
 		if groupName == "_root" {
 			continue
 		}
-		items := lo.Map(resources, func(r Resource, _ int) layouts.NavItem {
+		navItems := lo.Map(items, func(item navItem, _ int) layouts.NavItem {
 			return layouts.NavItem{
-				Slug:  r.Slug(),
-				Label: r.PluralLabel(),
-				Icon:  r.Icon(),
+				Slug:  item.slug,
+				Label: item.label,
+				Icon:  item.icon,
 			}
 		})
 		navGroups = append(navGroups, layouts.NavGroup{
 			Label: groupName,
-			Items: items,
+			Items: navItems,
 		})
 	}
 
@@ -143,6 +185,14 @@ func (p *Panel) Router() http.Handler {
 		slug := res.Slug()
 		protectedHandler := RequireAuth(p.AuthManager, p.DB)(handler)
 		mux.Handle("/"+slug+"/", protectedHandler)
+		mux.Handle("/"+slug, protectedHandler)
+	}
+
+	// Register custom pages
+	for _, pg := range p.Pages {
+		pageHandler := NewPageHandler(pg)
+		slug := pg.Slug()
+		protectedHandler := RequireAuth(p.AuthManager, p.DB)(pageHandler)
 		mux.Handle("/"+slug, protectedHandler)
 	}
 

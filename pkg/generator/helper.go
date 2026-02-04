@@ -19,6 +19,20 @@ type ResourceData struct {
 	Icon        string // users
 }
 
+// PageData contains the data to generate a custom page.
+type PageData struct {
+	PackageName string // settings
+	Name        string // Settings
+	TypeName    string // SettingsPage
+	TemplName   string // Settings
+	Slug        string // settings
+	Label       string // Settings
+	Description string // Manage application settings
+	Icon        string // settings
+	Group       string // System
+	Sort        int    // 100
+}
+
 // NewResourceData creates the data for a resource.
 func NewResourceData(name string) *ResourceData {
 	packageName := ToSnakeCase(name)
@@ -38,6 +52,43 @@ func NewResourceData(name string) *ResourceData {
 		PluralLabel: pluralLabel,
 		Icon:        slug,
 	}
+}
+
+// NewPageData creates the data for a custom page.
+func NewPageData(name string) *PageData {
+	packageName := ToSnakeCase(name)
+	typeName := ToPascalCase(name) + "Page"
+	templName := ToPascalCase(name)
+	slug := ToSnakeCase(name)
+	label := ToPascalCase(name)
+
+	return &PageData{
+		PackageName: packageName,
+		Name:        name,
+		TypeName:    typeName,
+		TemplName:   templName,
+		Slug:        slug,
+		Label:       label,
+		Description: "Custom page for " + label,
+		Icon:        "document",
+		Group:       "",
+		Sort:        100,
+	}
+}
+
+// NewPageDataWithOptions creates page data with custom options.
+func NewPageDataWithOptions(name, group, icon string, sort int) *PageData {
+	data := NewPageData(name)
+	if group != "" {
+		data.Group = group
+	}
+	if icon != "" {
+		data.Icon = icon
+	}
+	if sort > 0 {
+		data.Sort = sort
+	}
+	return data
 }
 
 // GenerateResource generates all files for a resource.
@@ -119,6 +170,67 @@ func GenerateMigration(name, outputDir string) error {
 	}
 
 	return writeFile(outputPath, []byte(content))
+}
+
+// GeneratePage generates all files for a custom page.
+func GeneratePage(g *Generator, name, outputDir string) error {
+	return GeneratePageWithOptions(g, name, outputDir, "", "", 100)
+}
+
+// GeneratePageWithOptions generates a page with custom options.
+func GeneratePageWithOptions(g *Generator, name, outputDir, group, icon string, sort int) error {
+	data := NewPageDataWithOptions(name, group, icon, sort)
+
+	pageDir := filepath.Join(outputDir, "internal", "pages", data.PackageName)
+
+	files := map[string]string{
+		"page":       filepath.Join(pageDir, "page.go"),
+		"page_templ": filepath.Join(pageDir, "content.templ"),
+	}
+
+	stats := struct {
+		Generated int
+		Skipped   int
+		Failed    int
+	}{}
+
+	for templateName, outputPath := range files {
+		if g.shouldSkip(templateName) {
+			if g.options.Verbose {
+				fmt.Printf("Skipped: %s\n", filepath.Base(outputPath))
+			}
+			stats.Skipped++
+			continue
+		}
+
+		if err := g.Generate(templateName, outputPath, data); err != nil {
+			if g.options.Verbose {
+				fmt.Printf("Failed: %s - %v\n", filepath.Base(outputPath), err)
+			}
+			stats.Failed++
+			return err
+		}
+
+		stats.Generated++
+	}
+
+	if g.options.Verbose {
+		fmt.Printf("\nPage generated:\n")
+		fmt.Printf("   - Generated: %d files\n", stats.Generated)
+		if stats.Skipped > 0 {
+			fmt.Printf("   - Skipped: %d files\n", stats.Skipped)
+		}
+		if stats.Failed > 0 {
+			fmt.Printf("   - Failed: %d files\n", stats.Failed)
+		}
+		fmt.Printf("\nNext steps:\n")
+		fmt.Printf("   1. Edit %s/page.go to customize the page\n", pageDir)
+		fmt.Printf("   2. Edit %s/content.templ for the page template\n", pageDir)
+		fmt.Printf("   3. Run 'templ generate' to compile templates\n")
+		fmt.Printf("   4. Run 'sublimego scan' to register the page\n")
+	}
+
+	return nil
 }
 
 // GenerateSeeder generates a seeder file.

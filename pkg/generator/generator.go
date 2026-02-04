@@ -26,6 +26,12 @@ var tableTemplate string
 //go:embed stubs/form.go.tmpl
 var formTemplate string
 
+//go:embed stubs/page.go.tmpl
+var pageTemplate string
+
+//go:embed stubs/page_templ.go.tmpl
+var pageTemplTemplate string
+
 // Generator handles code generation with embedded templates.
 type Generator struct {
 	templates map[string]*template.Template
@@ -67,10 +73,12 @@ func New(opts *Options) (*Generator, error) {
 	}
 
 	templates := map[string]string{
-		"resource": resourceTemplate,
-		"schema":   schemaTemplate,
-		"table":    tableTemplate,
-		"form":     formTemplate,
+		"resource":   resourceTemplate,
+		"schema":     schemaTemplate,
+		"table":      tableTemplate,
+		"form":       formTemplate,
+		"page":       pageTemplate,
+		"page_templ": pageTemplTemplate,
 	}
 
 	for name, content := range templates {

@@ -16,8 +16,8 @@ func TestNew(t *testing.T) {
 		t.Fatal("New() returned nil generator")
 	}
 
-	if len(g.templates) != 4 {
-		t.Errorf("Expected 4 templates, got %d", len(g.templates))
+	if len(g.templates) != 6 {
+		t.Errorf("Expected 6 templates, got %d", len(g.templates))
 	}
 }
 
@@ -33,6 +33,8 @@ func TestHasTemplate(t *testing.T) {
 		{"schema exists", "schema", true},
 		{"table exists", "table", true},
 		{"form exists", "form", true},
+		{"page exists", "page", true},
+		{"page_templ exists", "page_templ", true},
 		{"unknown template", "unknown", false},
 	}
 

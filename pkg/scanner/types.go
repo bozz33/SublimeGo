@@ -18,20 +18,40 @@ type ResourceInfo struct {
 	Conflict  bool   // True if this resource has a conflict
 }
 
+// PageInfo represents a page for generation.
+type PageInfo struct {
+	Reference string // "settings.SettingsPage"
+	Source    string // "internal/pages/settings/page.go"
+	Alias     string // Alias used if needed
+	Conflict  bool   // True if this page has a conflict
+}
+
+// PageMetadata contains metadata for a discovered page.
+type PageMetadata struct {
+	TypeName    string
+	PackageName string
+	FilePath    string
+	Slug        string
+}
+
 // TemplateData contains all data for the template.
 type TemplateData struct {
-	Timestamp string         // "2024-01-30 11:53:00"
-	Count     int            // Number of resources
-	Imports   []ImportInfo   // Required imports
-	Resources []ResourceInfo // Resources to generate
-	Warnings  []string       // Educational warnings
-	Conflicts []Conflict     // Detected conflicts
-	Generated time.Time      // Generation date
+	Timestamp   string         // "2024-01-30 11:53:00"
+	Count       int            // Number of resources
+	PageCount   int            // Number of pages
+	Imports     []ImportInfo   // Required imports
+	PageImports []ImportInfo   // Page imports
+	Resources   []ResourceInfo // Resources to generate
+	Pages       []PageInfo     // Pages to generate
+	Warnings    []string       // Educational warnings
+	Conflicts   []Conflict     // Detected conflicts
+	Generated   time.Time      // Generation date
 }
 
 // ScannerConfig contains the scanner configuration.
 type ScannerConfig struct {
 	ResourcesPath   string   // Path to resources
+	PagesPath       string   // Path to pages
 	OutputPath      string   // Path to generated file
 	TemplatePath    string   // Path to template
 	StrictMode      bool     // Strict mode (error on warnings)
@@ -45,6 +65,7 @@ type ScannerConfig struct {
 func DefaultConfig() ScannerConfig {
 	return ScannerConfig{
 		ResourcesPath:   "internal/resources",
+		PagesPath:       "internal/pages",
 		OutputPath:      "internal/registry/provider_gen.go",
 		TemplatePath:    "templates/provider.go.tmpl",
 		StrictMode:      false,
@@ -58,6 +79,7 @@ func DefaultConfig() ScannerConfig {
 // ScanResult contains the scan result.
 type ScanResult struct {
 	Resources []ResourceMetadata
+	Pages     []PageMetadata
 	Conflicts []Conflict
 	Success   bool
 	Message   string

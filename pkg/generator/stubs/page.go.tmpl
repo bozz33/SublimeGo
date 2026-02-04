@@ -1,0 +1,87 @@
+package {{.PackageName}}
+
+import (
+	"context"
+	"net/http"
+
+	"github.com/a-h/templ"
+	"github.com/bozz33/SublimeGo/pkg/engine"
+	"github.com/bozz33/SublimeGo/pkg/form"
+	"github.com/bozz33/SublimeGo/pkg/table"
+	"github.com/bozz33/SublimeGo/pkg/ui/layouts"
+)
+
+// {{.TypeName}} is a custom page for {{.Label}}.
+// Custom pages can display any content: reports, settings, analytics, forms, tables, etc.
+type {{.TypeName}} struct {
+	*engine.BasePage
+}
+
+// New{{.TypeName}} creates a new {{.Label}} page.
+func New{{.TypeName}}() *{{.TypeName}} {
+	return &{{.TypeName}}{
+		BasePage: engine.NewBasePage("{{.Slug}}", "{{.Label}}").
+			SetIcon("{{.Icon}}").
+			SetGroup("{{.Group}}").
+			SetSort({{.Sort}}),
+	}
+}
+
+// Render returns the page content.
+// You can use any templ component, forms, tables, or custom HTML.
+func (p *{{.TypeName}}) Render(ctx context.Context, r *http.Request) templ.Component {
+	// Example: Create a form for this page
+	pageForm := form.New().SetSchema(
+		form.Text("example").Label("Example Field").Placeholder("Enter value"),
+	)
+
+	// Example: Create a table for this page
+	pageTable := table.New([]any{}).
+		WithColumns(
+			table.Text("id").Label("ID"),
+			table.Text("name").Label("Name"),
+		)
+
+	// Return the page content wrapped in the layout
+	return {{.TemplName}}Content(pageForm, pageTable)
+}
+
+// CanAccess checks if the current user can access this page.
+// Override this method to implement custom access control.
+func (p *{{.TypeName}}) CanAccess(ctx context.Context) bool {
+	// Example: Check user permissions
+	// user := auth.GetUserFromContext(ctx)
+	// return user != nil && user.HasPermission("{{.Slug}}.view")
+	return true
+}
+
+// GetForm returns a form builder for this page.
+// Use this to create interactive forms on the page.
+func (p *{{.TypeName}}) GetForm() *form.Form {
+	return form.New().SetSchema(
+		form.Text("name").Label("Name").Required(),
+		form.Email("email").Label("Email").Required(),
+		form.NewTextarea("description").Label("Description").Rows(4),
+		form.NewSelect("status").Label("Status").SetOptions(map[string]string{
+			"active":   "Active",
+			"inactive": "Inactive",
+		}),
+		form.NewCheckbox("notify").Label("Send notifications").Default(true),
+	)
+}
+
+// GetTable returns a table builder for this page.
+// Use this to display data in a table format.
+func (p *{{.TypeName}}) GetTable(data []any) *table.Table {
+	return table.New(data).
+		WithColumns(
+			table.Text("id").Label("ID").Sortable(),
+			table.Text("name").Label("Name").Sortable().Searchable(),
+			table.Badge("status").Label("Status").Colors(map[string]string{
+				"active":   "success",
+				"inactive": "warning",
+			}),
+		).
+		Search(true).
+		Paginate(true)
+}
