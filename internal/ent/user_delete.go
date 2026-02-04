@@ -8,8 +8,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/bozz33/SublimeGo/internal/ent/predicate"
-	"github.com/bozz33/SublimeGo/internal/ent/user"
+	"github.com/bozz33/sublimego/internal/ent/predicate"
+	"github.com/bozz33/sublimego/internal/ent/user"
 )
 
 // UserDelete is the builder for deleting a User entity.

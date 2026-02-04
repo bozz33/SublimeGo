@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/bozz33/SublimeGo/internal/ent"
+	"github.com/bozz33/sublimego/internal/ent"
 )
 
 // The UserFunc type is an adapter to allow the use of ordinary

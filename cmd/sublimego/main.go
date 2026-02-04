@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/bozz33/SublimeGo/cmd/sublimego/commands"
+	"github.com/bozz33/sublimego/cmd/sublimego/commands"
 )
 
 // Version information (set via ldflags during build)

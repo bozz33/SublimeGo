@@ -1,8 +1,9 @@
-# SublimeGo Starter
+# SublimeGo
 
-A complete starter kit for building admin panels with Go, powered by [Sublime Admin](https://github.com/bozz33/sublime-admin).
+A modern, idiomatic Go framework for building admin panels.
 
-> **Note**: This is the **starter project**. For the reusable framework, see [sublime-admin](https://github.com/bozz33/sublime-admin).
+[![Go Reference](https://pkg.go.dev/badge/github.com/bozz33/sublimego.svg)](https://pkg.go.dev/github.com/bozz33/sublimego)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Tech Stack
 
@@ -24,60 +25,14 @@ A complete starter kit for building admin panels with Go, powered by [Sublime Ad
 - **Authentication**: Built-in auth with bcrypt and sessions
 - **Multi-Panel**: Support for multiple admin panels
 
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    SUBLIMEGO ECOSYSTEM                      │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  sublime-admin (Framework)         SublimeGo (This Repo)   │
-│  ─────────────────────────         ─────────────────────   │
-│  github.com/bozz33/sublime-admin   Starter project         │
-│                                                             │
-│  • engine/    • form/              • Your resources        │
-│  • table/     • auth/              • Your views            │
-│  • middleware/• validation/        • Your config           │
-│  • ui/        • widget/            • CLI tools             │
-│                                                             │
-│  go get sublime-admin@v1.0.0       git clone SublimeGo     │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## Which One Should I Use?
-
-### Use `sublime-admin` (framework) if:
-- ✅ You have an existing Go project
-- ✅ You want just the admin panel features
-- ✅ You prefer to structure your project yourself
-- ✅ You need maximum flexibility
-
-**Installation:**
-```bash
-go get github.com/bozz33/sublime-admin@v1.0.0
-```
-
-### Use `SublimeGo` (starter) if:
-- ✅ You're starting a new project from scratch
-- ✅ You want a complete example with best practices
-- ✅ You want everything pre-configured (auth, DB, CLI, migrations)
-- ✅ You want to see how everything works together
-
-**Installation:**
-```bash
-git clone https://github.com/bozz33/SublimeGo.git myproject
-```
-
----
 
 ## Installation
 
-### Option 1: Start a new project (Recommended)
+### Quick Start
 
 ```bash
-# Clone this starter
-git clone https://github.com/bozz33/SublimeGo.git myproject
+# Clone the repository
+git clone https://github.com/bozz33/sublimego.git myproject
 cd myproject
 
 # Install dependencies
@@ -90,20 +45,19 @@ go run cmd/sublimego/main.go init
 go run cmd/sublimego/main.go serve
 ```
 
-### Option 2: Use the framework in an existing project
+### Use as a Library
 
 ```bash
-# Install the framework
-go get github.com/bozz33/sublime-admin@v1.0.0
+go get github.com/bozz33/sublimego@latest
 ```
 
 ```go
 package main
 
 import (
-    "github.com/bozz33/sublime-admin/engine"
-    "github.com/bozz33/sublime-admin/form"
-    "github.com/bozz33/sublime-admin/table"
+    "github.com/bozz33/sublimego/engine"
+    "github.com/bozz33/sublimego/form"
+    "github.com/bozz33/sublimego/table"
 )
 
 func main() {
@@ -124,14 +78,6 @@ func main() {
 ```
 
 Server starts at `http://localhost:8080`
-
-## Updating the Framework
-
-To receive updates from the `sublime-admin` framework:
-
-```bash
-go get -u github.com/bozz33/sublime-admin@latest
-```
 
 ## CLI Commands
 
@@ -181,7 +127,7 @@ go test ./...
 go test -cover ./...
 
 # Test specific package
-go test ./pkg/actions/...
+go test ./actions/...
 ```
 
 ## Documentation
@@ -194,23 +140,24 @@ go test ./pkg/actions/...
 ## Project Structure
 
 ```
-SublimeGo/
-├── cmd/sublimego/          # CLI entry point
-├── internal/
-│   ├── ent/                # ORM schemas and entities
-│   ├── resources/          # CRUD resources
-│   ├── providers/          # Data providers
-│   └── registry/           # Resource registration
-├── pkg/
-│   ├── actions/            # Action system
-│   ├── auth/               # Authentication
-│   ├── engine/             # Framework core
-│   ├── form/               # Form builder
-│   ├── table/              # Table builder
-│   ├── widget/             # Dashboard widgets
-│   └── ui/                 # Templates and layouts
-├── views/                  # Templ templates
-└── public/                 # Static assets
+sublimego/
+├── actions/            # Action system
+├── auth/               # Authentication
+├── engine/             # Framework core
+├── form/               # Form builder
+├── table/              # Table builder
+├── widget/             # Dashboard widgets
+├── ui/                 # UI components and layouts
+├── middleware/         # HTTP middlewares
+├── validation/         # Validation rules
+├── internal/           # Private packages
+│   ├── ent/            # ORM schemas (generated)
+│   ├── providers/      # Data providers
+│   └── registry/       # Resource registration
+├── cmd/                # CLI commands
+│   └── sublimego/      # Main CLI entry point
+├── views/              # Templ templates
+└── config/             # Configuration files
 ```
 
 ## Usage Example
@@ -221,9 +168,9 @@ SublimeGo/
 package product
 
 import (
-    "github.com/bozz33/SublimeGo/pkg/engine"
-    "github.com/bozz33/SublimeGo/pkg/form"
-    "github.com/bozz33/SublimeGo/pkg/table"
+    "github.com/bozz33/sublimego/engine"
+    "github.com/bozz33/sublimego/form"
+    "github.com/bozz33/sublimego/table"
 )
 
 type ProductResource struct {

@@ -246,7 +246,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/bozz33/SublimeGo/internal/ent"
+	"github.com/bozz33/sublimego/internal/ent"
 )
 
 // Seed%s inserts test data for %s

@@ -11,8 +11,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/bozz33/SublimeGo/internal/ent/predicate"
-	"github.com/bozz33/SublimeGo/internal/ent/user"
+	"github.com/bozz33/sublimego/internal/ent/predicate"
+	"github.com/bozz33/sublimego/internal/ent/user"
 )
 
 const (

@@ -3,7 +3,7 @@ package commands
 import (
 	"fmt"
 
-	"github.com/bozz33/SublimeGo/pkg/config"
+	"github.com/bozz33/sublimego/appconfig"
 	"github.com/spf13/cobra"
 )
 

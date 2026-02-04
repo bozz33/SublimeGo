@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"fmt"
-	"github.com/bozz33/SublimeGo/pkg/ui/layouts"
+	"github.com/bozz33/sublimego/ui/layouts"
 )
 
 func TooManyRequests(requestID string, retryAfter int) templ.Component {

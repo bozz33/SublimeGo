@@ -150,7 +150,7 @@ import (
 {{range .Imports}}
 	{{if .NeedsAlias}}{{.Alias}} {{end}}"{{.Path}}"
 {{end}}
-	"github.com/bozz33/SublimeGo/pkg/engine"
+	"github.com/bozz33/sublimego/engine"
 )
 
 {{if .Warnings}}

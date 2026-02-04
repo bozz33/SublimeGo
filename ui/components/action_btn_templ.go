@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"fmt"
-	"github.com/bozz33/SublimeGo/pkg/actions"
+	"github.com/bozz33/sublimego/actions"
 )
 
 func ActionButton(a *actions.Action, item any) templ.Component {

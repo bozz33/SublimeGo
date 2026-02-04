@@ -4,7 +4,7 @@ import "time"
 
 // ImportInfo represents an import with alias management.
 type ImportInfo struct {
-	Path       string // "github.com/bozz33/SublimeGo/internal/resources/user"
+	Path       string // "github.com/bozz33/sublimego/internal/resources/user"
 	Alias      string // "resource_user" (empty if no alias)
 	NeedsAlias bool   // true if an alias is needed
 	Package    string // "user"

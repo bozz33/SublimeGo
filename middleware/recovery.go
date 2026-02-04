@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"github.com/bozz33/SublimeGo/pkg/errors"
-	"github.com/bozz33/SublimeGo/pkg/logger"
+	"github.com/bozz33/sublimego/errors"
+	"github.com/bozz33/sublimego/logger"
 )
 
 // RecoveryConfig configures the recovery middleware.

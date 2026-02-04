@@ -9,8 +9,8 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"github.com/bozz33/SublimeGo/pkg/ui/atoms"
-	"github.com/bozz33/SublimeGo/pkg/ui/layouts"
+	"github.com/bozz33/sublimego/ui/atoms"
+	"github.com/bozz33/sublimego/ui/layouts"
 )
 
 func Components() templ.Component {

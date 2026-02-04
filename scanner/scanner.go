@@ -213,7 +213,7 @@ func (s *Scanner) buildImports(resources []ResourceMetadata, conflicts []Conflic
 	}
 
 	for _, resource := range resources {
-		importPath := fmt.Sprintf("github.com/bozz33/SublimeGo/internal/resources/%s", resource.PackageName)
+		importPath := fmt.Sprintf("github.com/bozz33/sublimego/internal/resources/%s", resource.PackageName)
 		alias, needsAlias := aliasMap[resource.PackageName]
 
 		imports = append(imports, ImportInfo{

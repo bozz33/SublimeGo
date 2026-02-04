@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/a-h/templ"
-	"github.com/bozz33/SublimeGo/pkg/ui/layouts"
+	"github.com/bozz33/sublimego/ui/layouts"
 )
 
 // CRUDHandler automatically handles CRUD operations for a resource.

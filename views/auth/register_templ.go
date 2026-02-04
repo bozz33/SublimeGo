@@ -8,7 +8,7 @@ package auth
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/bozz33/SublimeGo/pkg/ui/layouts"
+import "github.com/bozz33/sublimego/ui/layouts"
 
 // RegisterPage - Registration page with Filament-style design.
 // Clean design, centered form.

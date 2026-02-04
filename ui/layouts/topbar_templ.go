@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"context"
-	"github.com/bozz33/SublimeGo/pkg/auth"
+	"github.com/bozz33/sublimego/auth"
 	"strings"
 )
 

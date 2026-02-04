@@ -3,7 +3,7 @@ package table
 import (
 	"context"
 
-	"github.com/bozz33/SublimeGo/pkg/actions"
+	"github.com/bozz33/sublimego/actions"
 )
 
 // Table represents the complete configuration of a table.

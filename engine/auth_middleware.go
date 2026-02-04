@@ -3,9 +3,9 @@ package engine
 import (
 	"net/http"
 
-	"github.com/bozz33/SublimeGo/internal/ent"
-	"github.com/bozz33/SublimeGo/internal/ent/user"
-	"github.com/bozz33/SublimeGo/pkg/auth"
+	"github.com/bozz33/sublimego/internal/ent"
+	"github.com/bozz33/sublimego/internal/ent/user"
+	"github.com/bozz33/sublimego/auth"
 )
 
 // RequireAuth creates a middleware that requires authentication.

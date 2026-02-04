@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bozz33/SublimeGo/pkg/logger"
+	"github.com/bozz33/sublimego/logger"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 )

@@ -3,8 +3,8 @@ package providers
 import (
 	"context"
 
-	"github.com/bozz33/SublimeGo/internal/ent"
-	"github.com/bozz33/SublimeGo/pkg/widget"
+	"github.com/bozz33/sublimego/internal/ent"
+	"github.com/bozz33/sublimego/widget"
 )
 
 // GetDashboardStats generates widgets for the dashboard page.

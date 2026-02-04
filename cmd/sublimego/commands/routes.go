@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bozz33/SublimeGo/internal/ent"
-	"github.com/bozz33/SublimeGo/pkg/engine"
+	"github.com/bozz33/sublimego/internal/ent"
+	"github.com/bozz33/sublimego/engine"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 )
