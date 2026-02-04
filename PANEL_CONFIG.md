@@ -1,4 +1,4 @@
-﻿# Panel Configuration
+# Panel Configuration
 
 This guide explains how to configure your SublimeGo admin panel.
 
