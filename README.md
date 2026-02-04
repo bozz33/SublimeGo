@@ -22,7 +22,42 @@ SublimeGo is a modern Go framework inspired by Laravel Filament, designed to acc
 - **Authentication**: Built-in auth with bcrypt and sessions
 - **Multi-Panel**: Support for multiple admin panels
 
+## Installation
+
+```bash
+# Install SublimeGo in your Go project
+go get github.com/bozz33/SublimeGo@v1.0.0
+```
+
 ## Quick Start
+
+### Option 1: Use as a library in your existing project
+
+```go
+package main
+
+import (
+    "github.com/bozz33/SublimeGo/pkg/engine"
+    "github.com/bozz33/SublimeGo/pkg/form"
+    "github.com/bozz33/SublimeGo/pkg/table"
+)
+
+func main() {
+    // Create your admin panel
+    panel := engine.NewPanel("admin", "/admin")
+    
+    // Register resources
+    panel.RegisterResources(
+        &ProductResource{},
+        &UserResource{},
+    )
+    
+    // Start server
+    panel.Serve(":8080")
+}
+```
+
+### Option 2: Clone and customize
 
 ```bash
 # Clone the repository
