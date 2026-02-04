@@ -8,7 +8,7 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/bozz33/SublimeGo/pkg/flash"
+import "github.com/bozz33/sublimego/flash"
 
 // ToastContainer displays toast notifications with Alpine.js
 func ToastContainer() templ.Component {

@@ -4,62 +4,48 @@ This document describes the architecture and structure of SublimeGo.
 
 ## Project Structure
 
+Following [Go's official module layout](https://go.dev/doc/modules/layout), packages are at the root level for easy importing:
+
 ```
-SublimeGo/
-├── cmd/
-│   ├── scanner/              # Code scanner for resource generation
-│   │   └── main.go
-│   └── sublimego/            # Main CLI application
-│       ├── main.go
-│       └── commands/         # CLI commands (init, serve, make:*)
-├── internal/
-│   ├── ent/                  # Ent ORM schema and generated code
-│   │   ├── schema/           # Database schema definitions
-│   │   ├── migrate/          # Migration helpers
-│   │   └── ...               # Generated Ent code
-│   ├── providers/            # Application-specific providers
-│   │   └── dashboard_stats.go
-│   └── registry/             # Resource registration
-│       └── resources.go
-├── pkg/                      # Framework code (local copy)
-│   ├── actions/              # Action system (edit, delete, custom)
-│   ├── auth/                 # Authentication & authorization
-│   ├── config/               # Configuration management
-│   ├── engine/               # Core panel engine
-│   ├── errors/               # Error handling
-│   ├── export/               # Data export (CSV, Excel, PDF)
-│   ├── flash/                # Flash messages
-│   ├── form/                 # Form builder
-│   ├── generator/            # Code generation utilities
-│   ├── jobs/                 # Background job queue
-│   ├── logger/               # Logging utilities
-│   ├── middleware/           # HTTP middlewares
-│   ├── registry/             # Resource registry
-│   ├── scanner/              # Code scanner utilities
-│   ├── table/                # Table builder
-│   ├── ui/                   # UI components
-│   │   ├── atoms/            # Basic UI elements
-│   │   ├── components/       # Complex components
-│   │   ├── icons/            # Icon system
-│   │   └── layouts/          # Layout templates
-│   ├── validation/           # Validation rules
-│   └── widget/               # Dashboard widgets
-├── views/                    # Application views (Templ templates)
-│   ├── auth/                 # Authentication pages
-│   ├── components/           # View components
-│   ├── dashboard/            # Dashboard page
-│   ├── demo/                 # Demo pages
-│   ├── errors/               # Error pages
-│   ├── generics/             # Generic CRUD views
-│   └── widgets/              # Widget templates
-├── config.yaml               # Application configuration
+sublimego/
+├── actions/              # Action system (edit, delete, custom)
+├── auth/                 # Authentication & authorization
+├── appconfig/            # Configuration management
+├── engine/               # Core panel engine
+├── errors/               # Error handling
+├── export/               # Data export (CSV, Excel, PDF)
+├── flash/                # Flash messages
+├── form/                 # Form builder
+├── generator/            # Code generation utilities
+├── jobs/                 # Background job queue
+├── logger/               # Logging utilities
+├── middleware/           # HTTP middlewares
+├── registry/             # Resource registry
+├── scanner/              # Code scanner utilities
+├── table/                # Table builder
+├── ui/                   # UI components
+│   ├── atoms/            # Basic UI elements
+│   ├── components/       # Complex components
+│   ├── icons/            # Icon system
+│   └── layouts/          # Layout templates
+├── validation/           # Validation rules
+├── widget/               # Dashboard widgets
+├── internal/             # Private packages (not importable externally)
+│   ├── ent/              # Ent ORM schema and generated code
+│   ├── providers/        # Application-specific providers
+│   └── registry/         # Resource registration
+├── cmd/                  # CLI commands
+│   ├── scanner/          # Code scanner for resource generation
+│   └── sublimego/        # Main CLI application
+├── views/                # Application views (Templ templates)
+├── config/               # Configuration files
 ├── go.mod
 └── README.md
 ```
 
 ## Core Components
 
-### 1. Engine (`pkg/engine/`)
+### 1. Engine (`engine/`)
 
 The engine is the heart of SublimeGo. It manages:
 - **Panel**: Main admin panel with routing and middleware
@@ -74,7 +60,7 @@ The engine is the heart of SublimeGo. It manages:
 - `auth_handler.go` - Authentication handlers
 - `auth_middleware.go` - Auth middleware
 
-### 2. Form Builder (`pkg/form/`)
+### 2. Form Builder (`form/`)
 
 Fluent API for building forms with validation.
 
@@ -94,7 +80,7 @@ form.New().SetSchema(
 )
 ```
 
-### 3. Table Builder (`pkg/table/`)
+### 3. Table Builder (`table/`)
 
 Interactive data tables with advanced features.
 
@@ -116,7 +102,7 @@ table.New(getData).
     SetActions(actions.EditAction(), actions.DeleteAction())
 ```
 
-### 4. Resource System (`pkg/engine/resource.go`)
+### 4. Resource System (`engine/resource.go`)
 
 Resources represent database entities with CRUD operations.
 
@@ -131,7 +117,7 @@ type Resource interface {
 }
 ```
 
-### 5. Authentication (`pkg/auth/`)
+### 5. Authentication (`auth/`)
 
 Built-in authentication system with:
 - Password hashing (bcrypt)
@@ -139,7 +125,7 @@ Built-in authentication system with:
 - User context
 - Login/logout handlers
 
-### 6. UI Components (`pkg/ui/`)
+### 6. UI Components (`ui/`)
 
 Reusable UI components built with Templ:
 - **Atoms**: Buttons, badges, inputs, modals, toasts
@@ -175,6 +161,32 @@ Database (Ent ORM)
 Response (Templ Template)
 ```
 
+### Component Interaction
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    COMPONENT INTERACTION                    │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Panel (engine/panel.go)                                    │
+│  ├─ SetDatabase(client)                                     │
+│  ├─ SetAuthManager(auth)                                     │
+│  ├─ AddResources(resources)                                  │
+│  └─ Router() -> HTTP Handler                                │
+│                                                             │
+│  Resources (views/resources/)                              │
+│  ├─ GetForm() -> Form Builder (form/)                        │
+│  ├─ GetTable() -> Table Builder (table/)                       │
+│  ├─ GetData() -> Database Queries (internal/ent/)               │
+│  └─ CRUD Operations -> Database                                │
+│                                                             │
+│  Templates (views/*.templ)                                    │
+│  ├─ Form Pages -> Form Builder                                 │
+│  ├─ List Pages -> Table Builder                                │
+│  └─ Dashboard -> Widget Builder (widget/)                     │
+└─────────────────────────────────────────────────────────────┘
+```
+
 ### Resource Registration
 
 ```
@@ -197,8 +209,22 @@ form.New().
     Build()
 ```
 
+**Why?** Provides a clean, readable API for complex configuration.
+
 ### 2. Interface Segregation
 Resources implement multiple small interfaces instead of one large interface.
+
+```go
+type Resource interface {
+    GetMeta() ResourceMeta
+    GetNavigation() ResourceNavigation
+    GetViews() ResourceViews
+    GetPermissions() ResourcePermissions
+    GetCRUD() ResourceCRUD
+}
+```
+
+**Why?** Allows partial implementation and reduces coupling.
 
 ### 3. Dependency Injection
 Panel accepts dependencies (DB, Auth, Session) via setters.
@@ -210,8 +236,25 @@ panel := engine.NewPanel("admin").
     SetSession(session)
 ```
 
+**Why?** Makes components testable and loosely coupled.
+
 ### 4. Template Method
 Base resource provides default implementations, resources override as needed.
+
+```go
+type BaseResource struct{}
+
+func (b *BaseResource) GetViews() ResourceViews {
+    return ResourceViews{
+        Index:   views.GenericIndex,
+        Create:  views.GenericForm,
+        Edit:    views.GenericForm,
+        Show:    views.GenericShow,
+    }
+}
+```
+
+**Why?** Reduces boilerplate while allowing customization.
 
 ## Configuration
 
@@ -225,6 +268,30 @@ Configuration is managed via `config.yaml` and loaded using Viper.
 - `jobs` - Background job settings
 
 See [PANEL_CONFIG.md](PANEL_CONFIG.md) for details.
+
+### Configuration Example
+
+```yaml
+server:
+  host: "0.0.0.0"
+  port: 8080
+  read_timeout: 15s
+  write_timeout: 15s
+
+database:
+  driver: "sqlite3"
+  dsn: "file:sublimego.db?cache=shared&_fk=1"
+
+engine:
+  base_path: "/admin"
+  brand_name: "SublimeGo Admin"
+  items_per_page: 25
+
+auth:
+  session_lifetime: 24h
+  cookie_name: "session"
+  bcrypt_cost: 12
+```
 
 ## Database Layer
 
@@ -351,7 +418,7 @@ go test ./...
 go test ./... -cover
 
 # Run specific package
-go test ./pkg/form
+go test ./form
 ```
 
 See individual package `*_test.go` files for examples.

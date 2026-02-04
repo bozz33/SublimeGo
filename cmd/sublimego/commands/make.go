@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bozz33/SublimeGo/pkg/generator"
+	"github.com/bozz33/sublimego/generator"
 	"github.com/spf13/cobra"
 )
 

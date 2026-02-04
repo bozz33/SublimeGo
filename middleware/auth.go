@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bozz33/SublimeGo/pkg/auth"
-	"github.com/bozz33/SublimeGo/pkg/errors"
+	"github.com/bozz33/sublimego/auth"
+	"github.com/bozz33/sublimego/errors"
 )
 
 // AuthConfig configures the authentication middleware.

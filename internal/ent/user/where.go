@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/bozz33/SublimeGo/internal/ent/predicate"
+	"github.com/bozz33/sublimego/internal/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.

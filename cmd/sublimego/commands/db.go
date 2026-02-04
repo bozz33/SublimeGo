@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bozz33/SublimeGo/internal/ent"
+	"github.com/bozz33/sublimego/internal/ent"
 	"github.com/spf13/cobra"
 )
 

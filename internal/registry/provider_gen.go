@@ -6,7 +6,7 @@
 package registry
 
 import (
-	"github.com/bozz33/SublimeGo/pkg/engine"
+	"github.com/bozz33/sublimego/engine"
 )
 
 // AllResources contains all discovered resources.

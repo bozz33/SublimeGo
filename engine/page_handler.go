@@ -3,7 +3,7 @@ package engine
 import (
 	"net/http"
 
-	"github.com/bozz33/SublimeGo/pkg/ui/layouts"
+	"github.com/bozz33/sublimego/ui/layouts"
 )
 
 // PageHandler handles HTTP requests for custom pages.

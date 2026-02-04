@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/bozz33/SublimeGo/internal/ent/user"
+	"github.com/bozz33/sublimego/internal/ent/user"
 )
 
 // ent aliases to avoid import conflicts in user's code.

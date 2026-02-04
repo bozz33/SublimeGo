@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/bozz33/SublimeGo/internal/ent/user"
+	"github.com/bozz33/sublimego/internal/ent/user"
 )
 
 // User is the model entity for the User schema.

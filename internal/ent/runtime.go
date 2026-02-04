@@ -5,8 +5,8 @@ package ent
 import (
 	"time"
 
-	"github.com/bozz33/SublimeGo/internal/ent/schema"
-	"github.com/bozz33/SublimeGo/internal/ent/user"
+	"github.com/bozz33/sublimego/internal/ent/schema"
+	"github.com/bozz33/sublimego/internal/ent/user"
 )
 
 // The init function reads all schema descriptors with runtime code

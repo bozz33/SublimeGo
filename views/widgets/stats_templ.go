@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"fmt"
-	"github.com/bozz33/SublimeGo/pkg/widget"
+	"github.com/bozz33/sublimego/widget"
 )
 
 func Stats(w *widget.StatsWidget) templ.Component {

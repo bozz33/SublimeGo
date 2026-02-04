@@ -57,12 +57,12 @@ import (
     "context"
     "fmt"
     
-    "github.com/bozz33/SublimeGo/internal/ent"
-    "github.com/bozz33/SublimeGo/internal/ent/product"
-    "github.com/bozz33/SublimeGo/pkg/actions"
-    "github.com/bozz33/SublimeGo/pkg/engine"
-    "github.com/bozz33/SublimeGo/pkg/form"
-    "github.com/bozz33/SublimeGo/pkg/table"
+    "github.com/bozz33/sublimego/internal/ent"
+    "github.com/bozz33/sublimego/internal/ent/product"
+    "github.com/bozz33/sublimego/pkg/actions"
+    "github.com/bozz33/sublimego/pkg/engine"
+    "github.com/bozz33/sublimego/pkg/form"
+    "github.com/bozz33/sublimego/pkg/table"
 )
 
 type ProductResource struct {

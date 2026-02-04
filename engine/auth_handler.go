@@ -5,10 +5,10 @@ import (
 	"strings"
 
 	"github.com/a-h/templ"
-	"github.com/bozz33/SublimeGo/internal/ent"
-	"github.com/bozz33/SublimeGo/internal/ent/user"
-	authpkg "github.com/bozz33/SublimeGo/pkg/auth"
-	authtemplates "github.com/bozz33/SublimeGo/views/auth"
+	"github.com/bozz33/sublimego/internal/ent"
+	"github.com/bozz33/sublimego/internal/ent/user"
+	authpkg "github.com/bozz33/sublimego/auth"
+	authtemplates "github.com/bozz33/sublimego/views/auth"
 	"golang.org/x/crypto/bcrypt"
 )
 

@@ -10,8 +10,8 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"fmt"
-	"github.com/bozz33/SublimeGo/pkg/engine"
-	"github.com/bozz33/SublimeGo/pkg/ui/atoms"
+	"github.com/bozz33/sublimego/engine"
+	"github.com/bozz33/sublimego/ui/atoms"
 )
 
 // List is the universal template for all tables.

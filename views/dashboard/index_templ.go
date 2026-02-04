@@ -9,9 +9,9 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"github.com/bozz33/SublimeGo/pkg/ui/layouts"
-	"github.com/bozz33/SublimeGo/pkg/widget"
-	"github.com/bozz33/SublimeGo/views/widgets"
+	"github.com/bozz33/sublimego/ui/layouts"
+	"github.com/bozz33/sublimego/widget"
+	"github.com/bozz33/sublimego/views/widgets"
 )
 
 func Index(dashboardWidgets []widget.Widget) templ.Component {

@@ -5,12 +5,12 @@ package enttest
 import (
 	"context"
 
-	"github.com/bozz33/SublimeGo/internal/ent"
+	"github.com/bozz33/sublimego/internal/ent"
 	// required by schema hooks.
-	_ "github.com/bozz33/SublimeGo/internal/ent/runtime"
+	_ "github.com/bozz33/sublimego/internal/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
-	"github.com/bozz33/SublimeGo/internal/ent/migrate"
+	"github.com/bozz33/sublimego/internal/ent/migrate"
 )
 
 type (

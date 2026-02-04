@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"github.com/a-h/templ"
-	"github.com/bozz33/SublimeGo/pkg/form"
+	"github.com/bozz33/sublimego/form"
 )
 
 // RenderComponent is the smart switch that decides which template to call

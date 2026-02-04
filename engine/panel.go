@@ -5,11 +5,11 @@ import (
 	"sort"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/bozz33/SublimeGo/internal/ent"
-	"github.com/bozz33/SublimeGo/internal/providers"
-	"github.com/bozz33/SublimeGo/pkg/auth"
-	"github.com/bozz33/SublimeGo/pkg/ui/layouts"
-	"github.com/bozz33/SublimeGo/views/dashboard"
+	"github.com/bozz33/sublimego/internal/ent"
+	"github.com/bozz33/sublimego/internal/providers"
+	"github.com/bozz33/sublimego/auth"
+	"github.com/bozz33/sublimego/ui/layouts"
+	"github.com/bozz33/sublimego/views/dashboard"
 	"github.com/samber/lo"
 )
 
