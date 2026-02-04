@@ -48,10 +48,10 @@ A complete starter kit for building admin panels with Go, powered by [Sublime Ad
 ## Which One Should I Use?
 
 ### Use `sublime-admin` (framework) if:
-- ✅ You have an existing Go project
-- ✅ You want just the admin panel features
-- ✅ You prefer to structure your project yourself
-- ✅ You need maximum flexibility
+- You have an existing Go project
+- You want just the admin panel features
+- You prefer to structure your project yourself
+- You need maximum flexibility
 
 **Installation:**
 ```bash
@@ -59,10 +59,10 @@ go get github.com/bozz33/sublime-admin@v1.0.0
 ```
 
 ### Use `SublimeGo` (starter) if:
-- ✅ You're starting a new project from scratch
-- ✅ You want a complete example with best practices
-- ✅ You want everything pre-configured (auth, DB, CLI, migrations)
-- ✅ You want to see how everything works together
+- You're starting a new project from scratch
+- You want a complete example with best practices
+- You want everything pre-configured (auth, DB, CLI, migrations)
+- You want to see how everything works together
 
 **Installation:**
 ```bash
