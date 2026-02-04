@@ -89,9 +89,9 @@ func TestRateLimiter_ExceedLimit(t *testing.T) {
 	wrapped.ServeHTTP(rec, req)
 
 	assert.Equal(t, http.StatusTooManyRequests, rec.Code)
-	// Check for rate limit message (can be in French or English)
+	// Check for rate limit message
 	body := rec.Body.String()
-	assert.True(t, strings.Contains(body, "Trop de requêtes") || strings.Contains(body, "Too many requests"), "Expected rate limit message")
+	assert.True(t, strings.Contains(body, "Too many requests"), "Expected rate limit message")
 	assert.Equal(t, "0", rec.Header().Get("X-RateLimit-Remaining"))
 	assert.NotEmpty(t, rec.Header().Get("Retry-After"))
 }

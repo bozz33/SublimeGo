@@ -222,9 +222,9 @@ func formatValue(v reflect.Value) string {
 		return fmt.Sprintf("%.2f", v.Float())
 	case reflect.Bool:
 		if v.Bool() {
-			return "Oui"
+			return "Yes"
 		}
-		return "Non"
+		return "No"
 	case reflect.Struct:
 		if v.Type().String() == "time.Time" {
 			t := v.Interface().(time.Time)

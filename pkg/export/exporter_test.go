@@ -12,10 +12,10 @@ import (
 
 type TestUser struct {
 	ID        int       `export:"ID"`
-	Name      string    `export:"Nom"`
+	Name      string    `export:"Name"`
 	Email     string    `export:"Email"`
-	Active    bool      `export:"Actif"`
-	CreatedAt time.Time `export:"Créé le"`
+	Active    bool      `export:"Active"`
+	CreatedAt time.Time `export:"Created At"`
 	Internal  string    `export:"-"` // Ignored
 }
 
@@ -74,17 +74,17 @@ func TestFromStructs(t *testing.T) {
 
 	assert.Len(t, exp.headers, 5) // ID, Name, Email, Active, CreatedAt (Internal ignored)
 	assert.Equal(t, "ID", exp.headers[0])
-	assert.Equal(t, "Nom", exp.headers[1])
+	assert.Equal(t, "Name", exp.headers[1])
 	assert.Equal(t, "Email", exp.headers[2])
-	assert.Equal(t, "Actif", exp.headers[3])
-	assert.Equal(t, "Créé le", exp.headers[4])
+	assert.Equal(t, "Active", exp.headers[3])
+	assert.Equal(t, "Created At", exp.headers[4])
 
 	assert.Len(t, exp.data, 2)
 	assert.Equal(t, "1", exp.data[0][0])
 	assert.Equal(t, "John Doe", exp.data[0][1])
-	assert.Equal(t, "Oui", exp.data[0][3]) // Active = true
+	assert.Equal(t, "Yes", exp.data[0][3]) // Active = true
 	assert.Equal(t, "2", exp.data[1][0])
-	assert.Equal(t, "Non", exp.data[1][3]) // Active = false
+	assert.Equal(t, "No", exp.data[1][3]) // Active = false
 }
 
 func TestWriteCSV(t *testing.T) {
@@ -161,7 +161,7 @@ func TestExportStructsCSV(t *testing.T) {
 	require.NoError(t, err)
 
 	output := buf.String()
-	assert.Contains(t, output, "ID,Nom,Email")
+	assert.Contains(t, output, "ID,Name,Email")
 	assert.Contains(t, output, "1,John,john@example.com")
 }
 
