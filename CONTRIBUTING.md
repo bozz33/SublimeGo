@@ -14,7 +14,7 @@ Thank you for your interest in contributing to SublimeGo! This document provides
 1. Fork the repository
 2. Clone your fork:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/sublimego.git
+   git clone https://github.com/bozz33/sublimego.git
    cd sublimego
    ```
 3. Install dependencies:

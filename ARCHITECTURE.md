@@ -161,6 +161,32 @@ Database (Ent ORM)
 Response (Templ Template)
 ```
 
+### Component Interaction
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    COMPONENT INTERACTION                    │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Panel (engine/panel.go)                                    │
+│  ├─ SetDatabase(client)                                     │
+│  ├─ SetAuthManager(auth)                                     │
+│  ├─ AddResources(resources)                                  │
+│  └─ Router() -> HTTP Handler                                │
+│                                                             │
+│  Resources (views/resources/)                              │
+│  ├─ GetForm() -> Form Builder (form/)                        │
+│  ├─ GetTable() -> Table Builder (table/)                       │
+│  ├─ GetData() -> Database Queries (internal/ent/)               │
+│  └─ CRUD Operations -> Database                                │
+│                                                             │
+│  Templates (views/*.templ)                                    │
+│  ├─ Form Pages -> Form Builder                                 │
+│  ├─ List Pages -> Table Builder                                │
+│  └─ Dashboard -> Widget Builder (widget/)                     │
+└─────────────────────────────────────────────────────────────┘
+```
+
 ### Resource Registration
 
 ```
@@ -183,8 +209,22 @@ form.New().
     Build()
 ```
 
+**Why?** Provides a clean, readable API for complex configuration.
+
 ### 2. Interface Segregation
 Resources implement multiple small interfaces instead of one large interface.
+
+```go
+type Resource interface {
+    GetMeta() ResourceMeta
+    GetNavigation() ResourceNavigation
+    GetViews() ResourceViews
+    GetPermissions() ResourcePermissions
+    GetCRUD() ResourceCRUD
+}
+```
+
+**Why?** Allows partial implementation and reduces coupling.
 
 ### 3. Dependency Injection
 Panel accepts dependencies (DB, Auth, Session) via setters.
@@ -196,8 +236,25 @@ panel := engine.NewPanel("admin").
     SetSession(session)
 ```
 
+**Why?** Makes components testable and loosely coupled.
+
 ### 4. Template Method
 Base resource provides default implementations, resources override as needed.
+
+```go
+type BaseResource struct{}
+
+func (b *BaseResource) GetViews() ResourceViews {
+    return ResourceViews{
+        Index:   views.GenericIndex,
+        Create:  views.GenericForm,
+        Edit:    views.GenericForm,
+        Show:    views.GenericShow,
+    }
+}
+```
+
+**Why?** Reduces boilerplate while allowing customization.
 
 ## Configuration
 
@@ -211,6 +268,30 @@ Configuration is managed via `config.yaml` and loaded using Viper.
 - `jobs` - Background job settings
 
 See [PANEL_CONFIG.md](PANEL_CONFIG.md) for details.
+
+### Configuration Example
+
+```yaml
+server:
+  host: "0.0.0.0"
+  port: 8080
+  read_timeout: 15s
+  write_timeout: 15s
+
+database:
+  driver: "sqlite3"
+  dsn: "file:sublimego.db?cache=shared&_fk=1"
+
+engine:
+  base_path: "/admin"
+  brand_name: "SublimeGo Admin"
+  items_per_page: 25
+
+auth:
+  session_lifetime: 24h
+  cookie_name: "session"
+  bcrypt_cost: 12
+```
 
 ## Database Layer
 

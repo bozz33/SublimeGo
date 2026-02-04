@@ -162,36 +162,67 @@ sublimego/
 
 ## Usage Example
 
-### Creating a Resource
+### Complete Resource Implementation
 
 ```go
 package product
 
 import (
+    "context"
+    "fmt"
+    
     "github.com/bozz33/sublimego/engine"
     "github.com/bozz33/sublimego/form"
     "github.com/bozz33/sublimego/table"
+    "github.com/bozz33/sublimego/actions"
 )
 
 type ProductResource struct {
     engine.BaseResource
+    client *ent.Client
 }
 
-func (r *ProductResource) Schema() *form.Form {
+func NewProductResource(client *ent.Client) *ProductResource {
+    return &ProductResource{client: client}
+}
+
+func (r *ProductResource) GetMeta() engine.ResourceMeta {
+    return engine.ResourceMeta{
+        Name:         "product",
+        Label:        "Product",
+        PluralLabel:  "Products",
+        Icon:         "package",
+        Description:  "Manage your product catalog",
+    }
+}
+
+func (r *ProductResource) GetForm() *form.Form {
     return form.New().SetSchema(
-        form.Text("name").Label("Name").Required(),
-        form.Textarea("description").Label("Description"),
-        form.Number("price").Label("Price").Required(),
+        form.Text("name").Label("Product Name").Required(),
+        form.Textarea("description").Label("Description").Rows(5),
+        form.Number("price").Label("Price").Required().Min(0),
+        form.Select("status").Label("Status").Options([]form.Option{
+            {Value: "draft", Label: "Draft"},
+            {Value: "published", Label: "Published"},
+            {Value: "archived", Label: "Archived"},
+        }).Default("draft"),
     )
 }
 
-func (r *ProductResource) Table() *table.Table {
-    return table.New(r.GetData()).
+func (r *ProductResource) GetTable() *table.Table {
+    return table.New(r.GetData).
         WithColumns(
-            table.Text("name").Label("Name").Sortable(),
-            table.Badge("status").Label("Status"),
-            table.Text("price").Label("Price"),
+            table.ID("id"),
+            table.Text("name").Sortable().Searchable(),
+            table.Currency("price").Sortable(),
+            table.Badge("status").Colors(map[string]string{
+                "draft":     "gray",
+                "published": "green",
+                "archived":  "red",
+            }),
+            table.DateTime("created_at").Sortable(),
         ).
+        SetDefaultSort("created_at", "desc").
         SetActions(
             actions.EditAction("/admin/products"),
             actions.DeleteAction("/admin/products"),
