@@ -186,10 +186,10 @@ go test ./pkg/actions/...
 
 ## Documentation
 
-- **Architecture**: [ARCHITECTURE.md](docs/ARCHITECTURE.md)
-- **Resources**: [RESOURCES_GUIDE.md](docs/RESOURCES_GUIDE.md)
-- **Templating**: [TEMPLATING.md](docs/TEMPLATING.md)
-- **Configuration**: [PANEL_CONFIG.md](docs/PANEL_CONFIG.md)
+- **Architecture**: [ARCHITECTURE.md](ARCHITECTURE.md) - Project structure and design patterns
+- **Resources**: [RESOURCES_GUIDE.md](RESOURCES_GUIDE.md) - Complete guide to creating resources
+- **Templating**: [TEMPLATING.md](TEMPLATING.md) - Working with Templ templates
+- **Configuration**: [PANEL_CONFIG.md](PANEL_CONFIG.md) - Panel configuration options
 
 ## Project Structure
 
