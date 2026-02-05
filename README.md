@@ -5,6 +5,21 @@ A modern, idiomatic Go framework for building admin panels.
 [![Go Reference](https://pkg.go.dev/badge/github.com/bozz33/sublimego.svg)](https://pkg.go.dev/github.com/bozz33/sublimego)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+## Which One Should I Use?
+
+- **SublimeGo** (`github.com/bozz33/sublimego`) - Complete starter project with examples, database setup, and project structure
+- **sublime-admin** (`github.com/bozz33/sublimeadmin`) - Core framework library only, use this as a dependency in your existing Go project
+
+**Use SublimeGo if you want to start a new admin panel project.**
+**Use sublime-admin if you want to add admin panel functionality to an existing Go project.**
+
+## Relationship with sublime-admin
+
+- **sublime-admin** is the core framework library
+- **SublimeGo** is a complete starter project that uses sublime-admin
+- SublimeGo includes database setup, examples, and a ready-to-run project structure
+- sublime-admin provides just the framework components for integration into existing projects
+
 ## Tech Stack
 
 - **Language**: Go 1.24+
