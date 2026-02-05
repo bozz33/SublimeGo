@@ -147,7 +147,7 @@ func Page500(data Error500Data) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</ul></div></div></div></div></div></div><script>\n\t\t\t\t// Display current time\n\t\t\t\tdocument.getElementById('error-time').textContent = new Date().toLocaleString('en-US');\n\t\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</ul></div></div></div></div></div></div><script>\r\n\t\t\t\t// Display current time\r\n\t\t\t\tdocument.getElementById('error-time').textContent = new Date().toLocaleString('en-US');\r\n\t\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

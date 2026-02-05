@@ -10,8 +10,8 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"github.com/bozz33/sublimego/ui/layouts"
-	"github.com/bozz33/sublimego/widget"
 	"github.com/bozz33/sublimego/views/widgets"
+	"github.com/bozz33/sublimego/widget"
 )
 
 func Index(dashboardWidgets []widget.Widget) templ.Component {
