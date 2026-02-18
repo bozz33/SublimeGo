@@ -34,6 +34,31 @@ templ List(state engine.TableState) {
 						Import
 					</a>
 				}
+				for _, action := range state.HeaderActions {
+					if action.Method == "POST" {
+						<form method="POST" action={ templ.SafeURL(action.URL) } class="inline">
+							<button
+								type="submit"
+								class={ headerActionClass(action.Color) }
+							>
+								if action.Icon != "" {
+									<span class="material-icons-outlined text-base">{ action.Icon }</span>
+								}
+								{ action.Label }
+							</button>
+						</form>
+					} else {
+						<a
+							href={ templ.SafeURL(action.URL) }
+							class={ headerActionClass(action.Color) }
+						>
+							if action.Icon != "" {
+								<span class="material-icons-outlined text-base">{ action.Icon }</span>
+							}
+							{ action.Label }
+						</a>
+					}
+				}
 				if state.NewURL != "" {
 					<a
 						href={ templ.SafeURL(state.NewURL) }

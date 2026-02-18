@@ -21,11 +21,12 @@ type BaseResource struct {
 	sort        int
 
 	// Table configuration
-	tableColumns     []Column
-	tableFilters     []FilterDef
-	tableBulkActions []BulkActionDef
-	tableExportURL   string
-	tableImportURL   string
+	tableColumns       []Column
+	tableFilters       []FilterDef
+	tableBulkActions   []BulkActionDef
+	tableHeaderActions []HeaderAction
+	tableExportURL     string
+	tableImportURL     string
 }
 
 // NewBaseResource creates a BaseResource with required values.
@@ -110,6 +111,12 @@ func (b *BaseResource) SetImportURL(url string) *BaseResource {
 	return b
 }
 
+// SetHeaderActions sets always-visible action buttons in the table header.
+func (b *BaseResource) SetHeaderActions(actions ...HeaderAction) *BaseResource {
+	b.tableHeaderActions = actions
+	return b
+}
+
 // BuildTableState constructs a TableState from the resource's list data.
 // Resolution order: ResourceQueryable > ResourceSearchable > ResourceFilterable > List.
 func (b *BaseResource) BuildTableState(ctx context.Context, canCreate, canDelete bool) (TableState, error) {
@@ -137,6 +144,7 @@ func (b *BaseResource) BuildTableState(ctx context.Context, canCreate, canDelete
 		Filters:       b.tableFilters,
 		ActiveFilters: activeFilters,
 		BulkActions:   b.tableBulkActions,
+		HeaderActions: b.tableHeaderActions,
 		ExportURL:     b.tableExportURL,
 		ImportURL:     b.tableImportURL,
 		Pagination:    pagination,

@@ -96,6 +96,7 @@ type TableState struct {
 	Search        string            // current ?search= value
 	SortKey       string            // current ?sort= column key
 	SortDir       string            // current ?dir= (asc|desc)
+	HeaderActions []HeaderAction    // always-visible action buttons in header
 }
 
 // FilterDef describes a filter available on the table.
@@ -119,6 +120,16 @@ type BulkActionDef struct {
 	Icon  string
 	Color string // "danger", "warning", "primary"
 	URL   string // POST target URL
+}
+
+// HeaderAction describes a standalone action button shown in the table header.
+// Unlike BulkActions, HeaderActions are always visible and not tied to row selection.
+type HeaderAction struct {
+	Label  string
+	URL    string // GET link
+	Icon   string
+	Color  string // "primary", "secondary", "danger"
+	Method string // "GET" (default) or "POST"
 }
 
 // Pagination contains pagination info.

@@ -31,6 +31,19 @@ func hasValue(v any) bool { //nolint:unused
 	return v != nil
 }
 
+// headerActionClass returns Tailwind classes for a header action button by color.
+func headerActionClass(color string) string {
+	base := "inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-xl transition-colors "
+	switch color {
+	case "danger":
+		return base + "text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 dark:text-red-400 dark:bg-red-900/20 dark:border-red-800 dark:hover:bg-red-900/40"
+	case "secondary":
+		return base + "border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+	default: // "primary"
+		return base + "text-white bg-primary-600 hover:bg-primary-700"
+	}
+}
+
 // bulkActionClass returns Tailwind classes for a bulk action button by color.
 func bulkActionClass(color string) string { //nolint:unused
 	switch color {
