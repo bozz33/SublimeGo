@@ -60,7 +60,7 @@ templ List(state engine.TableState) {
 						<input
 							type="text"
 							name="search"
-							value={ state.ActiveFilters["search"] }
+							value={ state.Search }
 							placeholder="Search..."
 							class="block w-full pl-9 pr-3 py-2 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
 						/>
@@ -134,12 +134,16 @@ templ List(state engine.TableState) {
 							for _, col := range state.Columns {
 								<th scope="col" class="px-4 py-3 whitespace-nowrap">
 									if col.Sortable {
+										{{ nextDir := "asc"; sortIcon := "unfold_more"
+										if state.SortKey == col.Key {
+											if state.SortDir == "asc" { nextDir = "desc"; sortIcon = "arrow_upward" } else { nextDir = "asc"; sortIcon = "arrow_downward" }
+										} }}
 										<a
-											href={ templ.SafeURL(fmt.Sprintf("?sort=%s", col.Key)) }
+											href={ templ.SafeURL(fmt.Sprintf("?sort=%s&dir=%s&search=%s", col.Key, nextDir, state.Search)) }
 											class="inline-flex items-center gap-1 hover:text-gray-900 dark:hover:text-white"
 										>
 											{ col.Label }
-											<span class="material-icons-outlined text-xs">unfold_more</span>
+											<span class="material-icons-outlined text-xs">{ sortIcon }</span>
 										</a>
 									} else {
 										{ col.Label }
@@ -224,18 +228,19 @@ templ List(state engine.TableState) {
 						Showing { fmt.Sprintf("%d", (state.Pagination.CurrentPage-1)*state.Pagination.PerPage+1) }–{ fmt.Sprintf("%d", min(state.Pagination.CurrentPage*state.Pagination.PerPage, state.Pagination.Total)) } of { fmt.Sprintf("%d", state.Pagination.Total) }
 					</span>
 					<div class="flex items-center gap-1">
+						{{ pageBase := fmt.Sprintf("?sort=%s&dir=%s&search=%s", state.SortKey, state.SortDir, state.Search) }}
 						if state.Pagination.CurrentPage > 1 {
-							<a href={ templ.SafeURL(fmt.Sprintf("?page=%d", state.Pagination.CurrentPage-1)) } class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Previous</a>
+							<a href={ templ.SafeURL(fmt.Sprintf("%s&page=%d", pageBase, state.Pagination.CurrentPage-1)) } class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Previous</a>
 						}
 						for p := 1; p <= state.Pagination.LastPage; p++ {
 							if p == state.Pagination.CurrentPage {
 								<span class="px-3 py-1.5 text-sm rounded-lg bg-primary-600 text-white font-semibold">{ fmt.Sprintf("%d", p) }</span>
 							} else {
-								<a href={ templ.SafeURL(fmt.Sprintf("?page=%d", p)) } class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">{ fmt.Sprintf("%d", p) }</a>
+								<a href={ templ.SafeURL(fmt.Sprintf("%s&page=%d", pageBase, p)) } class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">{ fmt.Sprintf("%d", p) }</a>
 							}
 						}
 						if state.Pagination.CurrentPage < state.Pagination.LastPage {
-							<a href={ templ.SafeURL(fmt.Sprintf("?page=%d", state.Pagination.CurrentPage+1)) } class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Next</a>
+							<a href={ templ.SafeURL(fmt.Sprintf("%s&page=%d", pageBase, state.Pagination.CurrentPage+1)) } class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Next</a>
 						}
 					</div>
 				</div>
