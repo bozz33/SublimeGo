@@ -2,8 +2,10 @@ package engine
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
+	"reflect"
 
 	"github.com/a-h/templ"
 )
@@ -17,6 +19,13 @@ type BaseResource struct {
 	icon        string
 	group       string
 	sort        int
+
+	// Table configuration
+	tableColumns     []Column
+	tableFilters     []FilterDef
+	tableBulkActions []BulkActionDef
+	tableExportURL   string
+	tableImportURL   string
 }
 
 // NewBaseResource creates a BaseResource with required values.
@@ -69,6 +78,70 @@ func (b *BaseResource) SetGroup(group string) *BaseResource {
 func (b *BaseResource) SetSort(sort int) *BaseResource {
 	b.sort = sort
 	return b
+}
+
+// SetTableColumns sets the columns for BuildTableState.
+func (b *BaseResource) SetTableColumns(cols ...Column) *BaseResource {
+	b.tableColumns = cols
+	return b
+}
+
+// SetTableFilters sets the filters for BuildTableState.
+func (b *BaseResource) SetTableFilters(filters ...FilterDef) *BaseResource {
+	b.tableFilters = filters
+	return b
+}
+
+// SetTableBulkActions sets the bulk actions for BuildTableState.
+func (b *BaseResource) SetTableBulkActions(actions ...BulkActionDef) *BaseResource {
+	b.tableBulkActions = actions
+	return b
+}
+
+// SetExportURL enables the export button with the given URL.
+func (b *BaseResource) SetExportURL(url string) *BaseResource {
+	b.tableExportURL = url
+	return b
+}
+
+// SetImportURL enables the import button with the given URL.
+func (b *BaseResource) SetImportURL(url string) *BaseResource {
+	b.tableImportURL = url
+	return b
+}
+
+// BuildTableState constructs a TableState from the resource's list data.
+// Rows are built by calling GetValue on each column for each item.
+// Override Table() in your resource to use this helper.
+func (b *BaseResource) BuildTableState(ctx context.Context, canCreate, canDelete bool) (TableState, error) {
+	items, err := b.List(ctx)
+	if err != nil {
+		return TableState{}, err
+	}
+
+	rows := make([]Row, 0, len(items))
+	for _, item := range items {
+		row := Row{ID: getItemID(item)}
+		for _, col := range b.tableColumns {
+			row.Cells = append(row.Cells, getColumnValue(col, item))
+		}
+		rows = append(rows, row)
+	}
+
+	return TableState{
+		Title:       b.pluralLabel,
+		Slug:        b.slug,
+		Columns:     b.tableColumns,
+		Rows:        rows,
+		CanCreate:   canCreate,
+		CanDelete:   canDelete,
+		NewURL:      "/" + b.slug + "/create",
+		BaseURL:     "/" + b.slug,
+		Filters:     b.tableFilters,
+		BulkActions: b.tableBulkActions,
+		ExportURL:   b.tableExportURL,
+		ImportURL:   b.tableImportURL,
+	}, nil
 }
 
 // Badge returns an empty badge by default.
@@ -133,6 +206,47 @@ func emptyComponent() templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		return nil
 	})
+}
+
+// getItemID extracts the ID from an item using reflection.
+// Looks for fields named "ID", "Id", or "id" (int or string).
+func getItemID(item any) string {
+	if item == nil {
+		return ""
+	}
+	v := reflect.ValueOf(item)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	if v.Kind() != reflect.Struct {
+		return fmt.Sprintf("%v", item)
+	}
+	for _, name := range []string{"ID", "Id", "id"} {
+		f := v.FieldByName(name)
+		if f.IsValid() {
+			return fmt.Sprintf("%v", f.Interface())
+		}
+	}
+	return ""
+}
+
+// getColumnValue returns the string value of a column field from an item.
+func getColumnValue(col Column, item any) string {
+	if item == nil {
+		return ""
+	}
+	v := reflect.ValueOf(item)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	if v.Kind() != reflect.Struct {
+		return fmt.Sprintf("%v", item)
+	}
+	f := v.FieldByName(col.Key)
+	if !f.IsValid() {
+		return ""
+	}
+	return fmt.Sprintf("%v", f.Interface())
 }
 
 // SimpleResource is a minimal resource that only requires metadata.
