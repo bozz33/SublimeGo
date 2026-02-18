@@ -12,6 +12,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/bozz33/sublimego/auth"
 	"github.com/bozz33/sublimego/internal/ent"
+	"github.com/bozz33/sublimego/mailer"
 	"github.com/bozz33/sublimego/middleware"
 	"github.com/bozz33/sublimego/notifications"
 	"github.com/bozz33/sublimego/plugin"
@@ -51,6 +52,10 @@ type Panel struct {
 	Pages       []Page
 	AuthManager *auth.Manager
 	Session     *scs.SessionManager
+
+	// Mailer is used for password reset emails. Defaults to LogMailer if nil.
+	Mailer  mailer.Mailer
+	BaseURL string // e.g. "https://example.com" — used to build reset links
 
 	// Custom middleware applied to all protected routes
 	Middlewares []func(http.Handler) http.Handler
@@ -152,6 +157,20 @@ func (p *Panel) SetAuthManager(authManager *auth.Manager) *Panel {
 
 func (p *Panel) SetSession(session *scs.SessionManager) *Panel {
 	p.Session = session
+	return p
+}
+
+// SetMailer sets the mailer used for password reset emails.
+// Use mailer.NewSMTPMailer(cfg) for production, mailer.LogMailer{} for dev.
+func (p *Panel) SetMailer(m mailer.Mailer) *Panel {
+	p.Mailer = m
+	return p
+}
+
+// SetBaseURL sets the public base URL of the panel (e.g. "https://example.com").
+// Required for building password reset links in emails.
+func (p *Panel) SetBaseURL(url string) *Panel {
+	p.BaseURL = url
 	return p
 }
 
@@ -300,7 +319,7 @@ func (p *Panel) Router() http.Handler {
 		}
 
 		if p.PasswordReset {
-			resetHandler := NewPasswordResetHandler(p.AuthManager, p.DB)
+			resetHandler := NewPasswordResetHandler(p.AuthManager, p.DB, p.Mailer, p.BaseURL)
 			mux.Handle("/forgot-password", resetHandler)
 			mux.Handle("/reset-password", resetHandler)
 		}

@@ -3,6 +3,7 @@ package engine
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -11,6 +12,7 @@ import (
 	authpkg "github.com/bozz33/sublimego/auth"
 	"github.com/bozz33/sublimego/internal/ent"
 	"github.com/bozz33/sublimego/internal/ent/user"
+	"github.com/bozz33/sublimego/mailer"
 	authtemplates "github.com/bozz33/sublimego/views/auth"
 )
 
@@ -30,11 +32,17 @@ var resetStore = struct {
 type PasswordResetHandler struct {
 	authManager *authpkg.Manager
 	db          *ent.Client
+	mailer      mailer.Mailer
+	baseURL     string // e.g. "https://example.com" — used to build reset links
 }
 
 // NewPasswordResetHandler creates a new password reset handler.
-func NewPasswordResetHandler(authManager *authpkg.Manager, db *ent.Client) *PasswordResetHandler {
-	return &PasswordResetHandler{authManager: authManager, db: db}
+// Pass a mailer.LogMailer{} for development or mailer.NewSMTPMailer(cfg) for production.
+func NewPasswordResetHandler(authManager *authpkg.Manager, db *ent.Client, m mailer.Mailer, baseURL string) *PasswordResetHandler {
+	if m == nil {
+		m = &mailer.LogMailer{}
+	}
+	return &PasswordResetHandler{authManager: authManager, db: db, mailer: m, baseURL: baseURL}
 }
 
 func (h *PasswordResetHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -87,9 +95,12 @@ func (h *PasswordResetHandler) handleForgotPassword(w http.ResponseWriter, r *ht
 		}
 		resetStore.mu.Unlock()
 
-		// TODO: send email with link: /reset-password?token=TOKEN&email=EMAIL
-		// For now the token is logged — replace with your mailer
-		_ = token
+		resetLink := fmt.Sprintf("%s/reset-password?token=%s&email=%s", h.baseURL, token, email)
+		_ = h.mailer.Send(mailer.Message{
+			To:      []string{email},
+			Subject: "Reset your password",
+			Body:    fmt.Sprintf("Click the link below to reset your password (valid 1 hour):\n\n%s\n", resetLink),
+		})
 	}
 
 	templ.Handler(authtemplates.ForgotPasswordPage("",
