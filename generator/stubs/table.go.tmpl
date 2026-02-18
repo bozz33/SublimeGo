@@ -51,11 +51,24 @@ func (r *{{.TypeName}}) table(ctx context.Context, items []any) templ.Component 
 	})
 
 	return generics.List(engine.TableState{
-		Title:   r.PluralLabel(),
-		NewURL:  "/" + r.Slug() + "/create",
-		BaseURL: "/" + r.Slug(),
-		Columns: columns,
-		Rows:    rows,
+		Title:     r.PluralLabel(),
+		NewURL:    "/" + r.Slug() + "/create",
+		BaseURL:   "/" + r.Slug(),
+		ExportURL: "/" + r.Slug() + "/export",
+		Columns:   columns,
+		Rows:      rows,
+		CanCreate: r.CanCreate(ctx),
+		CanDelete: r.CanDelete(ctx),
+		// Filters: []engine.FilterDef{
+		// 	{Key: "status", Label: "Status", Type: "select", Options: []engine.FilterOption{
+		// 		{Value: "active", Label: "Active"},
+		// 		{Value: "inactive", Label: "Inactive"},
+		// 	}},
+		// },
+		// BulkActions: []engine.BulkActionDef{
+		// 	{Key: "delete", Label: "Delete selected", Icon: "delete_outline", Color: "danger",
+		// 	 URL: "/" + r.Slug() + "/bulk-delete"},
+		// },
 	})
 }
 
