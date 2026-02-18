@@ -207,6 +207,13 @@ func (p *Panel) Router() http.Handler {
 		protectedHandler := middleware.RequireAuth(p.AuthManager)(handler)
 		mux.Handle("/"+slug+"/", protectedHandler)
 		mux.Handle("/"+slug, protectedHandler)
+
+		// Register relation manager sub-routes if the resource implements RelationManagerAware
+		rmHandler := NewRelationManagerHandler(res)
+		if rmHandler.HasManagers() {
+			rmProtected := middleware.RequireAuth(p.AuthManager)(rmHandler)
+			mux.Handle("/"+slug+"/relations/", rmProtected)
+		}
 	}
 
 	// Register custom pages
