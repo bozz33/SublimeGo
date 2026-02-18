@@ -8,26 +8,28 @@ import (
 
 // Table represents the complete configuration of a table.
 type Table struct {
-	Columns    []Column
-	Rows       []any
-	Actions    []*actions.Action
-	Filters    []Filter
-	Searchable bool
-	Pagination bool
-	PerPage    int
-	BaseURL    string
+	Columns     []Column
+	Rows        []any
+	Actions     []*actions.Action
+	BulkActions []*BulkAction
+	Filters     []Filter
+	Searchable  bool
+	Pagination  bool
+	PerPage     int
+	BaseURL     string
 }
 
 // New creates a new Table instance.
 func New(data []any) *Table {
 	return &Table{
-		Columns:    make([]Column, 0),
-		Rows:       data,
-		Actions:    make([]*actions.Action, 0),
-		Filters:    make([]Filter, 0),
-		Searchable: true,
-		Pagination: true,
-		PerPage:    15,
+		Columns:     make([]Column, 0),
+		Rows:        data,
+		Actions:     make([]*actions.Action, 0),
+		BulkActions: make([]*BulkAction, 0),
+		Filters:     make([]Filter, 0),
+		Searchable:  true,
+		Pagination:  true,
+		PerPage:     15,
 	}
 }
 
@@ -53,6 +55,12 @@ func (t *Table) SetBaseURL(url string) *Table {
 func (t *Table) AddColumn(key, label string) *Table {
 	col := Text(key).Label(label)
 	t.Columns = append(t.Columns, col)
+	return t
+}
+
+// WithBulkActions sets the bulk actions available on selected rows.
+func (t *Table) WithBulkActions(actions ...*BulkAction) *Table {
+	t.BulkActions = append(t.BulkActions, actions...)
 	return t
 }
 

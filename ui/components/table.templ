@@ -9,28 +9,41 @@ import (
 
 // Table displays a table with the provided configuration
 templ Table(ctx context.Context, t *table.Table, data []any) {
-	<div class="relative overflow-x-auto shadow-md sm:rounded-lg bg-white dark:bg-gray-800">
-		<!-- Header with search and filters -->
-		<div class="p-4 bg-white dark:bg-gray-900 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
-			if t.Searchable {
-				<div class="relative">
-					<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-						<svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-						</svg>
+	<div
+		class="relative overflow-x-auto shadow-md sm:rounded-lg bg-white dark:bg-gray-800"
+		x-data="{ selectedIds: [], selectAll: false }"
+	>
+		<!-- Header with search, filters and bulk actions -->
+		<div class="p-4 bg-white dark:bg-gray-900 flex flex-wrap justify-between items-center gap-3 border-b border-gray-200 dark:border-gray-700">
+			<div class="flex items-center gap-3">
+				if t.Searchable {
+					<div class="relative">
+						<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+							<svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+							</svg>
+						</div>
+						<input
+							type="text"
+							name="search"
+							class="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+							placeholder="Rechercher..."
+						/>
 					</div>
-					<input 
-						type="text" 
-						name="search" 
-						class="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" 
-						placeholder="Rechercher..."
-					/>
-				</div>
-			}
-			if len(t.Filters) > 0 {
-				<div class="flex gap-2">
-					for _, filter := range t.Filters {
-						@RenderFilter(filter)
+				}
+				if len(t.Filters) > 0 {
+					<div class="flex gap-2">
+						for _, filter := range t.Filters {
+							@RenderFilter(filter)
+						}
+					</div>
+				}
+			</div>
+			if len(t.BulkActions) > 0 {
+				<div x-show="selectedIds.length > 0" x-cloak class="flex items-center gap-2">
+					<span class="text-sm text-gray-500 dark:text-gray-400" x-text="`${selectedIds.length} selected`"></span>
+					for _, ba := range t.BulkActions {
+						@RenderBulkAction(ba)
 					}
 				</div>
 			}
@@ -40,6 +53,16 @@ templ Table(ctx context.Context, t *table.Table, data []any) {
 		<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
 			<thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 				<tr>
+					if len(t.BulkActions) > 0 {
+						<th scope="col" class="px-4 py-3 w-4">
+							<input
+								type="checkbox"
+								x-model="selectAll"
+								@change="selectAll ? selectedIds = [...$el.closest('table').querySelectorAll('tbody [data-row-id]')].map(el => el.dataset.rowId) : selectedIds = []"
+								class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
+							/>
+						</th>
+					}
 					for _, col := range t.Columns {
 						<th scope="col" class="px-6 py-3">
 							<div class="flex items-center">
@@ -62,13 +85,24 @@ templ Table(ctx context.Context, t *table.Table, data []any) {
 			<tbody>
 				if len(data) == 0 {
 					<tr>
-						<td colspan={ fmt.Sprintf("%d", len(t.Columns) + 1) } class="px-6 py-8 text-center text-gray-500">
+						<td colspan={ fmt.Sprintf("%d", len(t.Columns)+1) } class="px-6 py-8 text-center text-gray-500">
 							Aucun resultat trouve
 						</td>
 					</tr>
 				} else {
 					for _, item := range data {
 						<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+							if len(t.BulkActions) > 0 {
+								<td class="px-4 py-4 w-4">
+									<input
+										type="checkbox"
+										data-row-id={ fmt.Sprintf("%v", item) }
+										:value={ fmt.Sprintf("%v", item) }
+										x-model="selectedIds"
+										class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
+									/>
+								</td>
+							}
 							for _, col := range t.Columns {
 								<td class="px-6 py-4">
 									@RenderCell(ctx, col, item)
@@ -142,6 +176,29 @@ templ RenderCell(ctx context.Context, col table.Column, item any) {
 			<span class="text-gray-600 dark:text-gray-400 text-sm">{ col.GetValue(item) }</span>
 		default:
 			<span>{ col.GetValue(item) }</span>
+	}
+}
+
+// RenderBulkAction renders a bulk action button in the toolbar.
+templ RenderBulkAction(ba *table.BulkAction) {
+	if ba.RequireConf {
+		<button
+			type="button"
+			@click={ fmt.Sprintf("$dispatch('open-bulk-modal', { title: '%s', desc: '%s', ids: selectedIds })", ba.ConfTitle, ba.ConfDesc) }
+			class={ getBulkActionClasses(ba.GetColor()) }
+		>
+			@ActionIcon(ba.GetIcon())
+			{ ba.GetLabel() }
+		</button>
+	} else {
+		<button
+			type="button"
+			@click={ fmt.Sprintf("$dispatch('bulk-action', { action: '%s', ids: selectedIds })", ba.GetLabel()) }
+			class={ getBulkActionClasses(ba.GetColor()) }
+		>
+			@ActionIcon(ba.GetIcon())
+			{ ba.GetLabel() }
+		</button>
 	}
 }
 
