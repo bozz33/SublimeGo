@@ -10,6 +10,30 @@ Inspired by Laravel Filament, written entirely in idiomatic Go.
 
 ---
 
+## Two Repositories
+
+SublimeGo is split into two complementary repositories:
+
+| | [SublimeGo](https://github.com/bozz33/SublimeGo) | [sublime-admin](https://github.com/bozz33/sublime-admin) |
+|---|---|---|
+| **Type** | Complete starter project | Core framework library |
+| **Use when** | Starting a new admin panel project | Adding admin panel to an existing Go project |
+| **Includes** | DB setup, Ent schemas, CLI, examples, views | Framework packages only (engine, form, table, auth…) |
+| **Import** | `github.com/bozz33/sublimego` | `github.com/bozz33/sublimeadmin` |
+
+```bash
+# Use SublimeGo — clone and start building
+git clone https://github.com/bozz33/SublimeGo.git myproject
+
+# Use sublime-admin — add to an existing project
+go get github.com/bozz33/sublimeadmin@latest
+```
+
+> **Not sure which to pick?** Start with **SublimeGo** — it includes everything you need out of the box.
+> Switch to **sublime-admin** when you need to integrate the framework into an existing codebase.
+
+---
+
 ## Tech Stack
 
 | Component    | Technology                                      |
@@ -284,3 +308,4 @@ MIT  see [LICENSE](LICENSE).
 ---
 
 *Inspired by [Laravel Filament](https://filamentphp.com/)  Built with [Ent](https://entgo.io/) and [Templ](https://templ.guide/)*
+
