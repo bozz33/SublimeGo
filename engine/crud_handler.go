@@ -11,6 +11,16 @@ import (
 	"github.com/bozz33/sublimego/ui/layouts"
 )
 
+const contextKeyListQuery contextKey = "list_query"
+
+// GetListQuery retrieves the ListQuery from context (set by CRUDHandler.List).
+func GetListQuery(ctx context.Context) *ListQuery {
+	if q, ok := ctx.Value(contextKeyListQuery).(*ListQuery); ok {
+		return q
+	}
+	return nil
+}
+
 // CRUDHandler automatically handles CRUD operations for a resource.
 type CRUDHandler struct {
 	Resource Resource
@@ -22,20 +32,40 @@ func NewCRUDHandler(r Resource) *CRUDHandler {
 }
 
 // List displays the list of items.
-// Active filters are extracted from query params (prefix "filter_") and
-// injected into the context so BuildTableState / ListFiltered can use them.
+// Extracts filter_*, search, sort, dir, page, per_page from query params
+// and injects them into context as both ActiveFilters and ListQuery.
 func (h *CRUDHandler) List(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	q := r.URL.Query()
 
-	// Extract active filters: ?filter_status=active&filter_role=admin -> {"status":"active","role":"admin"}
-	activeFilters := make(map[string]string)
-	for key, vals := range r.URL.Query() {
+	// Build ListQuery from all relevant params
+	lq := &ListQuery{
+		Filters: make(map[string]string),
+		Search:  q.Get("search"),
+		SortKey: q.Get("sort"),
+		SortDir: q.Get("dir"),
+		Page:    1,
+		PerPage: 20,
+	}
+	if lq.SortDir != "desc" {
+		lq.SortDir = "asc"
+	}
+	if p, err := strconv.Atoi(q.Get("page")); err == nil && p > 0 {
+		lq.Page = p
+	}
+	if pp, err := strconv.Atoi(q.Get("per_page")); err == nil && pp > 0 && pp <= 200 {
+		lq.PerPage = pp
+	}
+	for key, vals := range q {
 		if strings.HasPrefix(key, "filter_") && len(vals) > 0 && vals[0] != "" {
-			activeFilters[strings.TrimPrefix(key, "filter_")] = vals[0]
+			lq.Filters[strings.TrimPrefix(key, "filter_")] = vals[0]
 		}
 	}
-	if len(activeFilters) > 0 {
-		ctx = context.WithValue(ctx, ContextKeyActiveFilters, activeFilters)
+
+	// Inject into context
+	ctx = context.WithValue(ctx, contextKeyListQuery, lq)
+	if len(lq.Filters) > 0 {
+		ctx = context.WithValue(ctx, ContextKeyActiveFilters, lq.Filters)
 	}
 
 	component := h.Resource.Table(ctx)

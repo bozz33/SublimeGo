@@ -111,26 +111,52 @@ func (b *BaseResource) SetImportURL(url string) *BaseResource {
 }
 
 // BuildTableState constructs a TableState from the resource's list data.
-// If the resource implements ResourceFilterable and active filters are present
-// in ctx (via ContextKeyActiveFilters), ListFiltered is called instead of List.
-// Override Table() in your resource to use this helper.
+// Resolution order for fetching items:
+//  1. ResourceQueryable.ListQuery  — full control (filters+search+sort+pagination)
+//  2. ResourceSearchable.Search    — when ?search= is set
+//  3. ResourceFilterable.ListFiltered — when filter_* params are set
+//  4. List()                       — default
+//
+// Pagination is built from ListQuery context when ResourceQueryable is used.
 func (b *BaseResource) BuildTableState(ctx context.Context, canCreate, canDelete bool) (TableState, error) {
+	lq := GetListQuery(ctx)
 	activeFilters := GetActiveFilters(ctx)
 
 	var items []any
+	var total int
 	var err error
 
-	if len(activeFilters) > 0 {
-		if filterable, ok := interface{}(b).(ResourceFilterable); ok {
-			items, err = filterable.ListFiltered(ctx, activeFilters)
+	self := interface{}(b)
+
+	switch {
+	case lq != nil:
+		if queryable, ok := self.(ResourceQueryable); ok {
+			items, total, err = queryable.ListQuery(ctx, *lq)
+		} else if lq.Search != "" {
+			if searchable, ok := self.(ResourceSearchable); ok {
+				items, err = searchable.Search(ctx, lq.Search)
+			} else {
+				items, err = b.List(ctx)
+			}
+		} else if len(activeFilters) > 0 {
+			if filterable, ok := self.(ResourceFilterable); ok {
+				items, err = filterable.ListFiltered(ctx, activeFilters)
+			} else {
+				items, err = b.List(ctx)
+			}
 		} else {
 			items, err = b.List(ctx)
 		}
-	} else {
+	default:
 		items, err = b.List(ctx)
 	}
+
 	if err != nil {
 		return TableState{}, err
+	}
+
+	if total == 0 {
+		total = len(items)
 	}
 
 	rows := make([]Row, 0, len(items))
@@ -142,19 +168,48 @@ func (b *BaseResource) BuildTableState(ctx context.Context, canCreate, canDelete
 		rows = append(rows, row)
 	}
 
+	// Build pagination if ListQuery is present
+	var pagination *Pagination
+	if lq != nil && lq.PerPage > 0 {
+		lastPage := (total + lq.PerPage - 1) / lq.PerPage
+		if lastPage < 1 {
+			lastPage = 1
+		}
+		pagination = &Pagination{
+			CurrentPage: lq.Page,
+			PerPage:     lq.PerPage,
+			Total:       total,
+			LastPage:    lastPage,
+		}
+	}
+
+	// Build active search/sort state for the template
+	var activeSearch string
+	var activeSortKey, activeSortDir string
+	if lq != nil {
+		activeSearch = lq.Search
+		activeSortKey = lq.SortKey
+		activeSortDir = lq.SortDir
+	}
+
 	return TableState{
-		Title:       b.pluralLabel,
-		Slug:        b.slug,
-		Columns:     b.tableColumns,
-		Rows:        rows,
-		CanCreate:   canCreate,
-		CanDelete:   canDelete,
-		NewURL:      "/" + b.slug + "/create",
-		BaseURL:     "/" + b.slug,
-		Filters:     b.tableFilters,
-		BulkActions: b.tableBulkActions,
-		ExportURL:   b.tableExportURL,
-		ImportURL:   b.tableImportURL,
+		Title:         b.pluralLabel,
+		Slug:          b.slug,
+		Columns:       b.tableColumns,
+		Rows:          rows,
+		CanCreate:     canCreate,
+		CanDelete:     canDelete,
+		NewURL:        "/" + b.slug + "/create",
+		BaseURL:       "/" + b.slug,
+		Filters:       b.tableFilters,
+		ActiveFilters: activeFilters,
+		BulkActions:   b.tableBulkActions,
+		ExportURL:     b.tableExportURL,
+		ImportURL:     b.tableImportURL,
+		Pagination:    pagination,
+		Search:        activeSearch,
+		SortKey:       activeSortKey,
+		SortDir:       activeSortDir,
 	}, nil
 }
 

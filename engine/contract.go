@@ -93,6 +93,9 @@ type TableState struct {
 	BulkActions   []BulkActionDef   // available bulk actions
 	ExportURL     string            // non-empty = show export button
 	ImportURL     string            // non-empty = show import button
+	Search        string            // current ?search= value
+	SortKey       string            // current ?sort= column key
+	SortDir       string            // current ?dir= (asc|desc)
 }
 
 // FilterDef describes a filter available on the table.
@@ -213,4 +216,27 @@ func GetActiveFilters(ctx context.Context) map[string]string {
 type ResourceFilterable interface {
 	// ListFiltered returns items matching the given filter key/value pairs.
 	ListFiltered(ctx context.Context, filters map[string]string) ([]any, error)
+}
+
+// ListQuery holds all query parameters for list operations.
+type ListQuery struct {
+	Filters map[string]string // filter_* query params
+	Search  string            // ?search=
+	SortKey string            // ?sort=field
+	SortDir string            // ?dir=asc|desc
+	Page    int               // ?page=N (1-indexed)
+	PerPage int               // ?per_page=N
+}
+
+// ResourceQueryable is an optional interface for resources that handle
+// all list query parameters in a single call (filters + search + sort + pagination).
+// Prefer this over ResourceFilterable when you need full control.
+type ResourceQueryable interface {
+	ListQuery(ctx context.Context, q ListQuery) (items []any, total int, err error)
+}
+
+// ResourceSearchable is an optional interface for resources that support
+// full-text search via the ?search= query param.
+type ResourceSearchable interface {
+	Search(ctx context.Context, query string) ([]any, error)
 }
