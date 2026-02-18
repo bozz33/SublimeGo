@@ -56,7 +56,11 @@ func (s *Scanner) Scan() ScanResult {
 		}
 
 		for _, pattern := range s.config.ExcludePatterns {
-			if matched, _ := filepath.Match(pattern, filepath.Base(path)); matched {
+			matched, err := filepath.Match(pattern, filepath.Base(path))
+			if err != nil {
+				continue
+			}
+			if matched {
 				return nil
 			}
 		}

@@ -2,6 +2,8 @@ package widget
 
 import (
 	"encoding/json"
+
+	"github.com/a-h/templ"
 )
 
 // ChartType defines the supported chart type.
@@ -53,7 +55,10 @@ func (c *ChartWidget) AddSeries(name string, data []int) *ChartWidget {
 
 // GetSeriesJSON returns the series as JSON for JavaScript.
 func (c *ChartWidget) GetSeriesJSON() string {
-	b, _ := json.Marshal(c.Series)
+	b, err := json.Marshal(c.Series)
+	if err != nil {
+		return "[]"
+	}
 	if c.Type == Donut {
 		simpleData := make([]int, len(c.Series))
 		for i, s := range c.Series {
@@ -61,21 +66,44 @@ func (c *ChartWidget) GetSeriesJSON() string {
 				simpleData[i] = s.Data[0]
 			}
 		}
-		b, _ = json.Marshal(simpleData)
+		if b2, e2 := json.Marshal(simpleData); e2 == nil {
+			b = b2
+		}
 	}
 	return string(b)
 }
 
 // GetLabelsJSON returns the labels as JSON.
 func (c *ChartWidget) GetLabelsJSON() string {
-	b, _ := json.Marshal(c.Labels)
+	b, err := json.Marshal(c.Labels)
+	if err != nil {
+		return "[]"
+	}
 	return string(b)
 }
 
 // GetColorsJSON returns the colors as JSON.
 func (c *ChartWidget) GetColorsJSON() string {
-	b, _ := json.Marshal(c.Colors)
+	b, err := json.Marshal(c.Colors)
+	if err != nil {
+		return "[]"
+	}
 	return string(b)
 }
 
 func (c *ChartWidget) GetType() string { return "chart" }
+
+// chartRenderFunc is set by views/widgets to avoid import cycles.
+var chartRenderFunc func(*ChartWidget) templ.Component
+
+// SetChartRenderer registers the render function.
+func SetChartRenderer(fn func(*ChartWidget) templ.Component) {
+	chartRenderFunc = fn
+}
+
+func (c *ChartWidget) Render() templ.Component {
+	if chartRenderFunc != nil {
+		return chartRenderFunc(c)
+	}
+	return templ.NopComponent
+}

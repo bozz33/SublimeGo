@@ -5,20 +5,20 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"github.com/bozz33/sublimego/errors"
+	apperrors "github.com/bozz33/sublimego/errors"
 	"github.com/bozz33/sublimego/logger"
 )
 
 // RecoveryConfig configures the recovery middleware.
 type RecoveryConfig struct {
-	ErrorHandler *errors.Handler
+	ErrorHandler *apperrors.Handler
 	Logger       *logger.Logger
 	PrintStack   bool
 	OnPanic      func(r *http.Request, rec any)
 }
 
 // DefaultRecoveryConfig returns a default configuration.
-func DefaultRecoveryConfig(errorHandler *errors.Handler) *RecoveryConfig {
+func DefaultRecoveryConfig(errorHandler *apperrors.Handler) *RecoveryConfig {
 	return &RecoveryConfig{
 		ErrorHandler: errorHandler,
 		Logger:       logger.Default(),
@@ -28,7 +28,7 @@ func DefaultRecoveryConfig(errorHandler *errors.Handler) *RecoveryConfig {
 }
 
 // Recovery returns a middleware that captures panics.
-func Recovery(errorHandler *errors.Handler) Middleware {
+func Recovery(errorHandler *apperrors.Handler) Middleware {
 	return RecoveryWithConfig(DefaultRecoveryConfig(errorHandler))
 }
 
@@ -64,8 +64,8 @@ func RecoveryWithConfig(config *RecoveryConfig) Middleware {
 					}
 
 					// Create AppError
-					err := errors.Internal(nil, "An internal error occurred")
-					err.WithField("panic", fmt.Sprint(rec))
+					err := apperrors.Internal(nil, "An error occurred")
+					_ = err.WithField("panic", fmt.Sprint(rec))
 
 					if config.PrintStack {
 						err.Stack = string(stack)
@@ -111,12 +111,12 @@ func logPanic(log *logger.Logger, r *http.Request, rec any, stack []byte, printS
 }
 
 // SafeHandler wrapper that never panics.
-func SafeHandler(h http.Handler, errorHandler *errors.Handler) http.Handler {
+func SafeHandler(h http.Handler, errorHandler *apperrors.Handler) http.Handler {
 	return Recovery(errorHandler)(h)
 }
 
 // SafeHandlerFunc wrapper that never panics.
-func SafeHandlerFunc(fn http.HandlerFunc, errorHandler *errors.Handler) http.Handler {
+func SafeHandlerFunc(fn http.HandlerFunc, errorHandler *apperrors.Handler) http.Handler {
 	return SafeHandler(fn, errorHandler)
 }
 
@@ -156,6 +156,6 @@ func RecoverToError(rec any) error {
 
 // Deprecated: Use Recovery instead.
 // PanicRecovery is an alias for Recovery (compatibility).
-func PanicRecovery(errorHandler *errors.Handler) Middleware {
+func PanicRecovery(errorHandler *apperrors.Handler) Middleware {
 	return Recovery(errorHandler)
 }

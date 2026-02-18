@@ -95,11 +95,11 @@ This command:
 		// Initialisation du panneau d'administration
 		fmt.Println("Initialisation du panneau d'administration...")
 		panel := engine.NewPanel("admin").
-			SetPath(cfg.Engine.BasePath).
-			SetBrandName(cfg.Engine.BrandName).
-			SetDatabase(client).
-			SetAuthManager(authManager).
-			SetSession(sessionManager)
+			WithPath(cfg.Engine.BasePath).
+			WithBrandName(cfg.Engine.BrandName).
+			WithDatabase(client).
+			WithAuthManager(authManager).
+			WithSession(sessionManager)
 
 		// Création du serveur HTTP
 		addr := cfg.ServerAddress()

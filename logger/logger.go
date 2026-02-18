@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/natefinch/lumberjack"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 // Config contains the logger configuration.

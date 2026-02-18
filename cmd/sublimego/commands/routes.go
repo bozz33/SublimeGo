@@ -58,7 +58,7 @@ Utile pour :
 
 		// Initialisation du panel pour récupérer les resources
 		panel := engine.NewPanel("admin").
-			SetPath(cfg.Engine.BasePath)
+			WithPath(cfg.Engine.BasePath)
 
 		// Affichage des routes de base
 		fmt.Println("Routes de base:")

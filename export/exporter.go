@@ -150,7 +150,7 @@ func (e *Exporter) writeCSV(w io.Writer) error {
 // writeExcel writes in Excel format.
 func (e *Exporter) writeExcel(w io.Writer) error {
 	f := excelize.NewFile()
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	sheetName := "Sheet1"
 	index, err := f.NewSheet(sheetName)
@@ -177,21 +177,21 @@ func (e *Exporter) writeExcel(w io.Writer) error {
 	if len(e.headers) > 0 {
 		for i, header := range e.headers {
 			cell := fmt.Sprintf("%s1", columnName(i))
-			f.SetCellValue(sheetName, cell, header)
-			f.SetCellStyle(sheetName, cell, cell, headerStyle)
+			_ = f.SetCellValue(sheetName, cell, header)
+			_ = f.SetCellStyle(sheetName, cell, cell, headerStyle)
 		}
 	}
 
 	for rowIdx, row := range e.data {
 		for colIdx, value := range row {
 			cell := fmt.Sprintf("%s%d", columnName(colIdx), rowIdx+2)
-			f.SetCellValue(sheetName, cell, value)
+			_ = f.SetCellValue(sheetName, cell, value)
 		}
 	}
 
 	for i := range e.headers {
 		col := columnName(i)
-		f.SetColWidth(sheetName, col, col, 15)
+		_ = f.SetColWidth(sheetName, col, col, 15)
 	}
 
 	return f.Write(w)

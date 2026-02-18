@@ -36,8 +36,8 @@ func TestTableAddColumn(t *testing.T) {
 }
 
 func TestTableWithColumns(t *testing.T) {
-	col1 := Text("id").Label("ID")
-	col2 := Text("name").Label("Name")
+	col1 := Text("id").WithLabel("ID")
+	col2 := Text("name").WithLabel("Name")
 
 	tbl := New(nil).WithColumns(col1, col2)
 
@@ -72,13 +72,13 @@ func TestTablePaginate(t *testing.T) {
 
 func TestTextColumn(t *testing.T) {
 	col := Text("name").
-		Label("Full Name").
+		WithLabel("Full Name").
 		Sortable().
 		Searchable().
 		Copyable()
 
-	if col.Key != "name" {
-		t.Errorf("Expected key 'name', got '%s'", col.Key)
+	if col.Key() != "name" {
+		t.Errorf("Expected key 'name', got '%s'", col.Key())
 	}
 	if col.LabelStr != "Full Name" {
 		t.Errorf("Expected label 'Full Name', got '%s'", col.LabelStr)
@@ -97,27 +97,27 @@ func TestTextColumn(t *testing.T) {
 func TestTextColumnInterface(t *testing.T) {
 	col := Text("test")
 
-	if col.GetKey() != "test" {
-		t.Errorf("Expected GetKey() 'test', got '%s'", col.GetKey())
+	if col.Key() != "test" {
+		t.Errorf("Expected Key() 'test', got '%s'", col.Key())
 	}
-	if col.GetType() != "text" {
-		t.Errorf("Expected GetType() 'text', got '%s'", col.GetType())
+	if col.Type() != "text" {
+		t.Errorf("Expected Type() 'text', got '%s'", col.Type())
 	}
 }
 
 func TestBadgeColumn(t *testing.T) {
 	col := Badge("status").
-		Label("Status").
+		WithLabel("Status").
 		Colors(map[string]string{
 			"active":   "success",
 			"inactive": "danger",
 		})
 
-	if col.Key != "status" {
-		t.Errorf("Expected key 'status', got '%s'", col.Key)
+	if col.Key() != "status" {
+		t.Errorf("Expected key 'status', got '%s'", col.Key())
 	}
-	if col.GetType() != "badge" {
-		t.Errorf("Expected type 'badge', got '%s'", col.GetType())
+	if col.Type() != "badge" {
+		t.Errorf("Expected type 'badge', got '%s'", col.Type())
 	}
 	if len(col.ColorMap) != 2 {
 		t.Errorf("Expected 2 color mappings, got %d", len(col.ColorMap))
@@ -126,14 +126,14 @@ func TestBadgeColumn(t *testing.T) {
 
 func TestImageColumn(t *testing.T) {
 	col := Image("avatar").
-		Label("Profile Picture").
+		WithLabel("Profile Picture").
 		Round()
 
-	if col.Key != "avatar" {
-		t.Errorf("Expected key 'avatar', got '%s'", col.Key)
+	if col.Key() != "avatar" {
+		t.Errorf("Expected key 'avatar', got '%s'", col.Key())
 	}
-	if col.GetType() != "image" {
-		t.Errorf("Expected type 'image', got '%s'", col.GetType())
+	if col.Type() != "image" {
+		t.Errorf("Expected type 'image', got '%s'", col.Type())
 	}
 	if !col.Rounded {
 		t.Error("Expected Rounded to be true")
@@ -142,34 +142,34 @@ func TestImageColumn(t *testing.T) {
 
 func TestSelectFilter(t *testing.T) {
 	filter := Select("status").
-		Label("Status").
+		WithLabel("Status").
 		WithOptions([]FilterOption{
 			{Value: "active", Label: "Active"},
 			{Value: "inactive", Label: "Inactive"},
 		})
 
-	if filter.Key != "status" {
-		t.Errorf("Expected key 'status', got '%s'", filter.Key)
+	if filter.Key() != "status" {
+		t.Errorf("Expected key 'status', got '%s'", filter.Key())
 	}
-	if filter.GetType() != "select" {
-		t.Errorf("Expected type 'select', got '%s'", filter.GetType())
+	if filter.Type() != "select" {
+		t.Errorf("Expected type 'select', got '%s'", filter.Type())
 	}
-	if len(filter.GetOptions()) != 2 {
-		t.Errorf("Expected 2 options, got %d", len(filter.GetOptions()))
+	if len(filter.FilterOptions()) != 2 {
+		t.Errorf("Expected 2 options, got %d", len(filter.FilterOptions()))
 	}
 }
 
 func TestBooleanFilter(t *testing.T) {
-	filter := Boolean("active").Label("Is Active")
+	filter := Boolean("active").WithLabel("Is Active")
 
-	if filter.Key != "active" {
-		t.Errorf("Expected key 'active', got '%s'", filter.Key)
+	if filter.Key() != "active" {
+		t.Errorf("Expected key 'active', got '%s'", filter.Key())
 	}
-	if filter.GetType() != "boolean" {
-		t.Errorf("Expected type 'boolean', got '%s'", filter.GetType())
+	if filter.Type() != "boolean" {
+		t.Errorf("Expected type 'boolean', got '%s'", filter.Type())
 	}
 
-	opts := filter.GetOptions()
+	opts := filter.FilterOptions()
 	if len(opts) != 2 {
 		t.Errorf("Expected 2 options (Yes/No), got %d", len(opts))
 	}

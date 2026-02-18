@@ -31,6 +31,14 @@ func RenderComponent(c form.Component) templ.Component {
 			return CheckboxField(v).Render(ctx, w)
 		case *form.FileUpload:
 			return FileUploadField(v).Render(ctx, w)
+		case *form.DatePicker:
+			return DatePickerField(v).Render(ctx, w)
+		case *form.HiddenField:
+			return HiddenInputField(v).Render(ctx, w)
+		case *form.Toggle:
+			return ToggleField(v).Render(ctx, w)
+		case *form.RepeaterField:
+			return RepeaterFieldView(v).Render(ctx, w)
 
 		default:
 			return nil

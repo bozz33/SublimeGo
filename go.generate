@@ -1,1 +1,0 @@
-//go:generate go run ./cmd/sublimego/internal/scanner/main.go -output=./internal/registry/provider_gen.go

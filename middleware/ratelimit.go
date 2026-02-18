@@ -110,9 +110,10 @@ func (rl *RateLimiter) Middleware() Middleware {
 // getLimiter retrieves or creates a limiter for a given key.
 func (rl *RateLimiter) getLimiter(key string) *rate.Limiter {
 	if entry, ok := rl.limiters.Load(key); ok {
-		e := entry.(*limiterEntry)
-		e.lastSeen = time.Now()
-		return e.limiter
+		if e, ok2 := entry.(*limiterEntry); ok2 {
+			e.lastSeen = time.Now()
+			return e.limiter
+		}
 	}
 
 	limit := rate.Limit(float64(rl.config.RequestsPerMinute) / 60.0)
@@ -181,7 +182,7 @@ func (rl *RateLimiter) handleRateLimitExceeded(w http.ResponseWriter, r *http.Re
 	w.Header().Set("Content-Type", "application/json")
 
 	w.WriteHeader(http.StatusTooManyRequests)
-	fmt.Fprintf(w, `{"error":"Too many requests. Retry in %d seconds."}`, retryAfter)
+	_, _ = fmt.Fprintf(w, `{"error":"Too many requests. Retry in %d seconds."}`, retryAfter)
 }
 
 // cleanupLoop periodically cleans up inactive limiters.
@@ -204,7 +205,10 @@ func (rl *RateLimiter) cleanup() {
 	threshold := time.Now().Add(-2 * rl.config.CleanupInterval)
 
 	rl.limiters.Range(func(key, value interface{}) bool {
-		entry := value.(*limiterEntry)
+		entry, ok := value.(*limiterEntry)
+		if !ok {
+			return true
+		}
 		if entry.lastSeen.Before(threshold) {
 			rl.limiters.Delete(key)
 		}

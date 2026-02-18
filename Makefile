@@ -4,7 +4,7 @@
 
 PROJECT_NAME := SublimeGo
 
-.PHONY: all build run test clean lint css css-watch tailwind-download generate dev
+.PHONY: all build build-all run test clean lint css css-watch tailwind-download generate dev
 
 all: build
 
@@ -37,6 +37,14 @@ dev: generate
 # Construire le binaire final (Production)
 build: generate css
 	go build -o bin/$(PROJECT_NAME) ./cmd/sublimego
+
+# Construire pour toutes les plateformes (cross-compilation pure Go, CGO_ENABLED=0)
+build-all: generate css
+	CGO_ENABLED=0 GOOS=linux   GOARCH=amd64  go build -ldflags="-s -w" -o bin/$(PROJECT_NAME)-linux-amd64   ./cmd/sublimego
+	CGO_ENABLED=0 GOOS=linux   GOARCH=arm64  go build -ldflags="-s -w" -o bin/$(PROJECT_NAME)-linux-arm64   ./cmd/sublimego
+	CGO_ENABLED=0 GOOS=darwin  GOARCH=amd64  go build -ldflags="-s -w" -o bin/$(PROJECT_NAME)-darwin-amd64  ./cmd/sublimego
+	CGO_ENABLED=0 GOOS=darwin  GOARCH=arm64  go build -ldflags="-s -w" -o bin/$(PROJECT_NAME)-darwin-arm64  ./cmd/sublimego
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64  go build -ldflags="-s -w" -o bin/$(PROJECT_NAME)-windows-amd64.exe ./cmd/sublimego
 
 # Verifier la qualite du code
 lint:

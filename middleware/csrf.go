@@ -1,4 +1,4 @@
-package engine
+package middleware
 
 import (
 	"crypto/rand"
@@ -78,8 +78,8 @@ func (m *CSRFManager) ValidateToken(token string) bool {
 	return false
 }
 
-// Middleware creates an HTTP middleware for CSRF protection.
-func (m *CSRFManager) Middleware(next http.Handler) http.Handler {
+// CSRF returns an HTTP middleware for CSRF protection.
+func (m *CSRFManager) CSRF(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet || r.Method == http.MethodHead || r.Method == http.MethodOptions {
 			cookie, err := r.Cookie(m.config.CookieName)
@@ -121,7 +121,7 @@ func (m *CSRFManager) Middleware(next http.Handler) http.Handler {
 	})
 }
 
-// GetCSRFToken retrieves the CSRF token from the request.
+// GetCSRFToken retrieves the CSRF token from the request cookie.
 func GetCSRFToken(r *http.Request, cookieName ...string) string {
 	name := "_csrf"
 	if len(cookieName) > 0 {
@@ -134,7 +134,7 @@ func GetCSRFToken(r *http.Request, cookieName ...string) string {
 	return cookie.Value
 }
 
-// CSRFField returns the HTML for a hidden CSRF field.
+// CSRFField returns the HTML for a hidden CSRF input field.
 func CSRFField(token string, fieldName ...string) string {
 	name := "_token"
 	if len(fieldName) > 0 {

@@ -46,8 +46,8 @@ func TestFormBind(t *testing.T) {
 func TestTextInput(t *testing.T) {
 	field := Text("username")
 
-	if field.Name != "username" {
-		t.Errorf("Expected name 'username', got '%s'", field.Name)
+	if field.Name() != "username" {
+		t.Errorf("Expected name 'username', got '%s'", field.Name())
 	}
 	if field.LabelStr != "username" {
 		t.Errorf("Expected default label 'username', got '%s'", field.LabelStr)
@@ -60,15 +60,15 @@ func TestTextInput(t *testing.T) {
 func TestTextInputFluent(t *testing.T) {
 	field := Text("name").
 		Label("Full Name").
-		Placeholder("Enter your name").
+		WithPlaceholder("Enter your name").
 		HelperText("Your legal name").
 		Required()
 
 	if field.LabelStr != "Full Name" {
 		t.Errorf("Expected label 'Full Name', got '%s'", field.LabelStr)
 	}
-	if field.BaseField.Placeholder != "Enter your name" {
-		t.Errorf("Expected placeholder, got '%s'", field.BaseField.Placeholder)
+	if field.Placeholder() != "Enter your name" {
+		t.Errorf("Expected placeholder, got '%s'", field.Placeholder())
 	}
 	if field.HelpText != "Your legal name" {
 		t.Errorf("Expected help text, got '%s'", field.HelpText)
@@ -84,7 +84,7 @@ func TestEmailInput(t *testing.T) {
 	if field.Type != "email" {
 		t.Errorf("Expected type 'email', got '%s'", field.Type)
 	}
-	if len(field.Rules) == 0 || field.Rules[0] != "email" {
+	if len(field.Rules()) == 0 || field.Rules()[0] != "email" {
 		t.Error("Expected 'email' rule")
 	}
 }
@@ -100,20 +100,20 @@ func TestPasswordInput(t *testing.T) {
 func TestSelect(t *testing.T) {
 	field := NewSelect("role").
 		Label("User Role").
-		SetOptions(map[string]string{
+		Options(map[string]string{
 			"admin": "Administrator",
 			"user":  "Regular User",
 		}).
 		Required()
 
-	if field.Name != "role" {
-		t.Errorf("Expected name 'role', got '%s'", field.Name)
+	if field.Name() != "role" {
+		t.Errorf("Expected name 'role', got '%s'", field.Name())
 	}
 	if field.LabelStr != "User Role" {
 		t.Errorf("Expected label 'User Role', got '%s'", field.LabelStr)
 	}
-	if len(field.Options) != 2 {
-		t.Errorf("Expected 2 options, got %d", len(field.Options))
+	if len(field.SelectOptions()) != 2 {
+		t.Errorf("Expected 2 options, got %d", len(field.SelectOptions()))
 	}
 	if !field.BaseField.Required {
 		t.Error("Expected Required to be true")
@@ -125,10 +125,10 @@ func TestCheckbox(t *testing.T) {
 		Label("Is Active").
 		Default(true)
 
-	if field.Name != "active" {
-		t.Errorf("Expected name 'active', got '%s'", field.Name)
+	if field.Name() != "active" {
+		t.Errorf("Expected name 'active', got '%s'", field.Name())
 	}
-	if field.Value != true {
+	if field.Value() != true {
 		t.Error("Expected default value true")
 	}
 }
@@ -139,8 +139,8 @@ func TestTextarea(t *testing.T) {
 		Rows(5).
 		Required()
 
-	if field.Name != "description" {
-		t.Errorf("Expected name 'description', got '%s'", field.Name)
+	if field.Name() != "description" {
+		t.Errorf("Expected name 'description', got '%s'", field.Name())
 	}
 	if field.RowCount != 5 {
 		t.Errorf("Expected 5 rows, got %d", field.RowCount)
@@ -157,8 +157,8 @@ func TestFileUpload(t *testing.T) {
 		MaxSize(5 * 1024 * 1024).
 		Required()
 
-	if field.Name != "avatar" {
-		t.Errorf("Expected name 'avatar', got '%s'", field.Name)
+	if field.Name() != "avatar" {
+		t.Errorf("Expected name 'avatar', got '%s'", field.Name())
 	}
 	if field.AcceptTypes != "image/*" {
 		t.Errorf("Expected accept 'image/*', got '%s'", field.AcceptTypes)
@@ -185,7 +185,7 @@ func TestFieldVisibility(t *testing.T) {
 func TestFieldComponentType(t *testing.T) {
 	field := Text("test")
 
-	if field.GetComponentType() != "field" {
-		t.Errorf("Expected component type 'field', got '%s'", field.GetComponentType())
+	if field.ComponentType() != "field" {
+		t.Errorf("Expected component type 'field', got '%s'", field.ComponentType())
 	}
 }

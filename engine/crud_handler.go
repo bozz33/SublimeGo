@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -9,6 +10,16 @@ import (
 	"github.com/a-h/templ"
 	"github.com/bozz33/sublimego/ui/layouts"
 )
+
+const contextKeyListQuery contextKey = "list_query"
+
+// GetListQuery retrieves the ListQuery from context (set by CRUDHandler.List).
+func GetListQuery(ctx context.Context) *ListQuery {
+	if q, ok := ctx.Value(contextKeyListQuery).(*ListQuery); ok {
+		return q
+	}
+	return nil
+}
 
 // CRUDHandler automatically handles CRUD operations for a resource.
 type CRUDHandler struct {
@@ -21,8 +32,42 @@ func NewCRUDHandler(r Resource) *CRUDHandler {
 }
 
 // List displays the list of items.
+// Extracts filter_*, search, sort, dir, page, per_page from query params
+// and injects them into context as both ActiveFilters and ListQuery.
 func (h *CRUDHandler) List(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	q := r.URL.Query()
+
+	// Build ListQuery from all relevant params
+	lq := &ListQuery{
+		Filters: make(map[string]string),
+		Search:  q.Get("search"),
+		SortKey: q.Get("sort"),
+		SortDir: q.Get("dir"),
+		Page:    1,
+		PerPage: 20,
+	}
+	if lq.SortDir != "desc" {
+		lq.SortDir = "asc"
+	}
+	if p, err := strconv.Atoi(q.Get("page")); err == nil && p > 0 {
+		lq.Page = p
+	}
+	if pp, err := strconv.Atoi(q.Get("per_page")); err == nil && pp > 0 && pp <= 200 {
+		lq.PerPage = pp
+	}
+	for key, vals := range q {
+		if strings.HasPrefix(key, "filter_") && len(vals) > 0 && vals[0] != "" {
+			lq.Filters[strings.TrimPrefix(key, "filter_")] = vals[0]
+		}
+	}
+
+	// Inject into context
+	ctx = context.WithValue(ctx, contextKeyListQuery, lq)
+	if len(lq.Filters) > 0 {
+		ctx = context.WithValue(ctx, ContextKeyActiveFilters, lq.Filters)
+	}
+
 	component := h.Resource.Table(ctx)
 	render(w, r, h.Resource.PluralLabel(), component)
 }
@@ -38,6 +83,33 @@ func (h *CRUDHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	component := h.Resource.Form(ctx, nil)
 	render(w, r, "Create "+h.Resource.Label(), component)
+}
+
+// View displays the read-only detail view (Infolist) for a resource.
+// Only available if the resource implements ResourceViewable.
+func (h *CRUDHandler) View(w http.ResponseWriter, r *http.Request, id string) {
+	ctx := r.Context()
+
+	if !h.Resource.CanRead(ctx) {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	viewable, ok := h.Resource.(ResourceViewable)
+	if !ok {
+		// Resource has no View — redirect to edit
+		http.Redirect(w, r, fmt.Sprintf("/%s/%s/edit", h.Resource.Slug(), id), http.StatusSeeOther)
+		return
+	}
+
+	item, err := h.Resource.Get(ctx, id)
+	if err != nil || item == nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	component := viewable.View(ctx, item)
+	render(w, r, h.Resource.Label(), component)
 }
 
 // Edit displays the edit form.
@@ -133,41 +205,13 @@ func (h *CRUDHandler) BulkDelete(w http.ResponseWriter, r *http.Request) {
 func (h *CRUDHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimPrefix(r.URL.Path, "/"+h.Resource.Slug())
 	path = strings.TrimPrefix(path, "/")
-
 	parts := strings.Split(path, "/")
 
 	switch r.Method {
 	case http.MethodGet:
-		if path == "" || path == "/" {
-			h.List(w, r)
-		} else if path == "create" {
-			h.Create(w, r)
-		} else if len(parts) == 2 && parts[1] == "edit" {
-			h.Edit(w, r, parts[0])
-		} else {
-			http.Redirect(w, r, fmt.Sprintf("/%s/%s/edit", h.Resource.Slug(), parts[0]), http.StatusSeeOther)
-		}
-
+		h.routeGET(w, r, path, parts)
 	case http.MethodPost:
-		r.ParseForm()
-		methodOverride := r.FormValue("_method")
-
-		if methodOverride == "DELETE" && len(parts) >= 1 {
-			h.Delete(w, r, parts[0])
-			return
-		}
-
-		if path == "bulk-delete" {
-			h.BulkDelete(w, r)
-			return
-		}
-
-		if path == "" || path == "/" {
-			h.Store(w, r)
-		} else if len(parts) >= 1 {
-			h.Update(w, r, parts[0])
-		}
-
+		h.routePOST(w, r, path, parts)
 	case http.MethodDelete:
 		if len(parts) >= 1 {
 			h.Delete(w, r, parts[0])
@@ -175,13 +219,44 @@ func (h *CRUDHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// extractID extracts the numeric ID from a path.
-func extractID(s string) (int, error) {
-	return strconv.Atoi(s)
+// routeGET dispatches GET requests.
+func (h *CRUDHandler) routeGET(w http.ResponseWriter, r *http.Request, path string, parts []string) {
+	switch {
+	case path == "" || path == "/":
+		h.List(w, r)
+	case path == "create":
+		h.Create(w, r)
+	case len(parts) == 2 && parts[1] == "edit":
+		h.Edit(w, r, parts[0])
+	case len(parts) == 1 && parts[0] != "":
+		h.View(w, r, parts[0])
+	default:
+		http.NotFound(w, r)
+	}
+}
+
+// routePOST dispatches POST requests (including _method override).
+func (h *CRUDHandler) routePOST(w http.ResponseWriter, r *http.Request, path string, parts []string) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	if r.FormValue("_method") == "DELETE" && len(parts) >= 1 {
+		h.Delete(w, r, parts[0])
+		return
+	}
+	switch {
+	case path == "bulk-delete":
+		h.BulkDelete(w, r)
+	case path == "" || path == "/":
+		h.Store(w, r)
+	case len(parts) >= 1:
+		h.Update(w, r, parts[0])
+	}
 }
 
 // render is a helper to display a component in the layout.
 func render(w http.ResponseWriter, r *http.Request, title string, content templ.Component) {
 	fullPage := layouts.Page(title, content)
-	fullPage.Render(r.Context(), w)
+	_ = fullPage.Render(r.Context(), w)
 }

@@ -1,275 +1,279 @@
 # Architecture
 
-This document describes the architecture and structure of SublimeGo.
+This document describes the structure, patterns, and design decisions of the SublimeGo framework.
 
-## Project Structure
+---
 
-Following [Go's official module layout](https://go.dev/doc/modules/layout), packages are at the root level for easy importing:
+## Guiding Principles
+
+1. **Idiomatic Go**  stdlib first; every dependency must be justified.
+2. **Small interfaces**  each contract exposes the minimum required (Interface Segregation Principle).
+3. **No magic**  everything is explicit, traceable, and testable.
+4. **Single binary**  `//go:embed` for all assets; no external files required at runtime.
+5. **Flat structure**  packages at the root level, no unnecessary `pkg/` wrapper.
+
+---
+
+## Package Layout
 
 ```
 sublimego/
-├── actions/              # Action system (edit, delete, custom)
-├── auth/                 # Authentication & authorization
-├── appconfig/            # Configuration management
-├── engine/               # Core panel engine
-├── errors/               # Error handling
-├── export/               # Data export (CSV, Excel, PDF)
-├── flash/                # Flash messages
-├── form/                 # Form builder
-├── generator/            # Code generation utilities
-├── jobs/                 # Background job queue
-├── logger/               # Logging utilities
-├── middleware/           # HTTP middlewares
-├── registry/             # Resource registry
-├── scanner/              # Code scanner utilities
-├── table/                # Table builder
-├── ui/                   # UI components
-│   ├── atoms/            # Basic UI elements
-│   ├── components/       # Complex components
-│   ├── icons/            # Icon system
-│   └── layouts/          # Layout templates
-├── validation/           # Validation rules
-├── widget/               # Dashboard widgets
-├── internal/             # Private packages (not importable externally)
-│   ├── ent/              # Ent ORM schema and generated code
-│   ├── providers/        # Application-specific providers
-│   └── registry/         # Resource registration
-├── cmd/                  # CLI commands
-│   ├── scanner/          # Code scanner for resource generation
-│   └── sublimego/        # Main CLI application
-├── views/                # Application views (Templ templates)
-├── config/               # Configuration files
-├── go.mod
-└── README.md
+ actions/          # Row actions (edit, delete, custom, bulk)
+ appconfig/        # Configuration loading (Viper + validation)
+ auth/             # Authentication, sessions, roles, permissions, MFA/TOTP
+ cmd/
+    sublimego/    # Cobra CLI (serve, init, make:*, db, routes, doctor)
+ config/           # YAML configuration files
+ engine/           # Framework core: Panel, CRUD handlers, multi-tenancy, relations
+ errors/           # Structured errors  package apperrors
+ export/           # CSV / Excel export
+ flash/            # Session-based flash messages
+ form/             # Form builder: fields, layouts, validation
+ generator/        # Code generation (embedded .tmpl stubs via //go:embed)
+ hooks/            # Render Hooks  named UI injection points
+ import/           # CSV / Excel / JSON import
+ infolist/         # Read-only detail view (Infolist)
+ internal/
+    ent/          # Ent ORM schemas + generated code (do not edit manually)
+    registry/     # Auto-generated resource registry (provider_gen.go)
+    scanner/      # Source scanner for automatic resource discovery
+ jobs/             # Background job queue with SQLite persistence
+ logger/           # Structured logger (log/slog + lumberjack rotation)
+ mailer/           # Email sending
+ middleware/       # HTTP middlewares (auth, CORS, CSRF, recovery, throttle)
+ notifications/    # Notifications: memory store, DatabaseStore, SSE Broadcaster
+ plugin/           # Plugin system (Plugin interface + thread-safe global registry)
+ search/           # Global fuzzy search (sahilm/fuzzy)
+ table/            # Table builder: columns, filters, summaries, grouping, bulk actions
+ ui/
+    assets/       # Static assets embedded via //go:embed (CSS, JS)
+    atoms/        # Atomic Templ components (badge, button, modal, steps, tabs)
+    components/   # Composite Templ components (table, action buttons)
+    layouts/      # Layout templates (base, sidebar, topbar, flash, navigation)
+ validation/       # Validation (go-playground/validator + gorilla/schema)
+ views/            # Application Templ templates (auth, dashboard, generics, widgets)
+ widget/           # Dashboard widgets (stats cards, ApexCharts)
+ generate.go       # //go:generate directive for the scanner
+ go.mod
+ Makefile
 ```
 
-## Core Components
+---
 
-### 1. Engine (`engine/`)
+## Layer Diagram
 
-The engine is the heart of SublimeGo. It manages:
-- **Panel**: Main admin panel with routing and middleware
-- **Resources**: CRUD resource management
-- **Authentication**: User authentication and sessions
-- **Navigation**: Menu and navigation system
-
-**Key Files:**
-- `panel.go` - Main panel implementation
-- `resource.go` - Resource interface and base implementation
-- `contract.go` - Interfaces and contracts
-- `auth_handler.go` - Authentication handlers
-- `auth_middleware.go` - Auth middleware
-
-### 2. Form Builder (`form/`)
-
-Fluent API for building forms with validation.
-
-**Features:**
-- Type-safe field definitions
-- Built-in validation rules
-- Conditional fields
-- File uploads
-- Relationship fields
-
-**Example:**
-```go
-form.New().SetSchema(
-    form.Text("name").Required(),
-    form.Email("email").Required(),
-    form.Select("role").Options(roleOptions),
-)
 ```
 
-### 3. Table Builder (`table/`)
+                     HTTP Request                        
 
-Interactive data tables with advanced features.
+                         
 
-**Features:**
-- Sorting and filtering
-- Pagination
-- Search
-- Bulk actions
-- Custom columns
-- Export functionality
+                Middlewares (middleware/)                 
+   RequireAuth  RequireRole  CORS  Recovery           
+   Throttle  TenantMiddleware  CSRF                    
 
-**Example:**
+                         
+
+            engine.Panel  (engine/panel.go)              
+   Routing  Auth  Session  Resources  Pages          
+   Notifications  Render Hooks  Multi-tenancy          
+
+                                           
+    
+  Resource       Custom Page       Notifications  
+  (CRUD)         (engine/page)     (SSE / DB)     
+    
+       
+
+                    Builders                             
+   form.Form  table.Table  infolist.Infolist           
+   actions.Action  widget.Widget                        
+
+       
+
+             Templ Templates  (views/ + ui/)             
+   views/generics/  ui/atoms/  ui/layouts/             
+
+       
+
+               Ent ORM  (internal/ent/)                  
+   Schemas  Migrations  Type-safe queries              
+
+```
+
+---
+
+## Key Modules
+
+### `engine/`  Framework Core
+
+| File | Role |
+|------|------|
+| `panel.go` | Panel configuration, route registration, middleware injection |
+| `contract.go` | Interfaces: `Resource`, `ResourceCRUD`, `ResourceViews`, `ResourcePermissions`, `ResourceQueryable` |
+| `base_resource.go` | Default implementations of the Resource interfaces |
+| `crud_handler.go` | Generic HTTP handlers for List, Create, Edit, Delete, BulkDelete |
+| `auth_handler.go` | Login / logout handlers |
+| `page.go` + `page_handler.go` | Custom non-CRUD pages |
+| `relations.go` | `RelationManager`  Nested Resources (BelongsTo, HasMany, ManyToMany) |
+| `tenant.go` | Multi-tenancy: `Tenant`, `SubdomainResolver`, `PathResolver`, `MultiPanelRouter`, `TenantAware` |
+
+### `form/`  Form Builder
+
 ```go
-table.New(getData).
+// Standard fields
+form.NewText("name").Label("Name").Required()
+form.NewEmail("email").Label("Email")
+form.NewPassword("password").Label("Password")
+form.NewNumber("price").Label("Price").Min(0)
+form.NewTextarea("bio").Label("Bio").Rows(5)
+form.NewSelect("status").Label("Status").WithOptions(...)
+form.NewCheckbox("active").Label("Active")
+form.NewToggle("featured").Label("Featured")
+form.NewDatePicker("published_at").Label("Published At")
+form.NewFileUpload("avatar").Label("Avatar").AcceptedTypes("image/*")
+
+// Advanced fields
+form.NewRichEditor("content").Label("Content").WithToolbar("bold", "italic", "link")
+form.NewMarkdownEditor("notes").Label("Notes").Rows(10)
+form.NewTagsInput("tags").Label("Tags").WithSuggestions("go", "web", "admin")
+form.NewKeyValue("meta").Label("Metadata").WithLabels("Key", "Value")
+form.NewColorPicker("color").Label("Color").WithSwatches("#ef4444", "#22c55e")
+form.NewSlider("discount").Label("Discount").Range(0, 100).WithUnit("%")
+form.NewRepeater("items").Label("Items")
+
+// Layouts
+form.NewSection("General").SetSchema(...)
+form.NewGrid(2).SetSchema(...)
+form.NewTabs().AddTab("General", ...).AddTab("Advanced", ...)
+form.NewWizard().AddStep("Step 1", ...).AddStep("Step 2", ...)
+form.NewCallout("Note").WithBody("Message").WithColor(form.CalloutInfo)
+```
+
+### `table/`  Table Builder
+
+```go
+table.New(data).
     WithColumns(
-        table.Text("name").Sortable(),
-        table.Badge("status"),
+        table.Text("name").WithLabel("Name").WithSortable(true).WithSearchable(true),
+        table.Badge("status").WithLabel("Status"),
+        table.Boolean("active").WithLabel("Active"),
+        table.Date("created_at").WithLabel("Created").WithSortable(true),
+        table.Image("avatar").WithLabel("Avatar"),
     ).
-    SetActions(actions.EditAction(), actions.DeleteAction())
+    WithFilters(
+        table.SelectFilter("status", "Status").WithOptions(...),
+        table.BooleanFilter("active", "Active"),
+    ).
+    WithSummaries(
+        table.NewSummary("price", table.SummarySum).WithLabel("Total").WithFormat("$%.2f"),
+        table.NewSummary("price", table.SummaryAverage).WithLabel("Average"),
+    ).
+    WithGroups(
+        table.GroupBy("status").WithLabel("By status").Collapsible(),
+    ).
+    WithBulkActions(
+        table.NewBulkAction("delete", "Delete selected").WithColor("danger"),
+    )
 ```
 
-### 4. Resource System (`engine/resource.go`)
+### `auth/`  Authentication
 
-Resources represent database entities with CRUD operations.
+| File | Role |
+|------|------|
+| `manager.go` | `Manager`  Login, Logout, session, permissions, roles |
+| `user.go` | `User` struct  permissions, roles, helpers |
+| `mfa.go` | MFA/TOTP RFC 6238  `GenerateSecret`, `Validate`, `GenerateRecoveryCodes`, `UseRecoveryCode` |
 
-**Interface:**
+### `notifications/`  Notifications
+
+| File | Role |
+|------|------|
+| `notification.go` | `Notification`, `Level`, `Store` (in-memory + SSE) |
+| `database_store.go` | `DatabaseStore`  Ent-backed persistence, implements `NotificationStore` |
+| `handler.go` | HTTP handler + `NotificationStore` interface (swappable backend) |
+| `broadcast.go` | `Broadcaster`  per-user SSE fan-out, 30s heartbeat, `BroadcastAll` |
+
+### `hooks/`  Render Hooks
+
 ```go
-type Resource interface {
-    GetMeta() ResourceMeta
-    GetNavigation() ResourceNavigation
-    GetViews() ResourceViews
-    GetPermissions() ResourcePermissions
-    GetCRUD() ResourceCRUD
+// Available positions
+hooks.BeforeContent    // Before the main content area
+hooks.AfterContent     // After the main content area
+hooks.BeforeFormFields // Before form fields
+hooks.AfterFormFields  // After form fields
+hooks.BeforeTableRows  // Before table rows
+hooks.AfterTableRows   // After table rows
+hooks.BeforeNavigation // Before the navigation sidebar
+hooks.AfterNavigation  // After the navigation sidebar
+hooks.InHead           // Inside <head>
+hooks.InFooter         // Inside <footer>
+
+// Usage
+hooks.Register(hooks.AfterContent, func(ctx context.Context) templ.Component {
+    return myBannerComponent()
+})
+```
+
+### `plugin/`  Plugin System
+
+```go
+type MyPlugin struct{}
+
+func (p *MyPlugin) Name() string { return "my-plugin" }
+func (p *MyPlugin) Boot() error  { /* initialization */ return nil }
+
+func init() {
+    plugin.Register(&MyPlugin{})
+}
+
+// At panel startup
+if err := plugin.Boot(); err != nil {
+    log.Fatal(err)
 }
 ```
 
-### 5. Authentication (`auth/`)
+---
 
-Built-in authentication system with:
-- Password hashing (bcrypt)
-- Session management (SCS)
-- User context
-- Login/logout handlers
+## SQLite Drivers  Build Tags
 
-### 6. UI Components (`ui/`)
+The project supports two SQLite drivers selected at compile time:
 
-Reusable UI components built with Templ:
-- **Atoms**: Buttons, badges, inputs, modals, toasts
-- **Components**: Tables, forms, cards, navigation
-- **Layouts**: Base layouts, dashboard layout
-- **Icons**: Lucide icon system
+| Build tag | Driver | Use case |
+|-----------|--------|----------|
+| `cgo` (default) | `github.com/mattn/go-sqlite3` | `make build`  maximum performance |
+| `!cgo` | `modernc.org/sqlite` | `make build-all`  pure Go, cross-compilation |
 
-## Data Flow
-
-### Request Lifecycle
-
-```
-HTTP Request
-    ↓
-Middleware Stack
-    ├─ Logger
-    ├─ Recovery
-    ├─ Rate Limiter
-    └─ Authentication
-    ↓
-Router (Panel.Router())
-    ↓
-Resource Handler
-    ├─ Index (List)
-    ├─ Create (Form)
-    ├─ Store (Save)
-    ├─ Edit (Form)
-    ├─ Update (Save)
-    └─ Delete
-    ↓
-Database (Ent ORM)
-    ↓
-Response (Templ Template)
+```bash
+make build      # CGO_ENABLED=1   mattn/go-sqlite3
+make build-all  # CGO_ENABLED=0   modernc.org/sqlite (5 targets)
 ```
 
-### Component Interaction
+This is intentional and follows the standard Go pattern for optional CGO dependencies.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    COMPONENT INTERACTION                    │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  Panel (engine/panel.go)                                    │
-│  ├─ SetDatabase(client)                                     │
-│  ├─ SetAuthManager(auth)                                     │
-│  ├─ AddResources(resources)                                  │
-│  └─ Router() -> HTTP Handler                                │
-│                                                             │
-│  Resources (views/resources/)                              │
-│  ├─ GetForm() -> Form Builder (form/)                        │
-│  ├─ GetTable() -> Table Builder (table/)                       │
-│  ├─ GetData() -> Database Queries (internal/ent/)               │
-│  └─ CRUD Operations -> Database                                │
-│                                                             │
-│  Templates (views/*.templ)                                    │
-│  ├─ Form Pages -> Form Builder                                 │
-│  ├─ List Pages -> Table Builder                                │
-│  └─ Dashboard -> Widget Builder (widget/)                     │
-└─────────────────────────────────────────────────────────────┘
-```
+---
 
-### Resource Registration
+## Error Handling
 
-```
-1. Define Ent Schema (internal/ent/schema/)
-2. Generate Ent Code (go generate)
-3. Create Resource (views/resources/)
-4. Register Resource (internal/registry/resources.go)
-5. Access via Panel
-```
-
-## Design Patterns
-
-### 1. Builder Pattern
-Used extensively in Form and Table builders for fluent API.
+The `errors/` package (imported as `apperrors`) provides structured, HTTP-aware errors:
 
 ```go
-form.New().
-    SetSchema(...).
-    SetValidation(...).
-    Build()
+import apperrors "github.com/bozz33/sublimego/errors"
+
+err := apperrors.NotFound("user not found")
+err := apperrors.Forbidden("access denied")
+err := apperrors.Validation("email", "invalid format")
+
+// In a handler
+apperrors.Handle(w, r, err)
 ```
 
-**Why?** Provides a clean, readable API for complex configuration.
-
-### 2. Interface Segregation
-Resources implement multiple small interfaces instead of one large interface.
-
-```go
-type Resource interface {
-    GetMeta() ResourceMeta
-    GetNavigation() ResourceNavigation
-    GetViews() ResourceViews
-    GetPermissions() ResourcePermissions
-    GetCRUD() ResourceCRUD
-}
-```
-
-**Why?** Allows partial implementation and reduces coupling.
-
-### 3. Dependency Injection
-Panel accepts dependencies (DB, Auth, Session) via setters.
-
-```go
-panel := engine.NewPanel("admin").
-    SetDatabase(db).
-    SetAuthManager(auth).
-    SetSession(session)
-```
-
-**Why?** Makes components testable and loosely coupled.
-
-### 4. Template Method
-Base resource provides default implementations, resources override as needed.
-
-```go
-type BaseResource struct{}
-
-func (b *BaseResource) GetViews() ResourceViews {
-    return ResourceViews{
-        Index:   views.GenericIndex,
-        Create:  views.GenericForm,
-        Edit:    views.GenericForm,
-        Show:    views.GenericShow,
-    }
-}
-```
-
-**Why?** Reduces boilerplate while allowing customization.
+---
 
 ## Configuration
 
-Configuration is managed via `config.yaml` and loaded using Viper.
-
-**Key Sections:**
-- `server` - HTTP server settings
-- `database` - Database connection
-- `engine` - Panel configuration
-- `auth` - Authentication settings
-- `jobs` - Background job settings
-
-See [PANEL_CONFIG.md](PANEL_CONFIG.md) for details.
-
-### Configuration Example
+Configuration is loaded by `appconfig/loader.go` via Viper.
+Priority order: environment variables > `config.yaml` > defaults.
 
 ```yaml
 server:
@@ -279,8 +283,8 @@ server:
   write_timeout: 15s
 
 database:
-  driver: "sqlite3"
-  dsn: "file:sublimego.db?cache=shared&_fk=1"
+  driver: "sqlite"
+  url: "file:sublimego.db?cache=shared&_fk=1"
 
 engine:
   base_path: "/admin"
@@ -289,142 +293,47 @@ engine:
 
 auth:
   session_lifetime: 24h
-  cookie_name: "session"
+  cookie_name: "sublimego_session"
   bcrypt_cost: 12
 ```
 
-## Database Layer
+---
 
-SublimeGo uses **Ent** as the ORM:
+## Design Patterns
 
-1. **Schema Definition** (`internal/ent/schema/`)
-   - Define entities with fields, edges, indexes
-   
-2. **Code Generation**
-   ```bash
-   go generate ./internal/ent
-   ```
+### Builder Pattern
+Used throughout `form`, `table`, `infolist`, and `widget` for a fluent, readable API.
 
-3. **Migrations**
-   - Automatic schema migration on startup
-   - Manual migrations via `ent migrate`
+### Interface Segregation
+`Resource` is composed of small focused interfaces (`ResourceMeta`, `ResourceCRUD`,
+`ResourceViews`, `ResourcePermissions`, `ResourceNavigation`)  each implementable independently.
 
-4. **Querying**
-   ```go
-   users, err := client.User.Query().
-       Where(user.EmailContains("@example.com")).
-       All(ctx)
-   ```
+### Dependency Injection
+`Panel` accepts its dependencies (DB, Auth, Session, Notifications) via `With*` setters.
 
-## View Layer
+### Template Method
+`BaseResource` provides default implementations that concrete resources override as needed.
 
-Views are built with **Templ** (type-safe Go templates):
+### Registry Pattern
+`internal/registry/provider_gen.go` is auto-generated by the scanner (`cmd/scanner`).
+Resources are discovered at build time  no manual registration required.
 
-1. **Define Template** (`.templ` file)
-   ```templ
-   package views
-   
-   templ UserList(users []User) {
-       <div>
-           for _, user := range users {
-               <p>{ user.Name }</p>
-           }
-       </div>
-   }
-   ```
-
-2. **Generate Go Code**
-   ```bash
-   templ generate
-   ```
-
-3. **Render in Handler**
-   ```go
-   templ.Handler(views.UserList(users)).ServeHTTP(w, r)
-   ```
-
-See [TEMPLATING.md](TEMPLATING.md) for details.
-
-## Extension Points
-
-### Custom Actions
-```go
-actions.NewAction("approve", "Approve").
-    SetHandler(func(ctx context.Context, ids []int) error {
-        // Custom logic
-    })
-```
-
-### Custom Widgets
-```go
-widget.NewCustom("sales", func() templ.Component {
-    return views.SalesWidget()
-})
-```
-
-### Custom Middleware
-```go
-panel.Router().Use(myCustomMiddleware)
-```
-
-### Custom Fields
-```go
-form.NewField("custom", "CustomField").
-    SetRender(func() templ.Component {
-        return views.CustomField()
-    })
-```
-
-## Performance Considerations
-
-1. **Database Queries**
-   - Use eager loading for relationships
-   - Add indexes for frequently queried fields
-   - Implement pagination for large datasets
-
-2. **Caching**
-   - Session data cached in memory
-   - Static assets served with cache headers
-
-3. **Asset Optimization**
-   - Tailwind CSS purged in production
-   - JavaScript minified
-   - Icons loaded on-demand
-
-## Security
-
-1. **Authentication**
-   - Bcrypt password hashing
-   - Secure session cookies
-   - CSRF protection (TODO)
-
-2. **Authorization**
-   - Resource-level permissions
-   - Action-level permissions
-   - Role-based access control (TODO)
-
-3. **Input Validation**
-   - Server-side validation
-   - XSS prevention via Templ escaping
-   - SQL injection prevention via Ent
+---
 
 ## Testing
 
 ```bash
-# Run all tests
-go test ./...
-
-# Run with coverage
-go test ./... -cover
-
-# Run specific package
-go test ./form
+go test ./...           # All tests
+go test -cover ./...    # With coverage report
+go test -race ./...     # Race condition detection
+go test ./engine/... -v # Specific package, verbose output
 ```
 
-See individual package `*_test.go` files for examples.
+---
 
-## Next Steps
+## Further Reading
 
-- Read [RESOURCES_GUIDE.md](RESOURCES_GUIDE.md) to learn how to create resources
-- Read [TEMPLATING.md](TEMPLATING.md) to learn about Templ templates
-- Read [PANEL_CONFIG.md](PANEL_CONFIG.md) to configure your panel
+- [RESOURCES_GUIDE.md](RESOURCES_GUIDE.md)  Building resources step by step
+- [PANEL_CONFIG.md](PANEL_CONFIG.md)  Full configuration reference
+- [TEMPLATING.md](TEMPLATING.md)  Working with Templ templates
+- [CONTRIBUTING.md](CONTRIBUTING.md)  Contribution guidelines

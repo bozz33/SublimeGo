@@ -1,17 +1,15 @@
 # Resources Guide
 
-This guide explains how to create and manage resources in SublimeGo.
+A resource represents a database entity (User, Product, Order) with full CRUD operations
+and automatic admin panel integration.
 
-## What is a Resource?
-
-A resource represents a database entity (like User, Product, Post) with full CRUD operations and admin panel integration.
+---
 
 ## Quick Start
 
-### 1. Create Ent Schema
+### 1. Define an Ent Schema
 
 ```bash
-# Generate a new Ent schema
 go run -mod=mod entgo.io/ent/cmd/ent new Product
 ```
 
@@ -21,13 +19,14 @@ Edit `internal/ent/schema/product.go`:
 package schema
 
 import (
+    "time"
+
     "entgo.io/ent"
     "entgo.io/ent/schema/field"
+    "entgo.io/ent/schema/index"
 )
 
-type Product struct {
-    ent.Schema
-}
+type Product struct{ ent.Schema }
 
 func (Product) Fields() []ent.Field {
     return []ent.Field{
@@ -35,20 +34,59 @@ func (Product) Fields() []ent.Field {
         field.Text("description").Optional(),
         field.Float("price"),
         field.String("status").Default("draft"),
-        field.Time("created_at").Default(time.Now),
+        field.Time("created_at").Default(time.Now).Immutable(),
+        field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
+    }
+}
+
+func (Product) Indexes() []ent.Index {
+    return []ent.Index{
+        index.Fields("status"),
     }
 }
 ```
 
-Generate Ent code:
+### 2. Generate Ent Code
 
 ```bash
 go generate ./internal/ent
 ```
 
-### 2. Create Resource File
+### 3. Generate the Resource Scaffold
 
-Create `views/resources/product.go`:
+```bash
+sublimego make:resource Product
+```
+
+This creates `views/resources/product_resource.go` with all required methods stubbed out.
+
+### 4. Register the Resource
+
+```go
+panel.AddResources(NewProductResource(db))
+```
+
+---
+
+## Resource Interface
+
+A resource must implement the `engine.Resource` interface, which is composed of:
+
+```go
+type Resource interface {
+    ResourceMeta        // Slug, Label, PluralLabel, Icon, Group, Sort
+    ResourceViews       // Table(ctx), Form(ctx, item)
+    ResourcePermissions // CanCreate, CanRead, CanUpdate, CanDelete
+    ResourceCRUD        // List, Get, Create, Update, Delete, BulkDelete
+    ResourceNavigation  // Badge(ctx), BadgeColor(ctx)
+}
+```
+
+Use `engine.BaseResource` to get default no-op implementations, then override only what you need.
+
+---
+
+## Complete Resource Example
 
 ```go
 package resources
@@ -56,506 +94,286 @@ package resources
 import (
     "context"
     "fmt"
-    
+    "net/http"
+    "strconv"
+
+    "github.com/a-h/templ"
+    "github.com/bozz33/sublimego/engine"
+    "github.com/bozz33/sublimego/form"
+    "github.com/bozz33/sublimego/table"
+    "github.com/bozz33/sublimego/views"
     "github.com/bozz33/sublimego/internal/ent"
-    "github.com/bozz33/sublimego/internal/ent/product"
-    "github.com/bozz33/sublimego/pkg/actions"
-    "github.com/bozz33/sublimego/pkg/engine"
-    "github.com/bozz33/sublimego/pkg/form"
-    "github.com/bozz33/sublimego/pkg/table"
+    entproduct "github.com/bozz33/sublimego/internal/ent/product"
 )
 
 type ProductResource struct {
     engine.BaseResource
-    client *ent.Client
+    db *ent.Client
 }
 
-func NewProductResource(client *ent.Client) *ProductResource {
-    return &ProductResource{client: client}
+func NewProductResource(db *ent.Client) *ProductResource {
+    return &ProductResource{db: db}
 }
 
-// Meta information
-func (r *ProductResource) GetMeta() engine.ResourceMeta {
-    return engine.ResourceMeta{
-        Name:         "product",
-        Label:        "Product",
-        PluralLabel:  "Products",
-        Icon:         "package",
-        Description:  "Manage your products",
+//  Meta 
+
+func (r *ProductResource) Slug() string        { return "products" }
+func (r *ProductResource) Label() string       { return "Product" }
+func (r *ProductResource) PluralLabel() string { return "Products" }
+func (r *ProductResource) Icon() string        { return "package" }
+func (r *ProductResource) Group() string       { return "Catalog" }
+func (r *ProductResource) Sort() int           { return 10 }
+
+//  Navigation badge 
+
+func (r *ProductResource) Badge(ctx context.Context) string {
+    count, _ := r.db.Product.Query().
+        Where(entproduct.Status("draft")).
+        Count(ctx)
+    if count == 0 {
+        return ""
     }
+    return strconv.Itoa(count)
 }
 
-// Navigation
-func (r *ProductResource) GetNavigation() engine.ResourceNavigation {
-    return engine.ResourceNavigation{
-        Group:    "Catalog",
-        Position: 1,
-        Visible:  true,
-    }
-}
+func (r *ProductResource) BadgeColor(_ context.Context) string { return "warning" }
 
-// Form builder
-func (r *ProductResource) GetForm() *form.Form {
-    return form.New().SetSchema(
-        form.Text("name").
-            Label("Product Name").
-            Required().
-            Placeholder("Enter product name"),
-            
-        form.Textarea("description").
-            Label("Description").
-            Rows(5),
-            
-        form.Number("price").
-            Label("Price").
-            Required().
-            Min(0).
-            Step(0.01),
-            
-        form.Select("status").
-            Label("Status").
-            Options([]form.Option{
-                {Value: "draft", Label: "Draft"},
-                {Value: "published", Label: "Published"},
-                {Value: "archived", Label: "Archived"},
-            }).
-            Default("draft"),
-    )
-}
+//  Permissions 
 
-// Table builder
-func (r *ProductResource) GetTable() *table.Table {
-    return table.New(r.GetData).
+func (r *ProductResource) CanCreate(_ context.Context) bool { return true }
+func (r *ProductResource) CanRead(_ context.Context) bool   { return true }
+func (r *ProductResource) CanUpdate(_ context.Context) bool { return true }
+func (r *ProductResource) CanDelete(_ context.Context) bool { return true }
+
+//  Views 
+
+func (r *ProductResource) Table(_ context.Context) templ.Component {
+    t := table.New(nil).
         WithColumns(
-            table.ID("id"),
-            table.Text("name").Sortable().Searchable(),
-            table.Currency("price").Sortable(),
-            table.Badge("status").Colors(map[string]string{
-                "draft":     "gray",
-                "published": "green",
-                "archived":  "red",
-            }),
-            table.DateTime("created_at").Sortable(),
+            table.Text("name").WithLabel("Name").WithSortable(true).WithSearchable(true),
+            table.Text("price").WithLabel("Price").WithSortable(true),
+            table.Badge("status").WithLabel("Status"),
+            table.Date("created_at").WithLabel("Created").WithSortable(true),
         ).
-        SetDefaultSort("created_at", "desc").
-        SetActions(
-            actions.EditAction("/admin/products"),
-            actions.DeleteAction("/admin/products"),
+        WithFilters(
+            table.SelectFilter("status", "Status").WithOptions(
+                table.FilterOption{Value: "draft",     Label: "Draft"},
+                table.FilterOption{Value: "published", Label: "Published"},
+                table.FilterOption{Value: "archived",  Label: "Archived"},
+            ),
         ).
-        SetBulkActions(
-            actions.BulkDeleteAction(),
+        WithSummaries(
+            table.NewSummary("price", table.SummarySum).WithLabel("Total").WithFormat("$%.2f"),
+        ).
+        WithGroups(
+            table.GroupBy("status").WithLabel("By status").Collapsible(),
         )
+    return views.GenericTable(t)
 }
 
-// CRUD Operations
-func (r *ProductResource) GetData(ctx context.Context, state table.TableState) ([]table.Row, int, error) {
-    query := r.client.Product.Query()
-    
-    // Search
-    if state.Search != "" {
-        query = query.Where(product.NameContains(state.Search))
-    }
-    
-    // Filters
-    for _, filter := range state.Filters {
-        if filter.Field == "status" {
-            query = query.Where(product.StatusEQ(filter.Value))
-        }
-    }
-    
-    // Count total
-    total, err := query.Count(ctx)
+func (r *ProductResource) Form(_ context.Context, _ any) templ.Component {
+    f := form.New().SetSchema(
+        form.NewSection("General").SetSchema(
+            form.NewText("name").Label("Name").Required(),
+            form.NewRichEditor("description").Label("Description"),
+            form.NewNumber("price").Label("Price").Required(),
+        ),
+        form.NewSection("Settings").SetSchema(
+            form.NewSelect("status").Label("Status").WithOptions(
+                form.Option{Value: "draft",     Label: "Draft"},
+                form.Option{Value: "published", Label: "Published"},
+                form.Option{Value: "archived",  Label: "Archived"},
+            ),
+            form.NewTagsInput("tags").Label("Tags"),
+            form.NewColorPicker("color").Label("Color"),
+        ),
+    )
+    return views.GenericForm(f)
+}
+
+//  CRUD 
+
+func (r *ProductResource) List(ctx context.Context) ([]any, error) {
+    products, err := r.db.Product.Query().
+        Order(ent.Desc(entproduct.FieldCreatedAt)).
+        All(ctx)
     if err != nil {
-        return nil, 0, err
+        return nil, fmt.Errorf("list products: %w", err)
     }
-    
-    // Sort
-    if state.SortField != "" {
-        if state.SortDirection == "asc" {
-            query = query.Order(ent.Asc(state.SortField))
-        } else {
-            query = query.Order(ent.Desc(state.SortField))
-        }
-    }
-    
-    // Pagination
-    query = query.
-        Limit(state.PerPage).
-        Offset((state.Page - 1) * state.PerPage)
-    
-    products, err := query.All(ctx)
-    if err != nil {
-        return nil, 0, err
-    }
-    
-    // Convert to rows
-    rows := make([]table.Row, len(products))
+    out := make([]any, len(products))
     for i, p := range products {
-        rows[i] = table.Row{
-            "id":          p.ID,
-            "name":        p.Name,
-            "description": p.Description,
-            "price":       p.Price,
-            "status":      p.Status,
-            "created_at":  p.CreatedAt,
-        }
+        out[i] = p
     }
-    
-    return rows, total, nil
+    return out, nil
 }
 
-func (r *ProductResource) Create(ctx context.Context, data map[string]interface{}) error {
-    _, err := r.client.Product.Create().
-        SetName(data["name"].(string)).
-        SetNillableDescription(toStringPtr(data["description"])).
-        SetPrice(data["price"].(float64)).
-        SetStatus(data["status"].(string)).
+func (r *ProductResource) Get(ctx context.Context, id string) (any, error) {
+    n, err := strconv.Atoi(id)
+    if err != nil {
+        return nil, fmt.Errorf("invalid id: %w", err)
+    }
+    return r.db.Product.Get(ctx, n)
+}
+
+func (r *ProductResource) Create(ctx context.Context, req *http.Request) error {
+    if err := req.ParseForm(); err != nil {
+        return err
+    }
+    price, _ := strconv.ParseFloat(req.FormValue("price"), 64)
+    _, err := r.db.Product.Create().
+        SetName(req.FormValue("name")).
+        SetDescription(req.FormValue("description")).
+        SetPrice(price).
+        SetStatus(req.FormValue("status")).
         Save(ctx)
     return err
 }
 
-func (r *ProductResource) Update(ctx context.Context, id int, data map[string]interface{}) error {
-    return r.client.Product.UpdateOneID(id).
-        SetName(data["name"].(string)).
-        SetNillableDescription(toStringPtr(data["description"])).
-        SetPrice(data["price"].(float64)).
-        SetStatus(data["status"].(string)).
+func (r *ProductResource) Update(ctx context.Context, id string, req *http.Request) error {
+    n, err := strconv.Atoi(id)
+    if err != nil {
+        return fmt.Errorf("invalid id: %w", err)
+    }
+    if err := req.ParseForm(); err != nil {
+        return err
+    }
+    price, _ := strconv.ParseFloat(req.FormValue("price"), 64)
+    return r.db.Product.UpdateOneID(n).
+        SetName(req.FormValue("name")).
+        SetDescription(req.FormValue("description")).
+        SetPrice(price).
+        SetStatus(req.FormValue("status")).
         Exec(ctx)
 }
 
-func (r *ProductResource) Delete(ctx context.Context, id int) error {
-    return r.client.Product.DeleteOneID(id).Exec(ctx)
-}
-
-func (r *ProductResource) Find(ctx context.Context, id int) (map[string]interface{}, error) {
-    p, err := r.client.Product.Get(ctx, id)
+func (r *ProductResource) Delete(ctx context.Context, id string) error {
+    n, err := strconv.Atoi(id)
     if err != nil {
-        return nil, err
+        return fmt.Errorf("invalid id: %w", err)
     }
-    
-    return map[string]interface{}{
-        "id":          p.ID,
-        "name":        p.Name,
-        "description": p.Description,
-        "price":       p.Price,
-        "status":      p.Status,
-        "created_at":  p.CreatedAt,
-    }, nil
+    return r.db.Product.DeleteOneID(n).Exec(ctx)
 }
 
-// Helper
-func toStringPtr(v interface{}) *string {
-    if v == nil {
-        return nil
-    }
-    s := v.(string)
-    return &s
-}
-```
-
-### 3. Register Resource
-
-Edit `internal/registry/resources.go`:
-
-```go
-func GetResources(client *ent.Client) []engine.Resource {
-    return []engine.Resource{
-        resources.NewProductResource(client),
-        // ... other resources
-    }
-}
-```
-
-### 4. Run Migrations
-
-```bash
-go run cmd/sublimego/main.go serve
-```
-
-The schema will be created automatically.
-
-## Advanced Features
-
-### Custom Actions
-
-Add custom actions to your resource:
-
-```go
-func (r *ProductResource) GetActions() []actions.Action {
-    return []actions.Action{
-        actions.NewAction("publish", "Publish").
-            SetIcon("check").
-            SetColor("green").
-            SetHandler(func(ctx context.Context, ids []int) error {
-                return r.client.Product.Update().
-                    Where(product.IDIn(ids...)).
-                    SetStatus("published").
-                    Exec(ctx)
-            }),
-            
-        actions.NewAction("archive", "Archive").
-            SetIcon("archive").
-            SetConfirmation("Are you sure you want to archive these products?").
-            SetHandler(func(ctx context.Context, ids []int) error {
-                return r.client.Product.Update().
-                    Where(product.IDIn(ids...)).
-                    SetStatus("archived").
-                    Exec(ctx)
-            }),
-    }
-}
-```
-
-### Filters
-
-Add filters to your table:
-
-```go
-func (r *ProductResource) GetFilters() []table.Filter {
-    return []table.Filter{
-        table.SelectFilter("status", "Status").
-            Options([]table.FilterOption{
-                {Value: "draft", Label: "Draft"},
-                {Value: "published", Label: "Published"},
-                {Value: "archived", Label: "Archived"},
-            }),
-            
-        table.DateRangeFilter("created_at", "Created Date"),
-        
-        table.NumberRangeFilter("price", "Price Range"),
-    }
-}
-```
-
-### Relationships
-
-Handle relationships in your resource:
-
-```go
-// In Ent schema
-func (Product) Edges() []ent.Edge {
-    return []ent.Edge{
-        edge.From("category", Category.Type).
-            Ref("products").
-            Unique(),
-    }
-}
-
-// In form
-form.Select("category_id").
-    Label("Category").
-    Options(r.getCategoryOptions()).
-    Required()
-
-// In table
-table.Text("category").
-    Value(func(row table.Row) string {
-        if cat := row["category"]; cat != nil {
-            return cat.(*ent.Category).Name
+func (r *ProductResource) BulkDelete(ctx context.Context, ids []string) error {
+    ns := make([]int, 0, len(ids))
+    for _, id := range ids {
+        n, err := strconv.Atoi(id)
+        if err != nil {
+            continue
         }
-        return "-"
-    })
-
-// In GetData - eager load
-products, err := query.WithCategory().All(ctx)
-```
-
-### Validation
-
-Add custom validation:
-
-```go
-func (r *ProductResource) Validate(ctx context.Context, data map[string]interface{}) error {
-    if price, ok := data["price"].(float64); ok {
-        if price < 0 {
-            return errors.New("price must be positive")
-        }
+        ns = append(ns, n)
     }
-    
-    // Check unique name
-    name := data["name"].(string)
-    exists, err := r.client.Product.Query().
-        Where(product.NameEQ(name)).
-        Exist(ctx)
-    if err != nil {
-        return err
-    }
-    if exists {
-        return errors.New("product name already exists")
-    }
-    
-    return nil
+    _, err := r.db.Product.Delete().
+        Where(entproduct.IDIn(ns...)).
+        Exec(ctx)
+    return err
 }
 ```
 
-### Permissions
+---
 
-Control access to resources:
+## Optional Interfaces
+
+Implement these to unlock additional features:
+
+### `ResourceViewable`  Detail view (Infolist)
 
 ```go
-func (r *ProductResource) GetPermissions() engine.ResourcePermissions {
-    return engine.ResourcePermissions{
-        View:   func(ctx context.Context) bool { return true },
-        Create: func(ctx context.Context) bool { 
-            user := auth.UserFromContext(ctx)
-            return user != nil && user.Role == "admin"
-        },
-        Edit:   func(ctx context.Context) bool { 
-            user := auth.UserFromContext(ctx)
-            return user != nil && user.Role == "admin"
-        },
-        Delete: func(ctx context.Context) bool { 
-            user := auth.UserFromContext(ctx)
-            return user != nil && user.Role == "admin"
-        },
+func (r *ProductResource) View(ctx context.Context, item any) templ.Component {
+    p := item.(*ent.Product)
+    il := infolist.New(p).SetSchema(
+        infolist.Text("name").Label("Name"),
+        infolist.Text("price").Label("Price"),
+        infolist.Badge("status").Label("Status"),
+    )
+    return views.GenericInfolist(il)
+}
+```
+
+### `ResourceQueryable`  Full query control (search + sort + filter + pagination)
+
+```go
+func (r *ProductResource) ListQuery(ctx context.Context, q engine.ListQuery) ([]any, int, error) {
+    query := r.db.Product.Query()
+
+    if q.Search != "" {
+        query = query.Where(entproduct.NameContainsFold(q.Search))
+    }
+    if status := q.Filters["status"]; status != "" {
+        query = query.Where(entproduct.Status(status))
+    }
+
+    total, _ := query.Count(ctx)
+
+    if q.SortKey != "" {
+        // apply sort...
+    }
+
+    products, err := query.
+        Offset((q.Page - 1) * q.PerPage).
+        Limit(q.PerPage).
+        All(ctx)
+
+    out := make([]any, len(products))
+    for i, p := range products {
+        out[i] = p
+    }
+    return out, total, err
+}
+```
+
+### `TenantAware`  Multi-tenancy
+
+```go
+func (r *ProductResource) SetTenant(t *engine.Tenant) {
+    r.tenantID = t.ID
+}
+```
+
+---
+
+## Nested Resources (Relation Manager)
+
+```go
+// In your resource, define a relation
+func (r *OrderResource) Relations() []engine.RelationManager {
+    return []engine.RelationManager{
+        engine.HasMany("items", "Order Items", NewOrderItemResource(r.db)),
+        engine.BelongsTo("customer", "Customer", NewCustomerResource(r.db)),
     }
 }
 ```
 
-### Export
+---
 
-Enable data export:
+## Custom Pages
 
 ```go
-func (r *ProductResource) GetExportConfig() *export.Config {
-    return export.NewConfig().
-        SetFormats([]string{"csv", "excel", "pdf"}).
-        SetColumns([]export.Column{
-            {Field: "id", Label: "ID"},
-            {Field: "name", Label: "Name"},
-            {Field: "price", Label: "Price"},
-            {Field: "status", Label: "Status"},
-        })
+sublimego make:page Dashboard
+```
+
+```go
+type DashboardPage struct{}
+
+func (p *DashboardPage) Slug() string  { return "dashboard" }
+func (p *DashboardPage) Label() string { return "Dashboard" }
+func (p *DashboardPage) Icon() string  { return "home" }
+
+func (p *DashboardPage) Render(ctx context.Context) templ.Component {
+    return views.DashboardView()
 }
 ```
 
-## Field Types
+---
 
-### Form Fields
-
-```go
-// Text input
-form.Text("name").Label("Name").Required()
-
-// Email
-form.Email("email").Required()
-
-// Password
-form.Password("password").MinLength(8)
-
-// Number
-form.Number("quantity").Min(0).Max(100)
-
-// Textarea
-form.Textarea("description").Rows(5)
-
-// Select
-form.Select("category").Options(options)
-
-// Checkbox
-form.Checkbox("active").Default(true)
-
-// Date
-form.Date("birth_date")
-
-// DateTime
-form.DateTime("published_at")
-
-// File upload
-form.File("image").Accept("image/*")
-
-// Rich text editor
-form.RichText("content")
-
-// JSON editor
-form.JSON("metadata")
-```
-
-### Table Columns
+## Export and Import
 
 ```go
-// ID column
-table.ID("id")
+// Export  add to your resource
+func (r *ProductResource) ExportURL() string { return "/admin/products/export" }
 
-// Text
-table.Text("name").Sortable().Searchable()
-
-// Number
-table.Number("quantity").Sortable()
-
-// Currency
-table.Currency("price").Sortable()
-
-// Badge
-table.Badge("status").Colors(colorMap)
-
-// Boolean
-table.Boolean("active")
-
-// Date
-table.Date("created_at").Sortable()
-
-// DateTime
-table.DateTime("updated_at").Sortable()
-
-// Image
-table.Image("avatar")
-
-// Custom
-table.Custom("actions", func(row table.Row) templ.Component {
-    return views.CustomCell(row)
-})
+// Import  add to your resource
+func (r *ProductResource) ImportURL() string { return "/admin/products/import" }
 ```
 
-## Best Practices
-
-1. **Keep resources focused** - One resource per entity
-2. **Use eager loading** - Load relationships when needed
-3. **Add indexes** - For sortable and searchable fields
-4. **Validate input** - Both client and server side
-5. **Handle errors** - Return meaningful error messages
-6. **Use transactions** - For complex operations
-7. **Cache when possible** - For dropdown options, etc.
-8. **Test your resources** - Write unit tests for CRUD operations
-
-## CLI Commands
-
-```bash
-# Generate resource scaffold
-go run cmd/sublimego/main.go make:resource Product
-
-# List all resources
-go run cmd/sublimego/main.go resource list
-
-# Generate Ent code
-go generate ./internal/ent
-
-# Generate Templ code
-templ generate
-```
-
-## Troubleshooting
-
-### Resource not showing in menu
-- Check `GetNavigation().Visible` is true
-- Verify resource is registered in `registry/resources.go`
-- Check permissions allow viewing
-
-### Form not saving
-- Verify field names match database columns
-- Check validation rules
-- Look for errors in server logs
-
-### Table not loading data
-- Check `GetData` returns correct format
-- Verify database query is correct
-- Check for errors in browser console
-
-## Examples
-
-See `views/resources/` for complete examples of:
-- Simple CRUD resource
-- Resource with relationships
-- Resource with custom actions
-- Resource with file uploads
-- Resource with complex validation
+The framework handles the HTTP endpoints automatically.

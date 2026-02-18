@@ -1,5 +1,28 @@
 package components
 
+import "fmt"
+
+// extractRowID extracts a string ID from an item using the Identifiable interface,
+// or falls back to fmt.Sprintf for map[string]any and raw values.
+func extractRowID(item any) string {
+	type identifiable interface{ GetID() int }
+	type identifiableStr interface{ GetID() string }
+	switch v := item.(type) {
+	case identifiable:
+		return fmt.Sprintf("%d", v.GetID())
+	case identifiableStr:
+		return v.GetID()
+	case map[string]any:
+		if id, ok := v["id"]; ok {
+			return fmt.Sprintf("%v", id)
+		}
+		if id, ok := v["ID"]; ok {
+			return fmt.Sprintf("%v", id)
+		}
+	}
+	return fmt.Sprintf("%v", item)
+}
+
 // getBadgeClasses returns the CSS classes for a badge based on its color
 func getBadgeClasses(color string) string {
 	classes := "px-2.5 py-0.5 text-xs font-medium rounded-full "
@@ -29,5 +52,18 @@ func getActionClasses(color string) string {
 		return base + "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
 	default:
 		return base + "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+	}
+}
+
+// getBulkActionClasses returns CSS classes for a bulk action button.
+func getBulkActionClasses(color string) string {
+	base := "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors "
+	switch color {
+	case "danger":
+		return base + "bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40"
+	case "primary":
+		return base + "bg-primary-50 text-primary-700 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/40"
+	default:
+		return base + "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
 	}
 }

@@ -26,7 +26,7 @@ func SetVersionInfo(v, commit, date string) {
 
 var (
 	// Configuration chargée (disponible pour toutes les commandes)
-	cfg *config.Config
+	cfg *appconfig.Config
 
 	// Fichier de configuration personnalisé
 	cfgFile string
@@ -55,13 +55,13 @@ Inspired by Laravel Filament, built for Go developers.`,
 		}
 
 		// Charge la configuration
-		opts := []config.Option{}
+		opts := []appconfig.Option{}
 		if cfgFile != "" {
-			opts = append(opts, config.WithConfigPath(cfgFile))
+			opts = append(opts, appconfig.WithConfigPath(cfgFile))
 		}
 
 		var err error
-		cfg, err = config.Load(opts...)
+		cfg, err = appconfig.Load(opts...)
 		if err != nil {
 			return fmt.Errorf("failed to load configuration: %w", err)
 		}
@@ -81,7 +81,7 @@ func Execute() error {
 
 func init() {
 	// Flags globaux
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default: ./config/config.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default: ./config/appconfig.yaml)")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "enable verbose output")
 
 	// Ajoute toutes les sous-commandes
@@ -98,6 +98,6 @@ func init() {
 }
 
 // GetConfig retourne la configuration chargée
-func GetConfig() *config.Config {
+func GetConfig() *appconfig.Config {
 	return cfg
 }

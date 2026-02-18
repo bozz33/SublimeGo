@@ -1,153 +1,233 @@
 # Contributing to SublimeGo
 
-Thank you for your interest in contributing to SublimeGo! This document provides guidelines and information for contributors.
+Thank you for your interest in contributing! This document covers everything you need to get started.
 
-## Getting Started
+---
 
-### Prerequisites
+## Prerequisites
 
 - Go 1.24 or later
 - Git
+- [Templ CLI](https://templ.guide/)  `go install github.com/a-h/templ/cmd/templ@latest`
+- [golangci-lint](https://golangci-lint.run/)  `go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest`
+- [air](https://github.com/air-verse/air) (optional, for hot reload)  `go install github.com/air-verse/air@latest`
 
-### Setting Up the Development Environment
+Or install everything at once:
 
-1. Fork the repository
-2. Clone your fork:
-   ```bash
-   git clone https://github.com/bozz33/sublimego.git
-   cd sublimego
-   ```
-3. Install dependencies:
-   ```bash
-   go mod download
-   ```
-4. Run tests to ensure everything works:
-   ```bash
-   go test ./...
-   ```
+```bash
+make install-tools
+```
 
-## Development Workflow
+---
 
-### Branching Strategy
+## Development Setup
 
-- `main` - Stable release branch
-- `dev` - Development branch for integration
-- Feature branches should be created from `dev`
+```bash
+# 1. Fork and clone
+git clone https://github.com/bozz33/sublimego.git
+cd sublimego
 
-### Making Changes
+# 2. Download dependencies
+go mod download
 
-1. Create a new branch for your feature or fix:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
+# 3. Download Tailwind CSS standalone CLI
+make tailwind-download
 
-2. Make your changes following the code style guidelines
+# 4. Run tests to verify the setup
+go test ./...
 
-3. Write or update tests as needed
+# 5. Start in development mode
+make dev
+```
 
-4. Run tests and ensure they pass:
-   ```bash
-   go test ./... -count=1
-   ```
+---
 
-5. Run the linter:
-   ```bash
-   golangci-lint run
-   ```
+## Branching Strategy
 
-6. Commit your changes with a clear message:
-   ```bash
-   git commit -m "feat: add new feature description"
-   ```
+| Branch | Purpose |
+|--------|---------|
+| `main` | Stable release  only merge from `SublimeGo-Dev` via PR |
+| `SublimeGo-Dev` | Active development  integration branch |
+| `refactor/go-standards` | Ongoing Go standards refactoring |
+| `feature/*` | New features  branch from `SublimeGo-Dev` |
+| `fix/*` | Bug fixes  branch from `SublimeGo-Dev` |
+| `docs/*` | Documentation only |
 
-### Commit Message Format
+```bash
+# Start a new feature
+git checkout SublimeGo-Dev
+git pull origin SublimeGo-Dev
+git checkout -b feature/my-feature
 
-We follow conventional commits:
+# Start a bug fix
+git checkout -b fix/issue-description
+```
 
-- `feat:` - New feature
-- `fix:` - Bug fix
-- `docs:` - Documentation changes
-- `refactor:` - Code refactoring
-- `test:` - Adding or updating tests
-- `chore:` - Maintenance tasks
+---
 
-### Pull Request Process
+## Workflow
 
-1. Push your branch to your fork
-2. Open a Pull Request against the `dev` branch
-3. Fill in the PR template with relevant information
-4. Wait for review and address any feedback
+1. Create a branch from `SublimeGo-Dev`
+2. Make your changes
+3. Write or update tests
+4. Run the full check suite:
 
-## Code Style Guidelines
+```bash
+go test ./...           # All tests must pass
+go test -race ./...     # No data races
+golangci-lint run       # No lint errors
+go vet ./...            # No vet issues
+templ generate          # Regenerate templates if .templ files changed
+```
+
+5. Commit using [Conventional Commits](#commit-message-format)
+6. Open a Pull Request against `SublimeGo-Dev`
+
+---
+
+## Commit Message Format
+
+We follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<scope>): <short description>
+
+[optional body]
+
+[optional footer]
+```
+
+### Types
+
+| Type | When to use |
+|------|-------------|
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `docs` | Documentation changes only |
+| `refactor` | Code change that neither fixes a bug nor adds a feature |
+| `test` | Adding or updating tests |
+| `chore` | Maintenance (deps, CI, tooling) |
+| `perf` | Performance improvement |
+| `style` | Formatting, missing semicolons  no logic change |
+
+### Examples
+
+```bash
+git commit -m "feat(form): add ColorPicker and Slider fields"
+git commit -m "fix(notifications): close SSE channel on context cancellation"
+git commit -m "docs: rewrite ARCHITECTURE.md with current module layout"
+git commit -m "refactor(engine): extract tenant middleware to separate file"
+git commit -m "test(table): add grouping unit tests"
+git commit -m "chore: remove mattn/go-sqlite3 direct import"
+```
+
+---
+
+## Code Style
 
 ### Go Code
 
-- Follow standard Go formatting (`gofmt`)
-- Use meaningful variable and function names
-- Add comments for exported functions and types
-- Keep functions focused and small
-- Handle errors explicitly
+- Run `gofmt` before committing (enforced by CI)
+- Follow [Effective Go](https://go.dev/doc/effective_go) and the [Go Code Review Comments](https://github.com/golang/go/wiki/CodeReviewComments)
+- Export only what needs to be exported
+- Document all exported types, functions, and methods
+- Handle every error explicitly  never use `_` for errors in production code
+- Prefer table-driven tests
+- Use `context.Context` as the first parameter for functions that perform I/O
 
-### Project Structure
+### Naming Conventions
 
+```go
+// Interfaces  describe behaviour, not the implementor
+type NotificationStore interface { ... }   // good
+type INotificationStore interface { ... }  // bad  no I prefix in Go
+
+// Constructors
+func NewStore(...) *Store { ... }          // New prefix for constructors
+
+// Builders  With* prefix for option setters
+func (t *Table) WithColumns(...) *Table { ... }
+
+// Errors  package apperrors, not errors
+import apperrors "github.com/bozz33/sublimego/errors"
 ```
-sublimego/
-├── actions/        # Action system
-├── auth/           # Authentication
-├── engine/         # Core panel engine
-├── form/           # Form builder
-├── table/          # Table builder
-├── middleware/     # HTTP middlewares
-├── ui/             # UI components
-├── validation/     # Validation rules
-├── widget/         # Dashboard widgets
-├── internal/       # Private packages
-├── cmd/            # CLI commands
-└── views/          # Templ templates
-```
 
-### Testing
+### Package Structure
 
-- Write unit tests for new functionality
-- Maintain or improve test coverage
+- One responsibility per package
+- No circular imports
+- `internal/` for packages that must not be imported externally
+- Avoid `utils/`, `helpers/`, `common/`  name packages by what they do
+
+---
+
+## Testing
+
+- Write unit tests for all new functionality
+- Maintain or improve existing coverage
 - Use table-driven tests where appropriate
-- Mock external dependencies
+- Mock external dependencies via interfaces
+
+```go
+// Table-driven test example
+func TestGroupRows(t *testing.T) {
+    tests := []struct {
+        name     string
+        rows     []any
+        wantLen  int
+    }{
+        {"empty input", nil, 0},
+        {"single group", []any{row1, row2}, 1},
+        {"two groups", []any{row1, row3}, 2},
+    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            got := GroupRows(tt.rows, col, grouping)
+            if len(got) != tt.wantLen {
+                t.Errorf("got %d groups, want %d", len(got), tt.wantLen)
+            }
+        })
+    }
+}
+```
+
+---
 
 ## Reporting Issues
 
 ### Bug Reports
 
-When reporting bugs, please include:
+Please include:
 
 - Go version (`go version`)
-- Operating system
+- Operating system and architecture
 - Steps to reproduce
-- Expected behavior
-- Actual behavior
-- Error messages or logs
+- Expected vs actual behaviour
+- Relevant error messages or stack traces
 
 ### Feature Requests
 
-For feature requests, please describe:
+Please describe:
 
-- The problem you're trying to solve
+- The problem you are trying to solve
 - Your proposed solution
-- Any alternatives you've considered
+- Alternatives you have considered
+- Whether you are willing to implement it
 
-## Code of Conduct
+---
 
-- Be respectful and inclusive
-- Provide constructive feedback
-- Focus on the code, not the person
-- Help others learn and grow
+## Pull Request Checklist
 
-## Questions?
+- [ ] Tests pass (`go test ./...`)
+- [ ] No race conditions (`go test -race ./...`)
+- [ ] No lint errors (`golangci-lint run`)
+- [ ] No vet issues (`go vet ./...`)
+- [ ] Templ templates regenerated if needed (`templ generate`)
+- [ ] Documentation updated if behaviour changed
+- [ ] Commit messages follow Conventional Commits
 
-If you have questions, feel free to:
-
-- Open an issue with the `question` label
-- Join discussions in existing issues
+---
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree that your contributions will be licensed under the [MIT License](LICENSE).
