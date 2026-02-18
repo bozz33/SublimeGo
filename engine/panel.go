@@ -405,7 +405,15 @@ func (p *Panel) Router() http.Handler {
 	if p.Session != nil {
 		handler = p.Session.LoadAndSave(handler)
 	}
+	// Security headers on every response
+	handler = SecurityHeadersMiddleware(handler)
 	return handler
+}
+
+// EnableDebug mounts pprof at /debug/pprof/ (call before Router()).
+// Protect with PprofAuthMiddleware in non-local environments.
+func (p *Panel) EnableDebug(mux *http.ServeMux) {
+	EnablePprof(mux)
 }
 
 // protect wraps a handler with auth + any custom middlewares.
