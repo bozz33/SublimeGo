@@ -307,7 +307,12 @@ func (p *Panel) Router() http.Handler {
 	// 4. Auth routes (conditional)
 	if p.AuthManager != nil {
 		authHandler := NewAuthHandler(p.AuthManager, p.DB)
-		mux.Handle("/login", middleware.RequireGuest(p.AuthManager, "/")(authHandler))
+		loginLimiter := middleware.NewRateLimiter(&middleware.RateLimitConfig{
+			RequestsPerMinute: 5,
+			Burst:             3,
+			KeyFunc:           middleware.KeyByIP,
+		})
+		mux.Handle("/login", middleware.RequireGuest(p.AuthManager, "/")(loginLimiter.Middleware()(authHandler)))
 		if p.Registration {
 			mux.Handle("/register", middleware.RequireGuest(p.AuthManager, "/")(authHandler))
 		}
