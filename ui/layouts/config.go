@@ -1,5 +1,7 @@
 package layouts
 
+import "context"
+
 // PanelConfig contains the admin panel configuration — Filament-style.
 type PanelConfig struct {
 	Name         string // Panel name (ex: "SublimeGo")
@@ -33,17 +35,36 @@ func DefaultPanelConfig() *PanelConfig {
 	}
 }
 
-// panelConfig stores the global panel configuration
+// panelConfig stores the global/default panel configuration.
+// For multi-panel setups, use WithPanelConfig(ctx, cfg) to inject per-request config.
 var panelConfig = DefaultPanelConfig()
 
-// SetPanelConfig sets the panel configuration
+// SetPanelConfig sets the global panel configuration.
 func SetPanelConfig(config *PanelConfig) {
 	if config != nil {
 		panelConfig = config
 	}
 }
 
-// GetPanelConfig returns the current configuration
+type panelConfigKey struct{}
+
+// WithPanelConfig returns a new context carrying the given PanelConfig.
+// Use this in multi-panel setups to inject per-panel config into each request.
+func WithPanelConfig(ctx context.Context, cfg *PanelConfig) context.Context {
+	return context.WithValue(ctx, panelConfigKey{}, cfg)
+}
+
+// GetPanelConfig returns the PanelConfig for the current context.
+// Falls back to the global config if none is set in the context.
+func GetPanelConfigFromContext(ctx context.Context) *PanelConfig {
+	if cfg, ok := ctx.Value(panelConfigKey{}).(*PanelConfig); ok && cfg != nil {
+		return cfg
+	}
+	return panelConfig
+}
+
+// GetPanelConfig returns the global panel configuration.
+// Templates call this; for context-aware access use GetPanelConfigFromContext.
 func GetPanelConfig() *PanelConfig {
 	return panelConfig
 }

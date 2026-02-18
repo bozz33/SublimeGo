@@ -365,9 +365,9 @@ func (p *Panel) Router() http.Handler {
 		mux.Handle("/"+slug, gzipMiddleware(p.protect(pageHandler)))
 	}
 
-	var handler http.Handler = mux
+	var handler http.Handler = p.injectConfig(mux)
 	if p.Session != nil {
-		handler = p.Session.LoadAndSave(mux)
+		handler = p.Session.LoadAndSave(handler)
 	}
 	return handler
 }
@@ -379,6 +379,16 @@ func (p *Panel) protect(h http.Handler) http.Handler {
 		h = p.Middlewares[i](h)
 	}
 	return h
+}
+
+// injectConfig injects the Panel's PanelConfig into every request context.
+// This enables multi-panel setups where each panel has its own config.
+func (p *Panel) injectConfig(next http.Handler) http.Handler {
+	cfg := layouts.GetPanelConfig()
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := layouts.WithPanelConfig(r.Context(), cfg)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
 
 // gzipMiddleware compresses responses when the client supports it.
