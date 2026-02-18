@@ -37,16 +37,16 @@ func TestNewPanel_Defaults(t *testing.T) {
 
 func TestPanel_FluentAPI(t *testing.T) {
 	p := NewPanel("test").
-		SetBrandName("MyApp").
-		SetLogo("/logo.svg").
-		SetFavicon("/favicon.ico").
-		SetPrimaryColor("blue").
-		SetDarkMode(true).
+		WithBrandName("MyApp").
+		WithLogo("/logo.svg").
+		WithFavicon("/favicon.ico").
+		WithPrimaryColor("blue").
+		WithDarkMode(true).
 		EnableRegistration(false).
 		EnableNotifications(false).
 		EnableProfile(false).
 		EnablePasswordReset(false).
-		SetPath("/admin")
+		WithPath("/admin")
 
 	if p.BrandName != "MyApp" {
 		t.Errorf("expected MyApp, got %s", p.BrandName)
@@ -76,9 +76,9 @@ func TestPanel_FluentAPI(t *testing.T) {
 
 func TestPanel_SyncConfig(t *testing.T) {
 	p := NewPanel("sync-test").
-		SetBrandName("SyncApp").
-		SetPrimaryColor("purple").
-		SetPath("/sync")
+		WithBrandName("SyncApp").
+		WithPrimaryColor("purple").
+		WithPath("/sync")
 
 	p.syncConfig()
 
@@ -96,8 +96,8 @@ func TestPanel_SyncConfig(t *testing.T) {
 
 func TestPanel_InjectConfig(t *testing.T) {
 	p := NewPanel("inject-test").
-		SetBrandName("InjectedApp").
-		SetPrimaryColor("indigo")
+		WithBrandName("InjectedApp").
+		WithPrimaryColor("indigo")
 
 	p.syncConfig()
 

@@ -28,11 +28,11 @@ type Entry struct {
 	HelpText   string
 }
 
-// GetLabel returns the display label.
-func (e *Entry) GetLabel() string { return e.LabelStr }
+// Label returns the display label.
+func (e *Entry) Label() string { return e.LabelStr }
 
-// GetValueStr returns the value as a string.
-func (e *Entry) GetValueStr() string {
+// ValueStr returns the value as a string.
+func (e *Entry) ValueStr() string {
 	if e.Value == nil {
 		return ""
 	}

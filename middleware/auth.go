@@ -5,14 +5,14 @@ import (
 	"time"
 
 	"github.com/bozz33/sublimego/auth"
-	"github.com/bozz33/sublimego/errors"
+	apperrors "github.com/bozz33/sublimego/errors"
 )
 
 // AuthConfig configures the authentication middleware.
 type AuthConfig struct {
 	Manager         *auth.Manager
 	RedirectURL     string
-	ErrorHandler    *errors.Handler
+	ErrorHandler    *apperrors.Handler
 	SaveIntendedURL bool
 }
 
@@ -50,7 +50,7 @@ func RequireAuthWithConfig(config *AuthConfig) Middleware {
 			user, err := config.Manager.UserFromRequest(r)
 			if err != nil || user == nil {
 				if config.ErrorHandler != nil {
-					config.ErrorHandler.Handle(w, r, errors.Unauthorized("Authentication required"))
+					config.ErrorHandler.Handle(w, r, apperrors.Unauthorized("Authentication required"))
 				} else {
 					http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				}

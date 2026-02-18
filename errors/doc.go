@@ -26,4 +26,4 @@
 //		appErr := errors.ToAppError(err)
 //		// Handle based on status code
 //	}
-package errors
+package apperrors

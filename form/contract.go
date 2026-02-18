@@ -7,25 +7,25 @@ import (
 // Component is the base interface for any form element.
 type Component interface {
 	IsVisible() bool
-	GetComponentType() string
+	ComponentType() string
 }
 
 // Field defines the contract for an input field.
 type Field interface {
 	Component
-	GetName() string
-	GetLabel() string
-	GetValue() any
-	GetPlaceholder() string
-	GetHelp() string
+	Name() string
+	Label() string
+	Value() any
+	Placeholder() string
+	Help() string
 	IsRequired() bool
 	IsDisabled() bool
-	GetAttributes() template.HTMLAttr
-	GetRules() []string
+	Attributes() template.HTMLAttr
+	Rules() []string
 }
 
 // Layout defines the contract for layout.
 type Layout interface {
 	Component
-	GetSchema() []Component
+	Schema() []Component
 }

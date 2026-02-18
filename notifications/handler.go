@@ -1,10 +1,24 @@
 package notifications
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 )
+
+// NotificationStore is the interface that both Store (in-memory) and
+// DatabaseStore (Ent-backed) implement. The Handler depends only on
+// this interface, making the persistence backend swappable.
+type NotificationStore interface {
+	Send(userID string, n *Notification)
+	GetAll(userID string) []*Notification
+	GetUnread(userID string) []*Notification
+	MarkRead(userID, notifID string)
+	MarkAllRead(userID string)
+	UnreadCount(userID string) int
+	Subscribe(ctx context.Context, userID string) <-chan *Notification
+}
 
 // Handler provides HTTP endpoints for the notification system.
 //
@@ -16,13 +30,14 @@ import (
 //	POST /notifications/{id}/read -> mark one as read
 //	POST /notifications/read-all  -> mark all as read
 type Handler struct {
-	store      *Store
+	store      NotificationStore
 	userIDFunc func(r *http.Request) string
 }
 
 // NewHandler creates a notification HTTP handler.
 // userIDFunc extracts the authenticated user ID from the request.
-func NewHandler(store *Store, userIDFunc func(r *http.Request) string) *Handler {
+// Pass nil as store to use the global in-memory store.
+func NewHandler(store NotificationStore, userIDFunc func(r *http.Request) string) *Handler {
 	if store == nil {
 		store = globalStore
 	}

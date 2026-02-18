@@ -99,9 +99,9 @@ func Table(ctx context.Context, t *table.Table, data []any) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var2 string
-			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(col.GetLabel())
+			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(col.Label())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 69, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 69, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -272,16 +272,16 @@ func RenderCell(ctx context.Context, col table.Column, item any) templ.Component
 			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		switch col.GetType() {
+		switch col.Type() {
 		case "text":
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div class=\"text-gray-900 dark:text-white\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(col.GetValue(item))
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(col.Value(item))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 140, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 140, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -303,7 +303,7 @@ func RenderCell(ctx context.Context, col table.Column, item any) templ.Component
 			}
 		case "badge":
 			if badgeCol, ok := col.(*table.BadgeColumn); ok {
-				templ_7745c5c3_Err = RenderBadge(badgeCol.GetValue(item), badgeCol.GetColor(badgeCol.GetValue(item))).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = RenderBadge(badgeCol.Value(item), badgeCol.GetColor(badgeCol.Value(item))).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -320,9 +320,9 @@ func RenderCell(ctx context.Context, col table.Column, item any) templ.Component
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var9 string
-				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(col.GetValue(item))
+				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(col.Value(item))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 156, Col: 29}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 156, Col: 26}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -333,9 +333,9 @@ func RenderCell(ctx context.Context, col table.Column, item any) templ.Component
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var10 string
-				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(col.GetLabel())
+				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(col.Label())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 157, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 157, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -361,7 +361,7 @@ func RenderCell(ctx context.Context, col table.Column, item any) templ.Component
 			}
 		case "boolean":
 			if boolCol, ok := col.(*table.BooleanColumn); ok {
-				if boolCol.GetValue(item) == boolCol.TrueLabel {
+				if boolCol.Value(item) == boolCol.TrueLabel {
 					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<span class=\"inline-flex items-center gap-1 text-green-600 dark:text-green-400 font-medium text-sm\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 13l4 4L19 7\"></path></svg> ")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
@@ -405,9 +405,9 @@ func RenderCell(ctx context.Context, col table.Column, item any) templ.Component
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var14 string
-			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(col.GetValue(item))
+			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(col.Value(item))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 176, Col: 78}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 176, Col: 75}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -423,9 +423,9 @@ func RenderCell(ctx context.Context, col table.Column, item any) templ.Component
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var15 string
-			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(col.GetValue(item))
+			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(col.Value(item))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 178, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 178, Col: 26}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -656,7 +656,7 @@ func RenderAction(action table.Action, item any) templ.Component {
 			templ_7745c5c3_Var29 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var30 = []any{getActionClasses(action.GetColor())}
+		var templ_7745c5c3_Var30 = []any{getActionClasses(action.Color())}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var30...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -666,9 +666,9 @@ func RenderAction(action table.Action, item any) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var31 templ.SafeURL
-		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(action.GetURL(item)))
+		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(action.URL(item)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 215, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 215, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 		if templ_7745c5c3_Err != nil {
@@ -692,9 +692,9 @@ func RenderAction(action table.Action, item any) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var33 string
-		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(action.GetLabel())
+		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(action.Label())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 217, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 217, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 		if templ_7745c5c3_Err != nil {
@@ -704,7 +704,7 @@ func RenderAction(action table.Action, item any) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ActionIcon(action.GetIcon()).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ActionIcon(action.Icon()).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -879,16 +879,16 @@ func RenderFilter(filter table.Filter) templ.Component {
 			templ_7745c5c3_Var43 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		switch filter.GetType() {
+		switch filter.Type() {
 		case "select":
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "<select class=\"block p-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white\"><option value=\"\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var44 string
-			templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(filter.GetLabel())
+			templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(filter.Label())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 250, Col: 40}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 250, Col: 37}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 			if templ_7745c5c3_Err != nil {
@@ -898,7 +898,7 @@ func RenderFilter(filter table.Filter) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			for _, opt := range filter.GetOptions() {
+			for _, opt := range filter.FilterOptions() {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "<option value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -940,9 +940,9 @@ func RenderFilter(filter table.Filter) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var47 string
-			templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.JoinStringErrs(filter.GetLabel())
+			templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.JoinStringErrs(filter.Label())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 257, Col: 40}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/components/table.templ`, Line: 257, Col: 37}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
 			if templ_7745c5c3_Err != nil {
@@ -952,7 +952,7 @@ func RenderFilter(filter table.Filter) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			for _, opt := range filter.GetOptions() {
+			for _, opt := range filter.FilterOptions() {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "<option value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err

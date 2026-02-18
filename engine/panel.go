@@ -19,6 +19,7 @@ import (
 	"github.com/bozz33/sublimego/notifications"
 	"github.com/bozz33/sublimego/plugin"
 	"github.com/bozz33/sublimego/search"
+	"github.com/bozz33/sublimego/ui/assets"
 	"github.com/bozz33/sublimego/ui/layouts"
 	"github.com/bozz33/sublimego/views/dashboard"
 	"github.com/bozz33/sublimego/widget"
@@ -84,39 +85,39 @@ func NewPanel(id string) *Panel {
 
 // Builder methods — Filament-style fluent API.
 
-func (p *Panel) SetPath(path string) *Panel {
+func (p *Panel) WithPath(path string) *Panel {
 	p.Path = path
 	return p
 }
 
-func (p *Panel) SetDatabase(db *ent.Client) *Panel {
+func (p *Panel) WithDatabase(db *ent.Client) *Panel {
 	p.DB = db
 	return p
 }
 
-func (p *Panel) SetBrandName(name string) *Panel {
+func (p *Panel) WithBrandName(name string) *Panel {
 	p.BrandName = name
 	return p
 }
 
-func (p *Panel) SetLogo(url string) *Panel {
+func (p *Panel) WithLogo(url string) *Panel {
 	p.Logo = url
 	return p
 }
 
-func (p *Panel) SetFavicon(url string) *Panel {
+func (p *Panel) WithFavicon(url string) *Panel {
 	p.Favicon = url
 	return p
 }
 
-// SetPrimaryColor sets the UI accent color.
+// WithPrimaryColor sets the UI accent color.
 // Accepted values: "green", "blue", "red", "purple", "orange", "pink", "indigo"
-func (p *Panel) SetPrimaryColor(color string) *Panel {
+func (p *Panel) WithPrimaryColor(color string) *Panel {
 	p.PrimaryColor = color
 	return p
 }
 
-func (p *Panel) SetDarkMode(enabled bool) *Panel {
+func (p *Panel) WithDarkMode(enabled bool) *Panel {
 	p.DarkMode = enabled
 	return p
 }
@@ -152,26 +153,26 @@ func (p *Panel) WithMiddleware(mw ...func(http.Handler) http.Handler) *Panel {
 	return p
 }
 
-func (p *Panel) SetAuthManager(authManager *auth.Manager) *Panel {
+func (p *Panel) WithAuthManager(authManager *auth.Manager) *Panel {
 	p.AuthManager = authManager
 	return p
 }
 
-func (p *Panel) SetSession(session *scs.SessionManager) *Panel {
+func (p *Panel) WithSession(session *scs.SessionManager) *Panel {
 	p.Session = session
 	return p
 }
 
-// SetMailer sets the mailer used for password reset emails.
+// WithMailer sets the mailer used for password reset emails.
 // Use mailer.NewSMTPMailer(cfg) for production, mailer.LogMailer{} for dev.
-func (p *Panel) SetMailer(m mailer.Mailer) *Panel {
+func (p *Panel) WithMailer(m mailer.Mailer) *Panel {
 	p.Mailer = m
 	return p
 }
 
-// SetBaseURL sets the public base URL of the panel (e.g. "https://example.com").
+// WithBaseURL sets the public base URL of the panel (e.g. "https://example.com").
 // Required for building password reset links in emails.
-func (p *Panel) SetBaseURL(url string) *Panel {
+func (p *Panel) WithBaseURL(url string) *Panel {
 	p.BaseURL = url
 	return p
 }
@@ -304,8 +305,8 @@ func (p *Panel) Router() http.Handler {
 }
 
 func (p *Panel) registerStaticRoutes(mux *http.ServeMux) {
-	fs := http.FileServer(http.Dir("ui/assets"))
-	mux.Handle("/assets/", gzipMiddleware(cacheControlMiddleware(http.StripPrefix("/assets/", fs))))
+	fs := http.FileServer(http.FS(assets.FS))
+	mux.Handle("/assets/", gzipMiddleware(cacheControlMiddleware(http.StripPrefix("/assets", fs))))
 }
 
 func (p *Panel) registerAuthRoutes(mux *http.ServeMux) {

@@ -163,9 +163,9 @@ func InfoEntry(e *infolist.Entry) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(e.GetLabel())
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(e.Label())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/generics/infolist.templ`, Line: 39, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/generics/infolist.templ`, Line: 39, Col: 14}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -200,9 +200,9 @@ func InfoEntry(e *infolist.Entry) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var10 string
-			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(e.GetValueStr())
+			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(e.ValueStr())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/generics/infolist.templ`, Line: 45, Col: 23}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/generics/infolist.templ`, Line: 45, Col: 20}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -213,7 +213,7 @@ func InfoEntry(e *infolist.Entry) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		case infolist.EntryTypeBoolean:
-			if e.GetValueStr() == "true" || e.GetValueStr() == "1" {
+			if e.ValueStr() == "true" || e.ValueStr() == "1" {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<span class=\"inline-flex items-center gap-1 text-green-600 dark:text-green-400 font-medium text-sm\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 13l4 4L19 7\"></path></svg> Yes</span> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -225,15 +225,15 @@ func InfoEntry(e *infolist.Entry) templ.Component {
 				}
 			}
 		case infolist.EntryTypeImage:
-			if e.GetValueStr() != "" {
+			if e.ValueStr() != "" {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<img src=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var11 string
-				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(e.GetValueStr())
+				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(e.ValueStr())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/generics/infolist.templ`, Line: 61, Col: 32}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/generics/infolist.templ`, Line: 61, Col: 29}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -244,9 +244,9 @@ func InfoEntry(e *infolist.Entry) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var12 string
-				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(e.GetLabel())
+				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(e.Label())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/generics/infolist.templ`, Line: 61, Col: 53}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/generics/infolist.templ`, Line: 61, Col: 47}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
@@ -268,9 +268,9 @@ func InfoEntry(e *infolist.Entry) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var13 string
-			templ_7745c5c3_Var13, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(fmt.Sprintf("background-color: %s", e.GetValueStr()))
+			templ_7745c5c3_Var13, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(fmt.Sprintf("background-color: %s", e.ValueStr()))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/generics/infolist.templ`, Line: 69, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/generics/infolist.templ`, Line: 69, Col: 64}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
@@ -281,9 +281,9 @@ func InfoEntry(e *infolist.Entry) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var14 string
-			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(e.GetValueStr())
+			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(e.ValueStr())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/generics/infolist.templ`, Line: 71, Col: 85}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/generics/infolist.templ`, Line: 71, Col: 82}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -298,15 +298,15 @@ func InfoEntry(e *infolist.Entry) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if e.GetValueStr() != "" {
+			if e.ValueStr() != "" {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<span class=\"text-sm text-gray-900 dark:text-white\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var15 string
-				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(e.GetValueStr())
+				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(e.ValueStr())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/generics/infolist.templ`, Line: 76, Col: 76}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/generics/infolist.templ`, Line: 76, Col: 73}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 				if templ_7745c5c3_Err != nil {
@@ -322,15 +322,15 @@ func InfoEntry(e *infolist.Entry) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			if e.IsCopyable && e.GetValueStr() != "" {
+			if e.IsCopyable && e.ValueStr() != "" {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<button type=\"button\" x-data @click=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var16 string
-				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("navigator.clipboard.writeText('%s')", e.GetValueStr()))
+				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("navigator.clipboard.writeText('%s')", e.ValueStr()))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/generics/infolist.templ`, Line: 84, Col: 84}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/generics/infolist.templ`, Line: 84, Col: 81}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 				if templ_7745c5c3_Err != nil {

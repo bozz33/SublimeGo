@@ -66,7 +66,7 @@ templ Table(ctx context.Context, t *table.Table, data []any) {
 					for _, col := range t.Columns {
 						<th scope="col" class="px-6 py-3">
 							<div class="flex items-center">
-								{ col.GetLabel() }
+								{ col.Label() }
 								if col.IsSortable() {
 									<a href="#" class="ml-1">
 										<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,10 +134,10 @@ templ Table(ctx context.Context, t *table.Table, data []any) {
 
 // RenderCell renders a cell according to its type
 templ RenderCell(ctx context.Context, col table.Column, item any) {
-	switch col.GetType() {
+	switch col.Type() {
 		case "text":
 			<div class="text-gray-900 dark:text-white">
-				{ col.GetValue(item) }
+				{ col.Value(item) }
 				if col.IsCopyable() {
 					<button class="ml-2 text-gray-400 hover:text-gray-600" title="Copy">
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,19 +148,19 @@ templ RenderCell(ctx context.Context, col table.Column, item any) {
 			</div>
 		case "badge":
 			if badgeCol, ok := col.(*table.BadgeColumn); ok {
-				@RenderBadge(badgeCol.GetValue(item), badgeCol.GetColor(badgeCol.GetValue(item)))
+				@RenderBadge(badgeCol.Value(item), badgeCol.GetColor(badgeCol.Value(item)))
 			}
 		case "image":
 			if imageCol, ok := col.(*table.ImageColumn); ok {
 				<img 
-					src={ col.GetValue(item) } 
-					alt={ col.GetLabel() }
+					src={ col.Value(item) } 
+					alt={ col.Label() }
 					class={ "w-10 h-10 object-cover", templ.KV("rounded-full", imageCol.Rounded), templ.KV("rounded", !imageCol.Rounded) }
 				/>
 			}
 		case "boolean":
 			if boolCol, ok := col.(*table.BooleanColumn); ok {
-				if boolCol.GetValue(item) == boolCol.TrueLabel {
+				if boolCol.Value(item) == boolCol.TrueLabel {
 					<span class="inline-flex items-center gap-1 text-green-600 dark:text-green-400 font-medium text-sm">
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
 						{ boolCol.TrueLabel }
@@ -173,9 +173,9 @@ templ RenderCell(ctx context.Context, col table.Column, item any) {
 				}
 			}
 		case "date":
-			<span class="text-gray-600 dark:text-gray-400 text-sm">{ col.GetValue(item) }</span>
+			<span class="text-gray-600 dark:text-gray-400 text-sm">{ col.Value(item) }</span>
 		default:
-			<span>{ col.GetValue(item) }</span>
+			<span>{ col.Value(item) }</span>
 	}
 }
 
@@ -212,11 +212,11 @@ templ RenderBadge(value, color string) {
 // RenderAction renders an action button (table.Action interface)
 templ RenderAction(action table.Action, item any) {
 	<a 
-		href={ templ.SafeURL(action.GetURL(item)) }
-		class={ getActionClasses(action.GetColor()) }
-		title={ action.GetLabel() }
+		href={ templ.SafeURL(action.URL(item)) }
+		class={ getActionClasses(action.Color()) }
+		title={ action.Label() }
 	>
-		@ActionIcon(action.GetIcon())
+		@ActionIcon(action.Icon())
 	</a>
 }
 
@@ -244,18 +244,18 @@ templ RenderActionButton(action *actions.Action, item any) {
 
 // RenderFilter renders a filter
 templ RenderFilter(filter table.Filter) {
-	switch filter.GetType() {
+	switch filter.Type() {
 		case "select":
 			<select class="block p-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-				<option value="">{ filter.GetLabel() }</option>
-				for _, opt := range filter.GetOptions() {
+				<option value="">{ filter.Label() }</option>
+				for _, opt := range filter.FilterOptions() {
 					<option value={ opt.Value }>{ opt.Label }</option>
 				}
 			</select>
 		case "boolean":
 			<select class="block p-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-				<option value="">{ filter.GetLabel() }</option>
-				for _, opt := range filter.GetOptions() {
+				<option value="">{ filter.Label() }</option>
+				for _, opt := range filter.FilterOptions() {
 					<option value={ opt.Value }>{ opt.Label }</option>
 				}
 			</select>

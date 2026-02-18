@@ -38,8 +38,8 @@ func TestAddSectionChaining(t *testing.T) {
 func TestTextEntry(t *testing.T) {
 	e := TextEntry("name", "Full Name", "John Doe")
 	assert.Equal(t, "name", e.Name)
-	assert.Equal(t, "Full Name", e.GetLabel())
-	assert.Equal(t, "John Doe", e.GetValueStr())
+	assert.Equal(t, "Full Name", e.Label())
+	assert.Equal(t, "John Doe", e.ValueStr())
 	assert.Equal(t, EntryTypeText, e.Type)
 }
 
@@ -47,13 +47,13 @@ func TestBadgeEntry(t *testing.T) {
 	e := BadgeEntry("status", "Status", "active", "green")
 	assert.Equal(t, EntryTypeBadge, e.Type)
 	assert.Equal(t, "green", e.BadgeColor)
-	assert.Equal(t, "active", e.GetValueStr())
+	assert.Equal(t, "active", e.ValueStr())
 }
 
 func TestBooleanEntry(t *testing.T) {
 	e := BooleanEntry("active", "Active", true)
 	assert.Equal(t, EntryTypeBoolean, e.Type)
-	assert.Equal(t, "true", e.GetValueStr())
+	assert.Equal(t, "true", e.ValueStr())
 }
 
 func TestDateEntry(t *testing.T) {
@@ -70,18 +70,18 @@ func TestDateEntryCustomFormat(t *testing.T) {
 func TestImageEntry(t *testing.T) {
 	e := ImageEntry("avatar", "Avatar", "/uploads/avatar.png")
 	assert.Equal(t, EntryTypeImage, e.Type)
-	assert.Equal(t, "/uploads/avatar.png", e.GetValueStr())
+	assert.Equal(t, "/uploads/avatar.png", e.ValueStr())
 }
 
 func TestColorEntry(t *testing.T) {
 	e := ColorEntry("color", "Color", "#FF5733")
 	assert.Equal(t, EntryTypeColor, e.Type)
-	assert.Equal(t, "#FF5733", e.GetValueStr())
+	assert.Equal(t, "#FF5733", e.ValueStr())
 }
 
 func TestEntryGetValueStrNil(t *testing.T) {
 	e := TextEntry("x", "X", nil)
-	assert.Equal(t, "", e.GetValueStr())
+	assert.Equal(t, "", e.ValueStr())
 }
 
 func TestEntryIsVisible(t *testing.T) {

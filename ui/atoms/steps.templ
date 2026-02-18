@@ -1,0 +1,158 @@
+package atoms
+
+// StepStatus represents the state of a single step.
+type StepStatus string
+
+const (
+	StepCompleted StepStatus = "completed"
+	StepCurrent   StepStatus = "current"
+	StepUpcoming  StepStatus = "upcoming"
+)
+
+// Step represents a single step in a wizard/stepper.
+type Step struct {
+	ID          string
+	Label       string
+	Description string
+	Status      StepStatus
+}
+
+// StepsProps configures the Steps component.
+type StepsProps struct {
+	Steps       []Step
+	Orientation string // "horizontal" (default) | "vertical"
+}
+
+// Steps renders a step indicator (wizard progress bar).
+templ Steps(props StepsProps) {
+	if props.Orientation == "vertical" {
+		@stepsVertical(props.Steps)
+	} else {
+		@stepsHorizontal(props.Steps)
+	}
+}
+
+// stepsHorizontal renders a horizontal stepper.
+templ stepsHorizontal(steps []Step) {
+	<ol class="flex items-center w-full">
+		for i, step := range steps {
+			<li class={ stepsHorizontalItemClass(step.Status, i == len(steps)-1) }>
+				<div class="flex items-center">
+					<span class={ stepsCircleClass(step.Status) }>
+						if step.Status == StepCompleted {
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+							</svg>
+						} else {
+							{ stepNumber(steps, step.ID) }
+						}
+					</span>
+					<span class={ stepsLabelClass(step.Status) }>{ step.Label }</span>
+				</div>
+				if i < len(steps)-1 {
+					<div class={ stepsConnectorClass(step.Status) }></div>
+				}
+			</li>
+		}
+	</ol>
+}
+
+// stepsVertical renders a vertical stepper.
+templ stepsVertical(steps []Step) {
+	<ol class="relative border-l border-gray-200 dark:border-gray-700 ml-3">
+		for _, step := range steps {
+			<li class="mb-8 ml-6">
+				<span class={ stepsVerticalCircleClass(step.Status) }>
+					if step.Status == StepCompleted {
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+						</svg>
+					} else {
+						{ stepNumber(steps, step.ID) }
+					}
+				</span>
+				<h3 class={ stepsVerticalLabelClass(step.Status) }>{ step.Label }</h3>
+				if step.Description != "" {
+					<p class="text-sm text-gray-500 dark:text-gray-400">{ step.Description }</p>
+				}
+			</li>
+		}
+	</ol>
+}
+
+// stepNumber returns the 1-based index of a step as a string.
+func stepNumber(steps []Step, id string) string {
+	for i, s := range steps {
+		if s.ID == id {
+			return intToStr(i + 1)
+		}
+	}
+	return "?"
+}
+
+func intToStr(n int) string {
+	if n < 10 {
+		return string(rune('0' + n))
+	}
+	return "10+"
+}
+
+func stepsHorizontalItemClass(status StepStatus, last bool) string {
+	base := "flex items-center"
+	if !last {
+		base += " w-full"
+	}
+	return base
+}
+
+func stepsCircleClass(status StepStatus) string {
+	base := "flex items-center justify-center w-8 h-8 rounded-full text-xs font-semibold shrink-0 "
+	switch status {
+	case StepCompleted:
+		return base + "bg-primary-600 text-white dark:bg-primary-500"
+	case StepCurrent:
+		return base + "bg-primary-100 text-primary-700 ring-2 ring-primary-600 dark:bg-primary-900/30 dark:text-primary-400 dark:ring-primary-400"
+	default:
+		return base + "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400"
+	}
+}
+
+func stepsLabelClass(status StepStatus) string {
+	base := "ms-2 text-sm font-medium hidden sm:inline-flex "
+	switch status {
+	case StepCompleted, StepCurrent:
+		return base + "text-primary-700 dark:text-primary-400"
+	default:
+		return base + "text-gray-500 dark:text-gray-400"
+	}
+}
+
+func stepsConnectorClass(status StepStatus) string {
+	base := "w-full h-0.5 mx-2 "
+	if status == StepCompleted {
+		return base + "bg-primary-600 dark:bg-primary-500"
+	}
+	return base + "bg-gray-200 dark:bg-gray-700"
+}
+
+func stepsVerticalCircleClass(status StepStatus) string {
+	base := "absolute flex items-center justify-center w-8 h-8 rounded-full -left-4 ring-4 ring-white dark:ring-gray-900 text-xs font-semibold "
+	switch status {
+	case StepCompleted:
+		return base + "bg-primary-600 text-white dark:bg-primary-500"
+	case StepCurrent:
+		return base + "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400"
+	default:
+		return base + "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400"
+	}
+}
+
+func stepsVerticalLabelClass(status StepStatus) string {
+	base := "flex items-center mb-1 text-sm font-semibold "
+	switch status {
+	case StepCompleted, StepCurrent:
+		return base + "text-primary-700 dark:text-primary-400"
+	default:
+		return base + "text-gray-500 dark:text-gray-400"
+	}
+}

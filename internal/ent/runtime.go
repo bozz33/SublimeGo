@@ -5,6 +5,7 @@ package ent
 import (
 	"time"
 
+	"github.com/bozz33/sublimego/internal/ent/notification"
 	"github.com/bozz33/sublimego/internal/ent/schema"
 	"github.com/bozz33/sublimego/internal/ent/user"
 )
@@ -13,6 +14,20 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	notificationFields := schema.Notification{}.Fields()
+	_ = notificationFields
+	// notificationDescLevel is the schema descriptor for level field.
+	notificationDescLevel := notificationFields[3].Descriptor()
+	// notification.DefaultLevel holds the default value on creation for the level field.
+	notification.DefaultLevel = notificationDescLevel.Default.(string)
+	// notificationDescRead is the schema descriptor for read field.
+	notificationDescRead := notificationFields[7].Descriptor()
+	// notification.DefaultRead holds the default value on creation for the read field.
+	notification.DefaultRead = notificationDescRead.Default.(bool)
+	// notificationDescCreatedAt is the schema descriptor for created_at field.
+	notificationDescCreatedAt := notificationFields[8].Descriptor()
+	// notification.DefaultCreatedAt holds the default value on creation for the created_at field.
+	notification.DefaultCreatedAt = notificationDescCreatedAt.Default.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescRole is the schema descriptor for role field.

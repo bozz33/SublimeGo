@@ -8,7 +8,7 @@ import (
 
 // TextColumn represents a text column.
 type TextColumn struct {
-	Key          string
+	colKey       string
 	LabelStr     string
 	SortableFlag bool
 	SearchFlag   bool
@@ -18,13 +18,13 @@ type TextColumn struct {
 // Text creates a new text column.
 func Text(key string) *TextColumn {
 	return &TextColumn{
-		Key:      key,
+		colKey:   key,
 		LabelStr: key,
 	}
 }
 
-// Label sets the column label.
-func (c *TextColumn) Label(label string) *TextColumn {
+// WithLabel sets the column label.
+func (c *TextColumn) WithLabel(label string) *TextColumn {
 	c.LabelStr = label
 	return c
 }
@@ -48,18 +48,18 @@ func (c *TextColumn) Copyable() *TextColumn {
 }
 
 // Column interface implementation
-func (c *TextColumn) GetKey() string     { return c.Key }
-func (c *TextColumn) GetLabel() string   { return c.LabelStr }
-func (c *TextColumn) GetType() string    { return "text" }
+func (c *TextColumn) Key() string        { return c.colKey }
+func (c *TextColumn) Label() string      { return c.LabelStr }
+func (c *TextColumn) Type() string       { return "text" }
 func (c *TextColumn) IsSortable() bool   { return c.SortableFlag }
 func (c *TextColumn) IsSearchable() bool { return c.SearchFlag }
 func (c *TextColumn) IsCopyable() bool   { return c.CopyFlag }
-func (c *TextColumn) GetValue(item any) string {
+func (c *TextColumn) Value(item any) string {
 	v := reflect.ValueOf(item)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
-	field := v.FieldByName(c.Key)
+	field := v.FieldByName(c.colKey)
 	if field.IsValid() {
 		return fmt.Sprintf("%v", field.Interface())
 	}
@@ -68,7 +68,7 @@ func (c *TextColumn) GetValue(item any) string {
 
 // BadgeColumn represents a badge column.
 type BadgeColumn struct {
-	Key          string
+	colKey       string
 	LabelStr     string
 	SortableFlag bool
 	ColorMap     map[string]string
@@ -77,14 +77,14 @@ type BadgeColumn struct {
 // Badge creates a new badge column.
 func Badge(key string) *BadgeColumn {
 	return &BadgeColumn{
-		Key:      key,
+		colKey:   key,
 		LabelStr: key,
 		ColorMap: make(map[string]string),
 	}
 }
 
-// Label sets the column label.
-func (c *BadgeColumn) Label(label string) *BadgeColumn {
+// WithLabel sets the column label.
+func (c *BadgeColumn) WithLabel(label string) *BadgeColumn {
 	c.LabelStr = label
 	return c
 }
@@ -110,18 +110,18 @@ func (c *BadgeColumn) GetColor(value string) string {
 }
 
 // Column interface implementation
-func (c *BadgeColumn) GetKey() string     { return c.Key }
-func (c *BadgeColumn) GetLabel() string   { return c.LabelStr }
-func (c *BadgeColumn) GetType() string    { return "badge" }
+func (c *BadgeColumn) Key() string        { return c.colKey }
+func (c *BadgeColumn) Label() string      { return c.LabelStr }
+func (c *BadgeColumn) Type() string       { return "badge" }
 func (c *BadgeColumn) IsSortable() bool   { return c.SortableFlag }
 func (c *BadgeColumn) IsSearchable() bool { return false }
 func (c *BadgeColumn) IsCopyable() bool   { return false }
-func (c *BadgeColumn) GetValue(item any) string {
+func (c *BadgeColumn) Value(item any) string {
 	v := reflect.ValueOf(item)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
-	field := v.FieldByName(c.Key)
+	field := v.FieldByName(c.colKey)
 	if field.IsValid() {
 		return fmt.Sprintf("%v", field.Interface())
 	}
@@ -130,7 +130,7 @@ func (c *BadgeColumn) GetValue(item any) string {
 
 // ImageColumn represents an image column.
 type ImageColumn struct {
-	Key      string
+	colKey   string
 	LabelStr string
 	Rounded  bool
 }
@@ -138,13 +138,13 @@ type ImageColumn struct {
 // Image creates a new image column.
 func Image(key string) *ImageColumn {
 	return &ImageColumn{
-		Key:      key,
+		colKey:   key,
 		LabelStr: key,
 	}
 }
 
-// Label sets the column label.
-func (c *ImageColumn) Label(label string) *ImageColumn {
+// WithLabel sets the column label.
+func (c *ImageColumn) WithLabel(label string) *ImageColumn {
 	c.LabelStr = label
 	return c
 }
@@ -156,18 +156,18 @@ func (c *ImageColumn) Round() *ImageColumn {
 }
 
 // Column interface implementation
-func (c *ImageColumn) GetKey() string     { return c.Key }
-func (c *ImageColumn) GetLabel() string   { return c.LabelStr }
-func (c *ImageColumn) GetType() string    { return "image" }
+func (c *ImageColumn) Key() string        { return c.colKey }
+func (c *ImageColumn) Label() string      { return c.LabelStr }
+func (c *ImageColumn) Type() string       { return "image" }
 func (c *ImageColumn) IsSortable() bool   { return false }
 func (c *ImageColumn) IsSearchable() bool { return false }
 func (c *ImageColumn) IsCopyable() bool   { return false }
-func (c *ImageColumn) GetValue(item any) string {
+func (c *ImageColumn) Value(item any) string {
 	v := reflect.ValueOf(item)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
-	field := v.FieldByName(c.Key)
+	field := v.FieldByName(c.colKey)
 	if field.IsValid() {
 		return fmt.Sprintf("%v", field.Interface())
 	}
@@ -176,7 +176,7 @@ func (c *ImageColumn) GetValue(item any) string {
 
 // BooleanColumn displays a boolean value as a ✓ or ✗ icon.
 type BooleanColumn struct {
-	Key          string
+	colKey       string
 	LabelStr     string
 	SortableFlag bool
 	TrueLabel    string
@@ -186,15 +186,15 @@ type BooleanColumn struct {
 // BoolCol creates a new boolean column.
 func BoolCol(key string) *BooleanColumn {
 	return &BooleanColumn{
-		Key:        key,
+		colKey:     key,
 		LabelStr:   key,
 		TrueLabel:  "Yes",
 		FalseLabel: "No",
 	}
 }
 
-// Label sets the column label.
-func (c *BooleanColumn) Label(label string) *BooleanColumn {
+// WithLabel sets the column label.
+func (c *BooleanColumn) WithLabel(label string) *BooleanColumn {
 	c.LabelStr = label
 	return c
 }
@@ -213,18 +213,18 @@ func (c *BooleanColumn) Labels(trueLabel, falseLabel string) *BooleanColumn {
 }
 
 // Column interface implementation
-func (c *BooleanColumn) GetKey() string     { return c.Key }
-func (c *BooleanColumn) GetLabel() string   { return c.LabelStr }
-func (c *BooleanColumn) GetType() string    { return "boolean" }
+func (c *BooleanColumn) Key() string        { return c.colKey }
+func (c *BooleanColumn) Label() string      { return c.LabelStr }
+func (c *BooleanColumn) Type() string       { return "boolean" }
 func (c *BooleanColumn) IsSortable() bool   { return c.SortableFlag }
 func (c *BooleanColumn) IsSearchable() bool { return false }
 func (c *BooleanColumn) IsCopyable() bool   { return false }
-func (c *BooleanColumn) GetValue(item any) string {
+func (c *BooleanColumn) Value(item any) string {
 	v := reflect.ValueOf(item)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
-	field := v.FieldByName(c.Key)
+	field := v.FieldByName(c.colKey)
 	if !field.IsValid() {
 		return c.FalseLabel
 	}
@@ -245,7 +245,7 @@ func (c *BooleanColumn) GetValue(item any) string {
 
 // DateColumn displays a time.Time value with a configurable format.
 type DateColumn struct {
-	Key          string
+	colKey       string
 	LabelStr     string
 	SortableFlag bool
 	Format       string // Go time format string, default "2006-01-02"
@@ -255,14 +255,14 @@ type DateColumn struct {
 // DateCol creates a new date column.
 func DateCol(key string) *DateColumn {
 	return &DateColumn{
-		Key:      key,
+		colKey:   key,
 		LabelStr: key,
 		Format:   "2006-01-02",
 	}
 }
 
-// Label sets the column label.
-func (c *DateColumn) Label(label string) *DateColumn {
+// WithLabel sets the column label.
+func (c *DateColumn) WithLabel(label string) *DateColumn {
 	c.LabelStr = label
 	return c
 }
@@ -286,18 +286,18 @@ func (c *DateColumn) ShowRelative() *DateColumn {
 }
 
 // Column interface implementation
-func (c *DateColumn) GetKey() string     { return c.Key }
-func (c *DateColumn) GetLabel() string   { return c.LabelStr }
-func (c *DateColumn) GetType() string    { return "date" }
+func (c *DateColumn) Key() string        { return c.colKey }
+func (c *DateColumn) Label() string      { return c.LabelStr }
+func (c *DateColumn) Type() string       { return "date" }
 func (c *DateColumn) IsSortable() bool   { return c.SortableFlag }
 func (c *DateColumn) IsSearchable() bool { return false }
 func (c *DateColumn) IsCopyable() bool   { return false }
-func (c *DateColumn) GetValue(item any) string {
+func (c *DateColumn) Value(item any) string {
 	v := reflect.ValueOf(item)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
-	field := v.FieldByName(c.Key)
+	field := v.FieldByName(c.colKey)
 	if !field.IsValid() {
 		return ""
 	}

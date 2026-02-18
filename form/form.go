@@ -46,15 +46,15 @@ func (f *Form) Validate(data map[string]any) bool {
 
 	for _, component := range f.Schema {
 		field, ok := component.(interface {
-			GetName() string
-			GetRules() []string
+			Name() string
+			Rules() []string
 		})
 		if !ok {
 			continue
 		}
 
-		fieldName := field.GetName()
-		rules := field.GetRules()
+		fieldName := field.Name()
+		rules := field.Rules()
 
 		if len(rules) == 0 {
 			continue
@@ -85,16 +85,16 @@ func (f *Form) GetValidationRules() map[string]string {
 
 	for _, component := range f.Schema {
 		field, ok := component.(interface {
-			GetName() string
-			GetRulesString() string
+			Name() string
+			RulesString() string
 		})
 		if !ok {
 			continue
 		}
 
-		rulesStr := field.GetRulesString()
+		rulesStr := field.RulesString()
 		if rulesStr != "" {
-			rules[field.GetName()] = rulesStr
+			rules[field.Name()] = rulesStr
 		}
 	}
 

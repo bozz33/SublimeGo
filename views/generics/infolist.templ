@@ -36,16 +36,16 @@ templ InfoSection(s *infolist.Section) {
 templ InfoEntry(e *infolist.Entry) {
 	<div class="px-6 py-4">
 		<dt class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-			{ e.GetLabel() }
+			{ e.Label() }
 		</dt>
 		<dd class="mt-1">
 			switch e.Type {
 				case infolist.EntryTypeBadge:
 					<span class={ infoBadgeClass(e.BadgeColor) }>
-						{ e.GetValueStr() }
+						{ e.ValueStr() }
 					</span>
 				case infolist.EntryTypeBoolean:
-					if e.GetValueStr() == "true" || e.GetValueStr() == "1" {
+					if e.ValueStr() == "true" || e.ValueStr() == "1" {
 						<span class="inline-flex items-center gap-1 text-green-600 dark:text-green-400 font-medium text-sm">
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
 							Yes
@@ -57,8 +57,8 @@ templ InfoEntry(e *infolist.Entry) {
 						</span>
 					}
 				case infolist.EntryTypeImage:
-					if e.GetValueStr() != "" {
-						<img src={ e.GetValueStr() } alt={ e.GetLabel() } class="h-16 w-16 rounded-lg object-cover"/>
+					if e.ValueStr() != "" {
+						<img src={ e.ValueStr() } alt={ e.Label() } class="h-16 w-16 rounded-lg object-cover"/>
 					} else {
 						<span class="text-gray-400 dark:text-gray-500 text-sm italic">—</span>
 					}
@@ -66,22 +66,22 @@ templ InfoEntry(e *infolist.Entry) {
 					<div class="flex items-center gap-2">
 						<span
 							class="inline-block w-5 h-5 rounded border border-gray-300 dark:border-gray-600"
-							style={ fmt.Sprintf("background-color: %s", e.GetValueStr()) }
+							style={ fmt.Sprintf("background-color: %s", e.ValueStr()) }
 						></span>
-						<span class="text-sm text-gray-900 dark:text-white font-mono">{ e.GetValueStr() }</span>
+						<span class="text-sm text-gray-900 dark:text-white font-mono">{ e.ValueStr() }</span>
 					</div>
 				default:
 					<div class="flex items-center gap-2">
-						if e.GetValueStr() != "" {
-							<span class="text-sm text-gray-900 dark:text-white">{ e.GetValueStr() }</span>
+						if e.ValueStr() != "" {
+							<span class="text-sm text-gray-900 dark:text-white">{ e.ValueStr() }</span>
 						} else {
 							<span class="text-sm text-gray-400 dark:text-gray-500 italic">—</span>
 						}
-						if e.IsCopyable && e.GetValueStr() != "" {
+						if e.IsCopyable && e.ValueStr() != "" {
 							<button
 								type="button"
 								x-data
-								@click={ fmt.Sprintf("navigator.clipboard.writeText('%s')", e.GetValueStr()) }
+								@click={ fmt.Sprintf("navigator.clipboard.writeText('%s')", e.ValueStr()) }
 								class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
 								title="Copy"
 							>
