@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -21,8 +22,22 @@ func NewCRUDHandler(r Resource) *CRUDHandler {
 }
 
 // List displays the list of items.
+// Active filters are extracted from query params (prefix "filter_") and
+// injected into the context so BuildTableState / ListFiltered can use them.
 func (h *CRUDHandler) List(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+
+	// Extract active filters: ?filter_status=active&filter_role=admin -> {"status":"active","role":"admin"}
+	activeFilters := make(map[string]string)
+	for key, vals := range r.URL.Query() {
+		if strings.HasPrefix(key, "filter_") && len(vals) > 0 && vals[0] != "" {
+			activeFilters[strings.TrimPrefix(key, "filter_")] = vals[0]
+		}
+	}
+	if len(activeFilters) > 0 {
+		ctx = context.WithValue(ctx, ContextKeyActiveFilters, activeFilters)
+	}
+
 	component := h.Resource.Table(ctx)
 	render(w, r, h.Resource.PluralLabel(), component)
 }

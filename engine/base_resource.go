@@ -111,10 +111,24 @@ func (b *BaseResource) SetImportURL(url string) *BaseResource {
 }
 
 // BuildTableState constructs a TableState from the resource's list data.
-// Rows are built by calling GetValue on each column for each item.
+// If the resource implements ResourceFilterable and active filters are present
+// in ctx (via ContextKeyActiveFilters), ListFiltered is called instead of List.
 // Override Table() in your resource to use this helper.
 func (b *BaseResource) BuildTableState(ctx context.Context, canCreate, canDelete bool) (TableState, error) {
-	items, err := b.List(ctx)
+	activeFilters := GetActiveFilters(ctx)
+
+	var items []any
+	var err error
+
+	if len(activeFilters) > 0 {
+		if filterable, ok := interface{}(b).(ResourceFilterable); ok {
+			items, err = filterable.ListFiltered(ctx, activeFilters)
+		} else {
+			items, err = b.List(ctx)
+		}
+	} else {
+		items, err = b.List(ctx)
+	}
 	if err != nil {
 		return TableState{}, err
 	}

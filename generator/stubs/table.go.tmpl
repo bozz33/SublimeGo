@@ -2,81 +2,45 @@ package {{.PackageName}}
 
 import (
 	"context"
-	"strconv"
+	"io"
 
 	"github.com/a-h/templ"
-	"github.com/bozz33/sublimego/internal/ent"
 	"github.com/bozz33/sublimego/engine"
 	"github.com/bozz33/sublimego/views/generics"
-	"github.com/samber/lo"
 )
 
-// table retourne le composant d'affichage de la liste
-func (r *{{.TypeName}}) table(ctx context.Context, items []any) templ.Component {
-	// Cast des items en entités typées
-	entities := make([]*ent.{{.EntTypeName}}, len(items))
-	for i, item := range items {
-		if entity, ok := item.(*ent.{{.EntTypeName}}); ok {
-			entities[i] = entity
-		}
+// Table returns the list view component.
+// It uses BuildTableState which automatically applies active filters from context.
+func (r *{{.TypeName}}) Table(ctx context.Context) templ.Component {
+	state, err := r.BuildTableState(ctx, r.CanCreate(ctx), r.CanDelete(ctx))
+	if err != nil {
+		return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
+			_, werr := io.WriteString(w, "<p class=\"text-red-500\">Error loading table: "+err.Error()+"</p>")
+			return werr
+		})
 	}
-
-	// Définition des colonnes du tableau
-	columns := []engine.Column{
-		{Key: "id", Label: "ID"},
-		{Key: "name", Label: "Nom"},
-		
-		// TODO: Ajouter d'autres colonnes ici
-		// Exemples:
-		// {Key: "email", Label: "Email"},
-		// {Key: "created_at", Label: "Créé le"},
-		// {Key: "is_active", Label: "Actif"},
-	}
-
-	// Transformation des données en lignes de tableau
-	rows := lo.Map(entities, func(item *ent.{{.EntTypeName}}, _ int) engine.Row {
-		return engine.Row{
-			ID: strconv.Itoa(item.ID),
-			Cells: []string{
-				strconv.Itoa(item.ID),
-				item.Name,
-				
-				// TODO: Ajouter d'autres cellules ici (dans le même ordre que columns)
-				// Exemples:
-				// item.Email,
-				// item.CreatedAt.Format("02/01/2006"),
-				// formatBool(item.IsActive),
-			},
-		}
-	})
-
-	return generics.List(engine.TableState{
-		Title:     r.PluralLabel(),
-		NewURL:    "/" + r.Slug() + "/create",
-		BaseURL:   "/" + r.Slug(),
-		ExportURL: "/" + r.Slug() + "/export",
-		Columns:   columns,
-		Rows:      rows,
-		CanCreate: r.CanCreate(ctx),
-		CanDelete: r.CanDelete(ctx),
-		// Filters: []engine.FilterDef{
-		// 	{Key: "status", Label: "Status", Type: "select", Options: []engine.FilterOption{
-		// 		{Value: "active", Label: "Active"},
-		// 		{Value: "inactive", Label: "Inactive"},
-		// 	}},
-		// },
-		// BulkActions: []engine.BulkActionDef{
-		// 	{Key: "delete", Label: "Delete selected", Icon: "delete_outline", Color: "danger",
-		// 	 URL: "/" + r.Slug() + "/bulk-delete"},
-		// },
-	})
+	return generics.List(state)
 }
 
-// Helpers pour le formatage des données
-
-func formatBool(b bool) string {
-	if b {
-		return "Oui"
-	}
-	return "Non"
-}
+// tableColumns returns the column definitions for this resource.
+// Called automatically by BuildTableState via SetTableColumns.
+// TODO: customise columns and call r.SetTableColumns(...) in your constructor.
+//
+// Example:
+//
+//	func New(db *ent.Client) *{{.TypeName}} {
+//		res := &{{.TypeName}}{db: db}
+//		res.SetTableColumns(
+//			engine.Column{Key: "ID",   Label: "ID"},
+//			engine.Column{Key: "Name", Label: "Name"},
+//			engine.Column{Key: "Email",Label: "Email"},
+//			engine.Column{Key: "CreatedAt", Label: "Created", Type: "date"},
+//		)
+//		res.SetExportURL("/" + res.Slug() + "/export")
+//		res.SetTableBulkActions(
+//			engine.BulkActionDef{Key: "delete", Label: "Delete selected",
+//				Icon: "delete_outline", Color: "danger",
+//				URL: "/" + res.Slug() + "/bulk-delete"},
+//		)
+//		return res
+//	}

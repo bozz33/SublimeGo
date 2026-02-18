@@ -178,9 +178,10 @@ type FormState struct {
 type contextKey string
 
 const (
-	ContextKeyPanel    contextKey = "panel"
-	ContextKeyResource contextKey = "resource"
-	ContextKeyUser     contextKey = "user"
+	ContextKeyPanel         contextKey = "panel"
+	ContextKeyResource      contextKey = "resource"
+	ContextKeyUser          contextKey = "user"
+	ContextKeyActiveFilters contextKey = "active_filters"
 )
 
 // GetPanelFromContext retrieves the Panel from context.
@@ -197,4 +198,19 @@ func GetResourceFromContext(ctx context.Context) Resource {
 		return r
 	}
 	return nil
+}
+
+// GetActiveFilters retrieves the active filter map from context.
+func GetActiveFilters(ctx context.Context) map[string]string {
+	if f, ok := ctx.Value(ContextKeyActiveFilters).(map[string]string); ok {
+		return f
+	}
+	return nil
+}
+
+// ResourceFilterable is an optional interface for resources that support
+// server-side filtering. Implement ListFiltered to apply query filters at DB level.
+type ResourceFilterable interface {
+	// ListFiltered returns items matching the given filter key/value pairs.
+	ListFiltered(ctx context.Context, filters map[string]string) ([]any, error)
 }
