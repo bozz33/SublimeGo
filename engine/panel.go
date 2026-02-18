@@ -11,6 +11,7 @@ import (
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/bozz33/sublimego/auth"
+	"github.com/bozz33/sublimego/export"
 	"github.com/bozz33/sublimego/internal/ent"
 	"github.com/bozz33/sublimego/mailer"
 	"github.com/bozz33/sublimego/middleware"
@@ -375,6 +376,16 @@ func (p *Panel) Router() http.Handler {
 		protectedHandler := p.protect(handler)
 		mux.Handle("/"+slug+"/", gzipMiddleware(protectedHandler))
 		mux.Handle("/"+slug, gzipMiddleware(protectedHandler))
+
+		// Export route (available for all resources, format via ?format=csv|xlsx)
+		exportHandler := NewExportHandler(res, export.FormatCSV)
+		mux.Handle("/"+slug+"/export", p.protect(exportHandler))
+
+		// Import route (only if resource implements ResourceImportable)
+		if _, ok := res.(ResourceImportable); ok {
+			importHandler := NewImportHandler(res)
+			mux.Handle("/"+slug+"/import", p.protect(importHandler))
+		}
 
 		rmHandler := NewRelationManagerHandler(res)
 		if rmHandler.HasManagers() {
