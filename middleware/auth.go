@@ -240,9 +240,27 @@ func Verified(manager *auth.Manager, redirectURL string) Middleware {
 	}
 }
 
-// ThrottleLogin limits login attempts per IP.
+// ThrottleLogin limits login attempts per IP using the token bucket algorithm.
+// maxAttempts is the number of allowed attempts per window duration.
 func ThrottleLogin(maxAttempts int, window time.Duration) Middleware {
-	return func(next http.Handler) http.Handler {
-		return next
+	if maxAttempts <= 0 {
+		maxAttempts = 5
 	}
+	if window <= 0 {
+		window = time.Minute
+	}
+
+	rpm := int(float64(maxAttempts) / window.Minutes())
+	if rpm < 1 {
+		rpm = 1
+	}
+
+	rl := NewRateLimiter(&RateLimitConfig{
+		RequestsPerMinute: rpm,
+		Burst:             maxAttempts,
+		KeyFunc:           KeyByIP,
+		CleanupInterval:   5 * time.Minute,
+	})
+
+	return rl.Middleware()
 }

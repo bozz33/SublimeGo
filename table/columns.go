@@ -3,6 +3,7 @@ package table
 import (
 	"fmt"
 	"reflect"
+	"time"
 )
 
 // TextColumn represents a text column.
@@ -171,4 +172,184 @@ func (c *ImageColumn) GetValue(item any) string {
 		return fmt.Sprintf("%v", field.Interface())
 	}
 	return ""
+}
+
+// BooleanColumn displays a boolean value as a ✓ or ✗ icon.
+type BooleanColumn struct {
+	Key          string
+	LabelStr     string
+	SortableFlag bool
+	TrueLabel    string
+	FalseLabel   string
+}
+
+// BoolCol creates a new boolean column.
+func BoolCol(key string) *BooleanColumn {
+	return &BooleanColumn{
+		Key:        key,
+		LabelStr:   key,
+		TrueLabel:  "Yes",
+		FalseLabel: "No",
+	}
+}
+
+// Label sets the column label.
+func (c *BooleanColumn) Label(label string) *BooleanColumn {
+	c.LabelStr = label
+	return c
+}
+
+// Sortable makes the column sortable.
+func (c *BooleanColumn) Sortable() *BooleanColumn {
+	c.SortableFlag = true
+	return c
+}
+
+// Labels sets custom true/false display labels.
+func (c *BooleanColumn) Labels(trueLabel, falseLabel string) *BooleanColumn {
+	c.TrueLabel = trueLabel
+	c.FalseLabel = falseLabel
+	return c
+}
+
+// Column interface implementation
+func (c *BooleanColumn) GetKey() string     { return c.Key }
+func (c *BooleanColumn) GetLabel() string   { return c.LabelStr }
+func (c *BooleanColumn) GetType() string    { return "boolean" }
+func (c *BooleanColumn) IsSortable() bool   { return c.SortableFlag }
+func (c *BooleanColumn) IsSearchable() bool { return false }
+func (c *BooleanColumn) IsCopyable() bool   { return false }
+func (c *BooleanColumn) GetValue(item any) string {
+	v := reflect.ValueOf(item)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	field := v.FieldByName(c.Key)
+	if !field.IsValid() {
+		return c.FalseLabel
+	}
+	switch val := field.Interface().(type) {
+	case bool:
+		if val {
+			return c.TrueLabel
+		}
+		return c.FalseLabel
+	case int, int8, int16, int32, int64:
+		if field.Int() != 0 {
+			return c.TrueLabel
+		}
+		return c.FalseLabel
+	}
+	return fmt.Sprintf("%v", field.Interface())
+}
+
+// DateColumn displays a time.Time value with a configurable format.
+type DateColumn struct {
+	Key          string
+	LabelStr     string
+	SortableFlag bool
+	Format       string // Go time format string, default "2006-01-02"
+	Relative     bool   // Show relative time ("2 hours ago")
+}
+
+// DateCol creates a new date column.
+func DateCol(key string) *DateColumn {
+	return &DateColumn{
+		Key:      key,
+		LabelStr: key,
+		Format:   "2006-01-02",
+	}
+}
+
+// Label sets the column label.
+func (c *DateColumn) Label(label string) *DateColumn {
+	c.LabelStr = label
+	return c
+}
+
+// Sortable makes the column sortable.
+func (c *DateColumn) Sortable() *DateColumn {
+	c.SortableFlag = true
+	return c
+}
+
+// DateFormat sets a custom Go time format string.
+func (c *DateColumn) DateFormat(format string) *DateColumn {
+	c.Format = format
+	return c
+}
+
+// ShowRelative displays relative time ("2 hours ago") instead of absolute.
+func (c *DateColumn) ShowRelative() *DateColumn {
+	c.Relative = true
+	return c
+}
+
+// Column interface implementation
+func (c *DateColumn) GetKey() string     { return c.Key }
+func (c *DateColumn) GetLabel() string   { return c.LabelStr }
+func (c *DateColumn) GetType() string    { return "date" }
+func (c *DateColumn) IsSortable() bool   { return c.SortableFlag }
+func (c *DateColumn) IsSearchable() bool { return false }
+func (c *DateColumn) IsCopyable() bool   { return false }
+func (c *DateColumn) GetValue(item any) string {
+	v := reflect.ValueOf(item)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	field := v.FieldByName(c.Key)
+	if !field.IsValid() {
+		return ""
+	}
+
+	var t time.Time
+	switch val := field.Interface().(type) {
+	case time.Time:
+		t = val
+	case *time.Time:
+		if val == nil {
+			return ""
+		}
+		t = *val
+	default:
+		return fmt.Sprintf("%v", field.Interface())
+	}
+
+	if t.IsZero() {
+		return ""
+	}
+
+	if c.Relative {
+		return relativeTime(t)
+	}
+	return t.Format(c.Format)
+}
+
+// relativeTime returns a human-readable relative time string.
+func relativeTime(t time.Time) string {
+	diff := time.Since(t)
+	switch {
+	case diff < time.Minute:
+		return "just now"
+	case diff < time.Hour:
+		mins := int(diff.Minutes())
+		if mins == 1 {
+			return "1 minute ago"
+		}
+		return fmt.Sprintf("%d minutes ago", mins)
+	case diff < 24*time.Hour:
+		hours := int(diff.Hours())
+		if hours == 1 {
+			return "1 hour ago"
+		}
+		return fmt.Sprintf("%d hours ago", hours)
+	case diff < 7*24*time.Hour:
+		days := int(diff.Hours() / 24)
+		if days == 1 {
+			return "yesterday"
+		}
+		return fmt.Sprintf("%d days ago", days)
+	default:
+		return t.Format("2006-01-02")
+	}
 }

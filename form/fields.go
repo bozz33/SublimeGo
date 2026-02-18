@@ -280,3 +280,159 @@ func (f *FileUpload) Required() *FileUpload {
 	f.Rules = append(f.Rules, "required")
 	return f
 }
+
+// DatePicker represents a date/datetime input field.
+type DatePicker struct {
+	BaseField
+	Type    string // "date", "datetime-local", "time", "month", "week"
+	MinDate string
+	MaxDate string
+	Format  string
+}
+
+// Date creates a date picker field (YYYY-MM-DD).
+func Date(name string) *DatePicker {
+	return &DatePicker{
+		BaseField: BaseField{Name: name, LabelStr: name},
+		Type:      "date",
+	}
+}
+
+// DateTime creates a datetime-local picker field.
+func DateTime(name string) *DatePicker {
+	return &DatePicker{
+		BaseField: BaseField{Name: name, LabelStr: name},
+		Type:      "datetime-local",
+	}
+}
+
+// Time creates a time picker field.
+func Time(name string) *DatePicker {
+	return &DatePicker{
+		BaseField: BaseField{Name: name, LabelStr: name},
+		Type:      "time",
+	}
+}
+
+// Label sets the label.
+func (d *DatePicker) Label(label string) *DatePicker {
+	d.LabelStr = label
+	return d
+}
+
+// Min sets the minimum date (YYYY-MM-DD).
+func (d *DatePicker) Min(date string) *DatePicker {
+	d.MinDate = date
+	return d
+}
+
+// Max sets the maximum date (YYYY-MM-DD).
+func (d *DatePicker) Max(date string) *DatePicker {
+	d.MaxDate = date
+	return d
+}
+
+// Required makes the field required.
+func (d *DatePicker) Required() *DatePicker {
+	d.BaseField.Required = true
+	d.Rules = append(d.Rules, "required")
+	return d
+}
+
+// Default sets the default value.
+func (d *DatePicker) Default(val any) *DatePicker {
+	d.Value = val
+	return d
+}
+
+// HiddenField represents a hidden input field.
+type HiddenField struct {
+	BaseField
+}
+
+// Hidden creates a hidden field with a fixed value.
+func Hidden(name string, value any) *HiddenField {
+	return &HiddenField{
+		BaseField: BaseField{Name: name, LabelStr: name, Value: value, Hidden: true},
+	}
+}
+
+// Toggle represents a toggle switch (boolean, rendered differently from Checkbox).
+type Toggle struct {
+	BaseField
+	OnLabel  string
+	OffLabel string
+}
+
+// NewToggle creates a toggle switch field.
+func NewToggle(name string) *Toggle {
+	return &Toggle{
+		BaseField: BaseField{Name: name, LabelStr: name},
+		OnLabel:   "Yes",
+		OffLabel:  "No",
+	}
+}
+
+// Label sets the label.
+func (t *Toggle) Label(label string) *Toggle {
+	t.LabelStr = label
+	return t
+}
+
+// Labels sets the on/off labels.
+func (t *Toggle) Labels(on, off string) *Toggle {
+	t.OnLabel = on
+	t.OffLabel = off
+	return t
+}
+
+// Default sets the default boolean value.
+func (t *Toggle) Default(val bool) *Toggle {
+	t.Value = val
+	return t
+}
+
+// RepeaterField represents a dynamic multi-value field (list of sub-fields).
+// Each entry in the repeater is a map of field name -> value.
+type RepeaterField struct {
+	BaseField
+	SubFields []Field
+	MinItems  int
+	MaxItems  int
+	AddLabel  string
+}
+
+// Repeater creates a repeater field with the given sub-fields.
+func Repeater(name string, subFields ...Field) *RepeaterField {
+	return &RepeaterField{
+		BaseField: BaseField{Name: name, LabelStr: name},
+		SubFields: subFields,
+		MinItems:  0,
+		MaxItems:  0,
+		AddLabel:  "Add item",
+	}
+}
+
+// Label sets the label.
+func (r *RepeaterField) Label(label string) *RepeaterField {
+	r.LabelStr = label
+	return r
+}
+
+// Min sets the minimum number of items.
+func (r *RepeaterField) Min(n int) *RepeaterField {
+	r.MinItems = n
+	return r
+}
+
+// Max sets the maximum number of items.
+func (r *RepeaterField) Max(n int) *RepeaterField {
+	r.MaxItems = n
+	return r
+}
+
+// AddButtonLabel sets the label for the "add item" button.
+func (r *RepeaterField) AddButtonLabel(label string) *RepeaterField {
+	r.AddLabel = label
+	return r
+}

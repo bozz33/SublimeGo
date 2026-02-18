@@ -5,6 +5,8 @@ import (
 	"sort"
 	"strings"
 	"sync"
+
+	"github.com/sahilm/fuzzy"
 )
 
 // Result represents a single search result.
@@ -55,10 +57,10 @@ func NewSearchable(label string) *BaseSearchable {
 	}
 }
 
-func (s *BaseSearchable) GetSearchLabel() string    { return s.label }
-func (s *BaseSearchable) GetSearchIcon() string     { return s.icon }
-func (s *BaseSearchable) GetSearchPriority() int    { return s.priority }
-func (s *BaseSearchable) IsSearchEnabled() bool     { return s.enabled }
+func (s *BaseSearchable) GetSearchLabel() string        { return s.label }
+func (s *BaseSearchable) GetSearchIcon() string         { return s.icon }
+func (s *BaseSearchable) GetSearchPriority() int        { return s.priority }
+func (s *BaseSearchable) IsSearchEnabled() bool         { return s.enabled }
 func (s *BaseSearchable) GetSearchableFields() []string { return s.fields }
 
 func (s *BaseSearchable) Search(ctx context.Context, query string, limit int) ([]Result, error) {
@@ -119,7 +121,7 @@ func Register(s Searchable) {
 func Unregister(label string) {
 	globalRegistry.mu.Lock()
 	defer globalRegistry.mu.Unlock()
-	
+
 	filtered := make([]Searchable, 0)
 	for _, s := range globalRegistry.searchables {
 		if s.GetSearchLabel() != label {
@@ -133,23 +135,23 @@ func Unregister(label string) {
 func GetSearchables() []Searchable {
 	globalRegistry.mu.RLock()
 	defer globalRegistry.mu.RUnlock()
-	
+
 	sorted := make([]Searchable, len(globalRegistry.searchables))
 	copy(sorted, globalRegistry.searchables)
-	
+
 	sort.Slice(sorted, func(i, j int) bool {
 		return sorted[i].GetSearchPriority() < sorted[j].GetSearchPriority()
 	})
-	
+
 	return sorted
 }
 
 // SearchOptions configures a global search.
 type SearchOptions struct {
-	Query       string
-	Limit       int
-	Types       []string // Filter by resource types (empty = all)
-	MinScore    float64  // Minimum score threshold
+	Query    string
+	Limit    int
+	Types    []string // Filter by resource types (empty = all)
+	MinScore float64  // Minimum score threshold
 }
 
 // DefaultSearchOptions returns default search options.
@@ -165,7 +167,7 @@ func DefaultSearchOptions(query string) *SearchOptions {
 // GlobalSearch performs a search across all registered searchables.
 func GlobalSearch(ctx context.Context, opts *SearchOptions) ([]Result, error) {
 	searchables := GetSearchables()
-	
+
 	if len(searchables) == 0 {
 		return []Result{}, nil
 	}
@@ -256,31 +258,44 @@ func SearchByType(ctx context.Context, query string, resourceType string, limit 
 	})
 }
 
-// CalculateScore calculates a simple relevance score.
+// CalculateScore calculates a relevance score using fuzzy matching.
+// Returns a value between 0.0 and 1.0. Uses sahilm/fuzzy for scoring,
+// with fallback to substring matching for exact/prefix hits.
 func CalculateScore(query, text string) float64 {
-	query = strings.ToLower(query)
-	text = strings.ToLower(text)
+	if query == "" || text == "" {
+		return 0
+	}
 
-	if text == query {
+	lowerText := strings.ToLower(text)
+	lowerQuery := strings.ToLower(query)
+
+	// Exact match
+	if lowerText == lowerQuery {
 		return 1.0
 	}
-	if strings.HasPrefix(text, query) {
-		return 0.9
+	// Prefix match
+	if strings.HasPrefix(lowerText, lowerQuery) {
+		return 0.95
 	}
-	if strings.Contains(text, query) {
-		return 0.7
+	// Substring match
+	if strings.Contains(lowerText, lowerQuery) {
+		return 0.8
 	}
 
-	// Word matching
-	queryWords := strings.Fields(query)
-	matchCount := 0
-	for _, word := range queryWords {
-		if strings.Contains(text, word) {
-			matchCount++
+	// Fuzzy match via sahilm/fuzzy
+	matches := fuzzy.Find(query, []string{text})
+	if len(matches) > 0 {
+		// fuzzy.Match.Score is negative (lower = worse); normalise to 0..0.75
+		score := matches[0].Score
+		if score >= 0 {
+			return 0.75
 		}
-	}
-	if len(queryWords) > 0 {
-		return float64(matchCount) / float64(len(queryWords)) * 0.5
+		// Map negative scores: -1 -> 0.74, -100 -> ~0.0
+		normalized := 0.75 + float64(score)/200.0
+		if normalized < 0 {
+			normalized = 0
+		}
+		return normalized
 	}
 
 	return 0
