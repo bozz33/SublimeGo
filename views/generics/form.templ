@@ -222,3 +222,104 @@ templ FileUploadField(f *form.FileUpload) {
 		}
 	</div>
 }
+
+templ DatePickerField(f *form.DatePicker) {
+	<div>
+		<label for={ f.Name } class="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+			{ f.LabelStr }
+			if f.BaseField.Required {
+				<span class="text-red-500">*</span>
+			}
+		</label>
+		<div class="mt-2">
+			<input
+				type={ f.Type }
+				name={ f.Name }
+				id={ f.Name }
+				value={ getValueStr(f.Value) }
+				if f.MinDate != "" {
+					min={ f.MinDate }
+				}
+				if f.MaxDate != "" {
+					max={ f.MaxDate }
+				}
+				if f.BaseField.Required {
+					required
+				}
+				if f.BaseField.Disabled {
+					disabled
+				}
+				class="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm"
+			/>
+		</div>
+		if f.HelpText != "" {
+			<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{ f.HelpText }</p>
+		}
+	</div>
+}
+
+templ HiddenInputField(f *form.HiddenField) {
+	<input type="hidden" name={ f.Name } id={ f.Name } value={ getValueStr(f.Value) }/>
+}
+
+templ ToggleField(f *form.Toggle) {
+	<div class="flex items-center justify-between">
+		<label for={ f.Name } class="text-sm font-medium text-gray-900 dark:text-gray-300">
+			{ f.LabelStr }
+		</label>
+		<label class="relative inline-flex items-center cursor-pointer">
+			<input
+				type="checkbox"
+				name={ f.Name }
+				id={ f.Name }
+				value="true"
+				if isChecked(f.Value) {
+					checked
+				}
+				if f.BaseField.Disabled {
+					disabled
+				}
+				class="sr-only peer"
+			/>
+			<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
+			<span class="ms-3 text-sm font-medium text-gray-500 dark:text-gray-400">
+				if isChecked(f.Value) {
+					{ f.OnLabel }
+				} else {
+					{ f.OffLabel }
+				}
+			</span>
+		</label>
+	</div>
+}
+
+templ RepeaterFieldView(f *form.RepeaterField) {
+	<div
+		x-data={ fmt.Sprintf(`{ items: [{}], max: %d }`, f.MaxItems) }
+		class="space-y-3"
+	>
+		<label class="block text-sm font-medium leading-6 text-gray-900 dark:text-white">{ f.LabelStr }</label>
+		<template x-for="(item, index) in items" :key="index">
+			<div class="relative border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-3">
+				for _, sub := range f.SubFields {
+					@RenderComponent(sub)
+				}
+				<button
+					type="button"
+					@click="items.splice(index, 1)"
+					class="absolute top-2 right-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400"
+				>
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+				</button>
+			</div>
+		</template>
+		<button
+			type="button"
+			@click="if (max === 0 || items.length < max) items.push({})"
+			class="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400"
+		>
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+			{ f.AddLabel }
+		</button>
+	</div>
+}
