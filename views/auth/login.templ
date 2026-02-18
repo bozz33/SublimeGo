@@ -20,9 +20,11 @@ templ LoginPage(basePath ...string) {
 			<h2 class="mt-6 text-center text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
 				Sign in to your account
 			</h2>
-			<p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-				Or <a href={ templ.SafeURL(getBasePath(basePath...) + "/register") } class="font-medium text-green-600 hover:text-green-500">create a new account</a>
-			</p>
+			if layouts.GetPanelConfig().Registration {
+				<p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+					Or <a href={ templ.SafeURL(getBasePath(basePath...) + "/register") } class="font-medium text-primary-600 hover:text-primary-500">create a new account</a>
+				</p>
+			}
 		</div>
 
 		<!-- Form -->
