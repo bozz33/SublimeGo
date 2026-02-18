@@ -13,7 +13,6 @@ import (
 	"github.com/bozz33/sublimego/ui/layouts"
 	"github.com/bozz33/sublimego/views/dashboard"
 	"github.com/bozz33/sublimego/widget"
-	"github.com/samber/lo"
 )
 
 // Panel represents a complete dashboard.
@@ -119,45 +118,42 @@ func (p *Panel) registerNavItems() {
 		return allItems[i].sort < allItems[j].sort
 	})
 
-	// Group items
-	grouped := lo.GroupBy(allItems, func(item navItem) string {
-		if item.group == "" {
-			return "_root"
+	// Group items by group name using stdlib
+	grouped := make(map[string][]navItem)
+	for _, item := range allItems {
+		key := item.group
+		if key == "" {
+			key = "_root"
 		}
-		return item.group
-	})
+		grouped[key] = append(grouped[key], item)
+	}
 
 	var navGroups []layouts.NavGroup
 
 	if rootItems, ok := grouped["_root"]; ok {
-		items := lo.Map(rootItems, func(item navItem, _ int) layouts.NavItem {
-			return layouts.NavItem{
-				Slug:  item.slug,
-				Label: item.label,
-				Icon:  item.icon,
-			}
-		})
-		navGroups = append(navGroups, layouts.NavGroup{
-			Label: "",
-			Items: items,
-		})
+		items := make([]layouts.NavItem, len(rootItems))
+		for i, item := range rootItems {
+			items[i] = layouts.NavItem{Slug: item.slug, Label: item.label, Icon: item.icon}
+		}
+		navGroups = append(navGroups, layouts.NavGroup{Label: "", Items: items})
 	}
 
-	for groupName, items := range grouped {
-		if groupName == "_root" {
-			continue
+	// Sort group names for deterministic order
+	groupNames := make([]string, 0, len(grouped))
+	for k := range grouped {
+		if k != "_root" {
+			groupNames = append(groupNames, k)
 		}
-		navItems := lo.Map(items, func(item navItem, _ int) layouts.NavItem {
-			return layouts.NavItem{
-				Slug:  item.slug,
-				Label: item.label,
-				Icon:  item.icon,
-			}
-		})
-		navGroups = append(navGroups, layouts.NavGroup{
-			Label: groupName,
-			Items: navItems,
-		})
+	}
+	sort.Strings(groupNames)
+
+	for _, groupName := range groupNames {
+		groupItems := grouped[groupName]
+		navItems := make([]layouts.NavItem, len(groupItems))
+		for i, item := range groupItems {
+			navItems[i] = layouts.NavItem{Slug: item.slug, Label: item.label, Icon: item.icon}
+		}
+		navGroups = append(navGroups, layouts.NavGroup{Label: groupName, Items: navItems})
 	}
 
 	layouts.SetNavGroups(navGroups)
@@ -167,7 +163,7 @@ func (p *Panel) registerNavItems() {
 func (p *Panel) Router() http.Handler {
 	mux := http.NewServeMux()
 
-	fs := http.FileServer(http.Dir("pkg/ui/assets"))
+	fs := http.FileServer(http.Dir("ui/assets"))
 	mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
 
 	if p.AuthManager != nil {

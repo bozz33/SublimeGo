@@ -27,10 +27,10 @@ templ Topbar(ctx context.Context) {
 	}}
 	<header class="sticky top-0 z-40 h-16 flex items-center border-b border-gray-200 bg-white/80 backdrop-blur-lg dark:border-gray-700 dark:bg-gray-800/80">
 		<div class="flex flex-1 items-center justify-between px-4 lg:px-6">
-			<!-- Left: Mobile Menu Button -->
-			<div class="flex items-center gap-4">
+			<!-- Left: Mobile Menu Button + Global Search -->
+			<div class="flex items-center gap-4 flex-1">
 				<!-- Mobile Menu Toggle -->
-				<button 
+				<button
 					@click="sidebarOpen = !sidebarOpen"
 					class="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
 				>
@@ -38,10 +38,96 @@ templ Topbar(ctx context.Context) {
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
 					</svg>
 				</button>
+				<!-- Global Search -->
+				<div
+					x-data="{ query: '', results: [], open: false }"
+					class="relative hidden sm:block w-full max-w-xs"
+				>
+					<div class="relative">
+						<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+							<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+							</svg>
+						</div>
+						<input
+							type="text"
+							x-model="query"
+							@input.debounce.300ms="if(query.length>1){fetch('/api/search?q='+encodeURIComponent(query)).then(r=>r.json()).then(d=>{results=d;open=d.length>0})}"
+							@keydown.escape="open=false;query=''"
+							@click.outside="open=false"
+							placeholder="Search..."
+							class="w-full pl-9 pr-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 border-0 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:bg-white dark:focus:bg-gray-600 transition-colors"
+						/>
+					</div>
+					<!-- Search Results Dropdown -->
+					<div
+						x-show="open"
+						x-cloak
+						@click.outside="open=false"
+						class="absolute top-full mt-1 left-0 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50"
+					>
+						<template x-for="result in results" :key="result.id">
+							<a
+								:href="result.url"
+								@click="open=false;query=''"
+								class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+							>
+								<div class="flex-1 min-w-0">
+									<p class="text-sm font-medium text-gray-900 dark:text-white truncate" x-text="result.title"></p>
+									<p class="text-xs text-gray-500 dark:text-gray-400 truncate" x-text="result.subtitle || result.type"></p>
+								</div>
+							</a>
+						</template>
+					</div>
+				</div>
 			</div>
 
 			<!-- Right: Actions -->
 			<div class="flex items-center gap-2">
+				<!-- Notification Bell -->
+				<div
+					x-data="{ unread: 0, open: false, init() { const es = new EventSource('/api/notifications/stream'); es.onmessage = e => { const d = JSON.parse(e.data); if(d.unread_count !== undefined) this.unread = d.unread_count; }; } }"
+					class="relative"
+				>
+					<button
+						@click="open = !open; if(open){ fetch('/api/notifications/unread').then(r=>r.json()).then(d=>{ unread=d.length||0 }) }"
+						class="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+						title="Notifications"
+					>
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
+						</svg>
+						<span
+							x-show="unread > 0"
+							x-cloak
+							x-text="unread > 9 ? '9+' : unread"
+							class="absolute -top-0.5 -right-0.5 min-w-[1.1rem] h-[1.1rem] flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-0.5"
+						></span>
+					</button>
+					<div
+						x-show="open"
+						x-cloak
+						@click.outside="open=false"
+						x-transition:enter="transition ease-out duration-200"
+						x-transition:enter-start="opacity-0 scale-95"
+						x-transition:enter-end="opacity-100 scale-100"
+						x-transition:leave="transition ease-in duration-150"
+						x-transition:leave-start="opacity-100 scale-100"
+						x-transition:leave-end="opacity-0 scale-95"
+						class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50"
+					>
+						<div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+							<span class="text-sm font-semibold text-gray-900 dark:text-white">Notifications</span>
+							<a href="/api/notifications/read-all" class="text-xs text-primary-600 dark:text-primary-400 hover:underline">Mark all read</a>
+						</div>
+						<div class="max-h-72 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700">
+							<p class="px-4 py-6 text-sm text-center text-gray-400 dark:text-gray-500">No notifications</p>
+						</div>
+						<div class="border-t border-gray-200 dark:border-gray-700 px-4 py-2">
+							<a href="/notifications" class="text-xs text-primary-600 dark:text-primary-400 hover:underline">View all</a>
+						</div>
+					</div>
+				</div>
 				<!-- Dark Mode Toggle -->
 				<button 
 					@click="darkMode = !darkMode"

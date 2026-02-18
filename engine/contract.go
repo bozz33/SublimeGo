@@ -56,6 +56,12 @@ type Resource interface {
 	ResourceNavigation
 }
 
+// ResourceViewable is an optional interface for resources that provide
+// a read-only detail view (Infolist). Implement it to enable GET /{id}.
+type ResourceViewable interface {
+	View(ctx context.Context, item any) templ.Component
+}
+
 // Column defines a table column.
 type Column struct {
 	Key        string

@@ -96,8 +96,8 @@ templ Table(ctx context.Context, t *table.Table, data []any) {
 								<td class="px-4 py-4 w-4">
 									<input
 										type="checkbox"
-										data-row-id={ fmt.Sprintf("%v", item) }
-										:value={ fmt.Sprintf("%v", item) }
+										data-row-id={ extractRowID(item) }
+										:value={ extractRowID(item) }
 										x-model="selectedIds"
 										class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
 									/>

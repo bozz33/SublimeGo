@@ -1,5 +1,28 @@
 package components
 
+import "fmt"
+
+// extractRowID extracts a string ID from an item using the Identifiable interface,
+// or falls back to fmt.Sprintf for map[string]any and raw values.
+func extractRowID(item any) string {
+	type identifiable interface{ GetID() int }
+	type identifiableStr interface{ GetID() string }
+	switch v := item.(type) {
+	case identifiable:
+		return fmt.Sprintf("%d", v.GetID())
+	case identifiableStr:
+		return v.GetID()
+	case map[string]any:
+		if id, ok := v["id"]; ok {
+			return fmt.Sprintf("%v", id)
+		}
+		if id, ok := v["ID"]; ok {
+			return fmt.Sprintf("%v", id)
+		}
+	}
+	return fmt.Sprintf("%v", item)
+}
+
 // getBadgeClasses returns the CSS classes for a badge based on its color
 func getBadgeClasses(color string) string {
 	classes := "px-2.5 py-0.5 text-xs font-medium rounded-full "

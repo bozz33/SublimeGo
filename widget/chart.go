@@ -2,6 +2,8 @@ package widget
 
 import (
 	"encoding/json"
+
+	"github.com/a-h/templ"
 )
 
 // ChartType defines the supported chart type.
@@ -79,3 +81,18 @@ func (c *ChartWidget) GetColorsJSON() string {
 }
 
 func (c *ChartWidget) GetType() string { return "chart" }
+
+// chartRenderFunc is set by views/widgets to avoid import cycles.
+var chartRenderFunc func(*ChartWidget) templ.Component
+
+// SetChartRenderer registers the render function.
+func SetChartRenderer(fn func(*ChartWidget) templ.Component) {
+	chartRenderFunc = fn
+}
+
+func (c *ChartWidget) Render() templ.Component {
+	if chartRenderFunc != nil {
+		return chartRenderFunc(c)
+	}
+	return templ.NopComponent
+}

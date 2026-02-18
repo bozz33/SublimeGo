@@ -40,6 +40,33 @@ func (h *CRUDHandler) Create(w http.ResponseWriter, r *http.Request) {
 	render(w, r, "Create "+h.Resource.Label(), component)
 }
 
+// View displays the read-only detail view (Infolist) for a resource.
+// Only available if the resource implements ResourceViewable.
+func (h *CRUDHandler) View(w http.ResponseWriter, r *http.Request, id string) {
+	ctx := r.Context()
+
+	if !h.Resource.CanRead(ctx) {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	viewable, ok := h.Resource.(ResourceViewable)
+	if !ok {
+		// Resource has no View — redirect to edit
+		http.Redirect(w, r, fmt.Sprintf("/%s/%s/edit", h.Resource.Slug(), id), http.StatusSeeOther)
+		return
+	}
+
+	item, err := h.Resource.Get(ctx, id)
+	if err != nil || item == nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	component := viewable.View(ctx, item)
+	render(w, r, h.Resource.Label(), component)
+}
+
 // Edit displays the edit form.
 func (h *CRUDHandler) Edit(w http.ResponseWriter, r *http.Request, id string) {
 	ctx := r.Context()
@@ -144,8 +171,10 @@ func (h *CRUDHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			h.Create(w, r)
 		} else if len(parts) == 2 && parts[1] == "edit" {
 			h.Edit(w, r, parts[0])
+		} else if len(parts) == 1 && parts[0] != "" {
+			h.View(w, r, parts[0])
 		} else {
-			http.Redirect(w, r, fmt.Sprintf("/%s/%s/edit", h.Resource.Slug(), parts[0]), http.StatusSeeOther)
+			http.NotFound(w, r)
 		}
 
 	case http.MethodPost:
