@@ -381,12 +381,13 @@ func (p *Panel) protect(h http.Handler) http.Handler {
 	return h
 }
 
-// injectConfig injects the Panel's PanelConfig into every request context.
-// This enables multi-panel setups where each panel has its own config.
+// injectConfig injects the Panel's PanelConfig and NavGroups into every request context.
+// This enables multi-panel setups where each panel has its own config and navigation.
 func (p *Panel) injectConfig(next http.Handler) http.Handler {
 	cfg := layouts.GetPanelConfig()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := layouts.WithPanelConfig(r.Context(), cfg)
+		ctx = layouts.WithNavGroups(ctx, layouts.GetNavGroups(ctx))
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
