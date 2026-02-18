@@ -47,6 +47,7 @@ type Queue struct {
 	wg      sync.WaitGroup
 	mu      sync.RWMutex
 	started bool
+	store   *Store // optional SQLite persistence
 }
 
 // NewQueue creates a new queue with a number of workers.
@@ -65,7 +66,22 @@ func NewQueue(workers int) *Queue {
 	}
 }
 
+// NewPersistentQueue creates a queue backed by a SQLite store.
+// Pending jobs from previous runs are automatically re-queued on Start().
+func NewPersistentQueue(workers int, storePath string) (*Queue, error) {
+	q := NewQueue(workers)
+
+	store, err := NewStore(storePath)
+	if err != nil {
+		return nil, fmt.Errorf("jobs: create persistent queue: %w", err)
+	}
+
+	q.store = store
+	return q, nil
+}
+
 // Start starts the queue workers.
+// If the queue has a Store, pending jobs from previous runs are re-queued.
 func (q *Queue) Start() {
 	q.mu.Lock()
 	defer q.mu.Unlock()
@@ -79,6 +95,18 @@ func (q *Queue) Start() {
 	for i := 0; i < q.workers; i++ {
 		q.wg.Add(1)
 		go q.worker(i)
+	}
+
+	if q.store != nil {
+		pending, err := q.store.LoadPending()
+		if err == nil {
+			for _, job := range pending {
+				q.jobs.Store(job.ID, job)
+				if job.Handler != nil {
+					q.jobChan <- job
+				}
+			}
+		}
 	}
 }
 
@@ -111,6 +139,7 @@ func (q *Queue) executeJob(job *Job) {
 	now := time.Now()
 	job.StartedAt = &now
 	q.jobs.Store(job.ID, job)
+	q.persist(job)
 
 	ctx, cancel := context.WithTimeout(q.ctx, 30*time.Minute)
 	defer cancel()
@@ -134,6 +163,14 @@ func (q *Queue) executeJob(job *Job) {
 	}
 
 	q.jobs.Store(job.ID, job)
+	q.persist(job)
+}
+
+// persist saves the job to the store if one is configured.
+func (q *Queue) persist(job *Job) {
+	if q.store != nil {
+		_ = q.store.Save(job)
+	}
 }
 
 // Dispatch adds a job to the queue.
@@ -148,6 +185,7 @@ func (q *Queue) Dispatch(name string, handler func(ctx context.Context, job *Job
 	}
 
 	q.jobs.Store(job.ID, job)
+	q.persist(job)
 	q.jobChan <- job
 
 	return job.ID
@@ -172,6 +210,7 @@ func (q *Queue) DispatchWithCallbacks(
 	}
 
 	q.jobs.Store(job.ID, job)
+	q.persist(job)
 	q.jobChan <- job
 
 	return job.ID

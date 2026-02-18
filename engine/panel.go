@@ -8,6 +8,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/bozz33/sublimego/auth"
 	"github.com/bozz33/sublimego/internal/ent"
+	"github.com/bozz33/sublimego/middleware"
 	"github.com/bozz33/sublimego/search"
 	"github.com/bozz33/sublimego/ui/layouts"
 	"github.com/bozz33/sublimego/views/dashboard"
@@ -171,12 +172,12 @@ func (p *Panel) Router() http.Handler {
 
 	if p.AuthManager != nil {
 		authHandler := NewAuthHandler(p.AuthManager, p.DB)
-		mux.Handle("/login", RequireGuest(p.AuthManager)(authHandler))
-		mux.Handle("/register", RequireGuest(p.AuthManager)(authHandler))
+		mux.Handle("/login", middleware.RequireGuest(p.AuthManager, "/")(authHandler))
+		mux.Handle("/register", middleware.RequireGuest(p.AuthManager, "/")(authHandler))
 		mux.Handle("/logout", authHandler)
 	}
 
-	dashboardHandler := RequireAuth(p.AuthManager, p.DB)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	dashboardHandler := middleware.RequireAuth(p.AuthManager)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Use declarative widget providers instead of hardcoded providers
 		widgets := widget.GetAllWidgets(r.Context())
 		dashboard.Index(widgets).Render(r.Context(), w)
@@ -184,7 +185,7 @@ func (p *Panel) Router() http.Handler {
 	mux.Handle("/", dashboardHandler)
 
 	// Global search API endpoint
-	mux.Handle("/api/search", RequireAuth(p.AuthManager, p.DB)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/api/search", middleware.RequireAuth(p.AuthManager)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query().Get("q")
 		if query == "" {
 			w.Header().Set("Content-Type", "application/json")
@@ -203,7 +204,7 @@ func (p *Panel) Router() http.Handler {
 	for _, res := range p.Resources {
 		handler := NewCRUDHandler(res)
 		slug := res.Slug()
-		protectedHandler := RequireAuth(p.AuthManager, p.DB)(handler)
+		protectedHandler := middleware.RequireAuth(p.AuthManager)(handler)
 		mux.Handle("/"+slug+"/", protectedHandler)
 		mux.Handle("/"+slug, protectedHandler)
 	}
@@ -212,7 +213,7 @@ func (p *Panel) Router() http.Handler {
 	for _, pg := range p.Pages {
 		pageHandler := NewPageHandler(pg)
 		slug := pg.Slug()
-		protectedHandler := RequireAuth(p.AuthManager, p.DB)(pageHandler)
+		protectedHandler := middleware.RequireAuth(p.AuthManager)(pageHandler)
 		mux.Handle("/"+slug, protectedHandler)
 	}
 
