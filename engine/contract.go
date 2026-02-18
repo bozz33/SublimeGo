@@ -66,6 +66,7 @@ type ResourceViewable interface {
 type Column struct {
 	Key        string
 	Label      string
+	Type       string // "text", "boolean", "date", "badge", "image"
 	Sortable   bool
 	Searchable bool
 }
@@ -78,14 +79,43 @@ type Row struct {
 
 // TableState contains the complete state of a table.
 type TableState struct {
-	Title      string
-	Slug       string
-	Columns    []Column
-	Rows       []Row
-	CanCreate  bool
-	NewURL     string
-	BaseURL    string
-	Pagination *Pagination
+	Title         string
+	Slug          string
+	Columns       []Column
+	Rows          []Row
+	CanCreate     bool
+	CanDelete     bool
+	NewURL        string
+	BaseURL       string
+	Pagination    *Pagination
+	Filters       []FilterDef       // available filter definitions
+	ActiveFilters map[string]string // currently active filter values (key -> value)
+	BulkActions   []BulkActionDef   // available bulk actions
+	ExportURL     string            // non-empty = show export button
+	ImportURL     string            // non-empty = show import button
+}
+
+// FilterDef describes a filter available on the table.
+type FilterDef struct {
+	Key     string
+	Label   string
+	Type    string // "select", "boolean", "text"
+	Options []FilterOption
+}
+
+// FilterOption is a single option in a select filter.
+type FilterOption struct {
+	Value string
+	Label string
+}
+
+// BulkActionDef describes a bulk action available on the table.
+type BulkActionDef struct {
+	Key   string
+	Label string
+	Icon  string
+	Color string // "danger", "warning", "primary"
+	URL   string // POST target URL
 }
 
 // Pagination contains pagination info.
