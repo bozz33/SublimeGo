@@ -127,3 +127,68 @@ func getItemID(item any) string {
 func GetItemID(item any) string {
 	return getItemID(item)
 }
+
+// CreateAction creates a standard Create button (header-level, no item context).
+func CreateAction(baseURL string) *Action {
+	return New("create").
+		SetLabel("New").
+		SetIcon("plus").
+		SetColor("primary").
+		SetUrl(func(_ any) string {
+			return fmt.Sprintf("%s/create", baseURL)
+		})
+}
+
+// ExportAction creates an Export button that triggers a CSV/Excel download.
+// format: "csv" or "xlsx"
+func ExportAction(baseURL string, format string) *Action {
+	if format == "" {
+		format = "csv"
+	}
+	return New("export").
+		SetLabel("Export").
+		SetIcon("arrow-down-tray").
+		SetColor("gray").
+		SetUrl(func(_ any) string {
+			return fmt.Sprintf("%s/export?format=%s", baseURL, format)
+		})
+}
+
+// ImportAction creates an Import button that opens the import form.
+func ImportAction(baseURL string) *Action {
+	return New("import").
+		SetLabel("Import").
+		SetIcon("arrow-up-tray").
+		SetColor("gray").
+		SetUrl(func(_ any) string {
+			return fmt.Sprintf("%s/import", baseURL)
+		})
+}
+
+// RestoreAction creates a Restore button for soft-deleted items.
+func RestoreAction(baseURL string) *Action {
+	a := New("restore").
+		SetLabel("Restore").
+		SetIcon("arrow-path").
+		SetColor("success").
+		RequiresDialog("Restore this item?", "The item will be restored and become active again.").
+		SetUrl(func(item any) string {
+			return fmt.Sprintf("%s/%v/restore", baseURL, getItemID(item))
+		})
+	a.Method = "POST"
+	return a
+}
+
+// ForceDeleteAction creates a permanent delete button with strong confirmation.
+func ForceDeleteAction(baseURL string) *Action {
+	a := New("force-delete").
+		SetLabel("Delete permanently").
+		SetIcon("trash").
+		SetColor("danger").
+		RequiresDialog("Permanently delete?", "This action CANNOT be undone. The record will be deleted forever.").
+		SetUrl(func(item any) string {
+			return fmt.Sprintf("%s/%v/force-delete", baseURL, getItemID(item))
+		})
+	a.Method = "DELETE"
+	return a
+}

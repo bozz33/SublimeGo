@@ -1,6 +1,6 @@
 package auth
 
-import "github.com/bozz33/SublimeGo/pkg/ui/layouts"
+import "github.com/bozz33/sublimego/ui/layouts"
 
 // LoginPage - Login page with Filament-style design.
 // Clean design, centered form.
@@ -20,9 +20,11 @@ templ LoginPage(basePath ...string) {
 			<h2 class="mt-6 text-center text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
 				Sign in to your account
 			</h2>
-			<p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-				Or <a href={ templ.SafeURL(getBasePath(basePath...) + "/register") } class="font-medium text-green-600 hover:text-green-500">create a new account</a>
-			</p>
+			if layouts.GetPanelConfig().Registration {
+				<p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+					Or <a href={ templ.SafeURL(getBasePath(basePath...) + "/register") } class="font-medium text-primary-600 hover:text-primary-500">create a new account</a>
+				</p>
+			}
 		</div>
 
 		<!-- Form -->
@@ -83,17 +85,20 @@ templ LoginPage(basePath ...string) {
 						<div class="flex items-center">
 							<input
 								id="remember"
-								name="remember"
+								name="remember_me"
 								type="checkbox"
-								class="h-4 w-4 text-green-500 focus:ring-green-500 border-gray-300 dark:border-gray-600 rounded"
+								value="1"
+								class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded"
 							/>
 							<label for="remember" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
 								Remember me
 							</label>
 						</div>
-						<a href="/forgot-password" class="text-sm font-medium text-green-600 hover:text-green-500">
-							Forgot password?
-						</a>
+						if layouts.GetPanelConfig().PasswordReset {
+							<a href="/forgot-password" class="text-sm font-medium text-green-600 hover:text-green-500">
+								Forgot password?
+							</a>
+						}
 					</div>
 
 					<!-- Submit Button -->

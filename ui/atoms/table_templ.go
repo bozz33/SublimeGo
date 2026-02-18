@@ -78,7 +78,7 @@ func TableHeader(headers []string) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(h)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/ui/atoms/table.templ`, Line: 15, Col: 41}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/atoms/table.templ`, Line: 15, Col: 41}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -130,7 +130,7 @@ func TableHeaderWithCheckbox(headers []string) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(h)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/ui/atoms/table.templ`, Line: 35, Col: 41}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/atoms/table.templ`, Line: 35, Col: 41}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -251,7 +251,7 @@ func TableRowWithCheckbox(id string) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs("checkbox-" + id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/ui/atoms/table.templ`, Line: 58, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/atoms/table.templ`, Line: 58, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -264,7 +264,7 @@ func TableRowWithCheckbox(id string) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs("checkbox-" + id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/ui/atoms/table.templ`, Line: 62, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/atoms/table.templ`, Line: 62, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {

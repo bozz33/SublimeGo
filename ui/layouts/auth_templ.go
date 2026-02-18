@@ -38,7 +38,7 @@ func Auth(title string) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/ui/layouts/auth.templ`, Line: 11, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/auth.templ`, Line: 11, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -51,7 +51,7 @@ func Auth(title string) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(GetPanelConfig().Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/ui/layouts/auth.templ`, Line: 11, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/auth.templ`, Line: 11, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -69,7 +69,7 @@ func Auth(title string) templ.Component {
 			var templ_7745c5c3_Var4 templ.SafeURL
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(GetPanelConfig().Favicon)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/ui/layouts/auth.templ`, Line: 15, Col: 52}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/auth.templ`, Line: 15, Col: 52}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -80,7 +80,7 @@ func Auth(title string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<!-- Tailwind CSS CDN v4 --><script src=\"https://cdn.tailwindcss.com\"></script><script>\n\t\t\t\ttailwind.config = {\n\t\t\t\t\tdarkMode: 'class',\n\t\t\t\t\ttheme: {\n\t\t\t\t\t\textend: {\n\t\t\t\t\t\t\tcolors: {\n\t\t\t\t\t\t\t\tprimary: {\n\t\t\t\t\t\t\t\t\t50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac',\n\t\t\t\t\t\t\t\t\t400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d',\n\t\t\t\t\t\t\t\t\t800: '#166534', 900: '#14532d'\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tfontFamily: { sans: ['Inter', 'sans-serif'] }\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t</script><!-- Fonts --><link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap\" rel=\"stylesheet\"><link href=\"https://fonts.googleapis.com/icon?family=Material+Icons+Outlined\" rel=\"stylesheet\"><!-- Custom styles (local) --><link href=\"/assets/css/custom.css\" rel=\"stylesheet\"><!-- Alpine.js (local) --><script src=\"/assets/js/alpine.min.js\" defer></script><style>[x-cloak] { display: none !important; }</style></head><body class=\"font-sans bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased min-h-screen\"><!-- Centered Container - Style Filament --><div class=\"min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<!-- Tailwind CSS CDN v4 --><script src=\"https://cdn.tailwindcss.com\"></script><script>\r\n\t\t\t\ttailwind.config = {\r\n\t\t\t\t\tdarkMode: 'class',\r\n\t\t\t\t\ttheme: {\r\n\t\t\t\t\t\textend: {\r\n\t\t\t\t\t\t\tcolors: {\r\n\t\t\t\t\t\t\t\tprimary: {\r\n\t\t\t\t\t\t\t\t\t50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac',\r\n\t\t\t\t\t\t\t\t\t400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d',\r\n\t\t\t\t\t\t\t\t\t800: '#166534', 900: '#14532d'\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\tfontFamily: { sans: ['Inter', 'sans-serif'] }\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t</script><!-- Fonts --><link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap\" rel=\"stylesheet\"><link href=\"https://fonts.googleapis.com/icon?family=Material+Icons+Outlined\" rel=\"stylesheet\"><!-- Custom styles (local) --><link href=\"/assets/css/custom.css\" rel=\"stylesheet\"><!-- Alpine.js (local) --><script src=\"/assets/js/alpine.min.js\" defer></script><style>[x-cloak] { display: none !important; }</style></head><body class=\"font-sans bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased min-h-screen\"><!-- Centered Container - Style Filament --><div class=\"min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

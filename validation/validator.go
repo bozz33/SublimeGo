@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/schema"
 	"github.com/samber/lo"
 )
 
@@ -183,72 +184,16 @@ func RegisterCustomMessage(tag, message string) {
 
 // RegisterValidation registers a custom validator.
 func RegisterValidation(tag string, fn validator.Func) {
-	validator.New().RegisterValidation(tag, fn)
+	_ = validator.New().RegisterValidation(tag, fn)
 }
 
 // Global variables for custom messages.
 var (
 	customMessages = make(map[string]string)
-	decoder        = NewFormDecoder()
+	decoder        = schema.NewDecoder()
 )
 
-// NewFormDecoder creates a form decoder.
-func NewFormDecoder() *FormDecoder {
-	return &FormDecoder{}
-}
-
-// FormDecoder decodes form data to a struct.
-type FormDecoder struct{}
-
-// Decode decodes form data to a struct.
-func (d *FormDecoder) Decode(dest interface{}, data map[string][]string) error {
-	val := reflect.ValueOf(dest).Elem()
-	typ := val.Type()
-
-	for i := 0; i < val.NumField(); i++ {
-		field := val.Field(i)
-		fieldType := typ.Field(i)
-
-		jsonTag := fieldType.Tag.Get("json")
-		fieldName := strings.SplitN(jsonTag, ",", 2)[0]
-		if fieldName == "" || fieldName == "-" {
-			fieldName = fieldType.Name
-		}
-
-		if values, exists := data[fieldName]; exists && len(values) > 0 {
-			value := values[0]
-
-			// Assign value based on type
-			if field.CanSet() {
-				switch field.Kind() {
-				case reflect.String:
-					field.SetString(value)
-				case reflect.Int:
-					if intVal, err := parseInt(value); err == nil {
-						field.SetInt(int64(intVal))
-					}
-				case reflect.Float64:
-					if floatVal, err := parseFloat(value); err == nil {
-						field.SetFloat(floatVal)
-					}
-				}
-			}
-		}
-	}
-
-	return nil
-}
-
-// parseInt converts string to int
-func parseInt(s string) (int, error) {
-	var result int
-	_, err := fmt.Sscanf(s, "%d", &result)
-	return result, err
-}
-
-// parseFloat converts string to float64
-func parseFloat(s string) (float64, error) {
-	var result float64
-	_, err := fmt.Sscanf(s, "%f", &result)
-	return result, err
+func init() {
+	decoder.SetAliasTag("json")
+	decoder.IgnoreUnknownKeys(true)
 }

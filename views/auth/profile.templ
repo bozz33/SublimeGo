@@ -1,0 +1,204 @@
+package auth
+
+import (
+	"fmt"
+	authpkg "github.com/bozz33/sublimego/auth"
+	"github.com/bozz33/sublimego/ui/layouts"
+)
+
+// ProfilePage renders the authenticated user's profile page.
+templ ProfilePage(user *authpkg.User, flashError string, flashSuccess string) {
+	@layouts.Base("My Profile") {
+		<div class="max-w-3xl mx-auto space-y-8">
+			<!-- Header -->
+			<div>
+				<h1 class="text-2xl font-bold text-gray-900 dark:text-white">My Profile</h1>
+				<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage your account information and password.</p>
+			</div>
+
+			if flashError != "" {
+				<div class="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 flex items-center gap-3">
+					<span class="material-icons-outlined text-red-500 text-xl">error_outline</span>
+					<p class="text-sm text-red-700 dark:text-red-400">{ flashError }</p>
+				</div>
+			}
+			if flashSuccess != "" {
+				<div class="rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4 flex items-center gap-3">
+					<span class="material-icons-outlined text-green-500 text-xl">check_circle_outline</span>
+					<p class="text-sm text-green-700 dark:text-green-400">{ flashSuccess }</p>
+				</div>
+			}
+
+			<!-- Avatar + Info -->
+			<div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 flex items-center gap-6">
+				<div class="w-20 h-20 rounded-full bg-primary-500 flex items-center justify-center text-white text-3xl font-bold select-none">
+					{ avatarInitial(user.Name) }
+				</div>
+				<div>
+					<p class="text-xl font-semibold text-gray-900 dark:text-white">{ user.Name }</p>
+					<p class="text-sm text-gray-500 dark:text-gray-400">{ user.Email }</p>
+					<div class="mt-2 flex flex-wrap gap-2">
+						for _, role := range user.Roles {
+							<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300">
+								{ role }
+							</span>
+						}
+					</div>
+				</div>
+			</div>
+
+			<!-- Update Profile Form -->
+			<div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
+				<div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+					<h2 class="text-base font-semibold text-gray-900 dark:text-white">Profile Information</h2>
+					<p class="text-sm text-gray-500 dark:text-gray-400">Update your name and email address.</p>
+				</div>
+				<form action="/profile" method="POST" class="p-6 space-y-5">
+					<input type="hidden" name="_action" value="update_profile"/>
+					<!-- Name -->
+					<div>
+						<label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
+						<div class="relative">
+							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<span class="material-icons-outlined text-gray-400 text-xl">person</span>
+							</div>
+							<input
+								id="name"
+								name="name"
+								type="text"
+								value={ user.Name }
+								required
+								class="block w-full pl-11 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+							/>
+						</div>
+					</div>
+					<!-- Email -->
+					<div>
+						<label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
+						<div class="relative">
+							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<span class="material-icons-outlined text-gray-400 text-xl">email</span>
+							</div>
+							<input
+								id="email"
+								name="email"
+								type="email"
+								value={ user.Email }
+								required
+								class="block w-full pl-11 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+							/>
+						</div>
+					</div>
+					<div class="flex justify-end">
+						<button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors">
+							<span class="material-icons-outlined text-base">save</span>
+							Save Changes
+						</button>
+					</div>
+				</form>
+			</div>
+
+			<!-- Change Password Form -->
+			<div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
+				<div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+					<h2 class="text-base font-semibold text-gray-900 dark:text-white">Change Password</h2>
+					<p class="text-sm text-gray-500 dark:text-gray-400">Ensure your account uses a strong password.</p>
+				</div>
+				<form action="/profile" method="POST" class="p-6 space-y-5" x-data="{ showCurrent: false, showNew: false, showConfirm: false }">
+					<input type="hidden" name="_action" value="change_password"/>
+					<!-- Current Password -->
+					<div>
+						<label for="current_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Password</label>
+						<div class="relative">
+							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<span class="material-icons-outlined text-gray-400 text-xl">lock</span>
+							</div>
+							<input
+								id="current_password"
+								name="current_password"
+								:type="showCurrent ? 'text' : 'password'"
+								required
+								class="block w-full pl-11 pr-11 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+								placeholder="••••••••"
+							/>
+							<button type="button" @click="showCurrent = !showCurrent" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+								<span class="material-icons-outlined text-xl" x-text="showCurrent ? 'visibility_off' : 'visibility'"></span>
+							</button>
+						</div>
+					</div>
+					<!-- New Password -->
+					<div>
+						<label for="new_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
+						<div class="relative">
+							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<span class="material-icons-outlined text-gray-400 text-xl">lock_open</span>
+							</div>
+							<input
+								id="new_password"
+								name="new_password"
+								:type="showNew ? 'text' : 'password'"
+								required
+								minlength="8"
+								class="block w-full pl-11 pr-11 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+								placeholder="Min. 8 characters"
+							/>
+							<button type="button" @click="showNew = !showNew" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+								<span class="material-icons-outlined text-xl" x-text="showNew ? 'visibility_off' : 'visibility'"></span>
+							</button>
+						</div>
+					</div>
+					<!-- Confirm New Password -->
+					<div>
+						<label for="new_password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm New Password</label>
+						<div class="relative">
+							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<span class="material-icons-outlined text-gray-400 text-xl">lock_open</span>
+							</div>
+							<input
+								id="new_password_confirmation"
+								name="new_password_confirmation"
+								:type="showConfirm ? 'text' : 'password'"
+								required
+								class="block w-full pl-11 pr-11 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+								placeholder="••••••••"
+							/>
+							<button type="button" @click="showConfirm = !showConfirm" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+								<span class="material-icons-outlined text-xl" x-text="showConfirm ? 'visibility_off' : 'visibility'"></span>
+							</button>
+						</div>
+					</div>
+					<div class="flex justify-end">
+						<button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors">
+							<span class="material-icons-outlined text-base">key</span>
+							Update Password
+						</button>
+					</div>
+				</form>
+			</div>
+
+			<!-- Account Info -->
+			<div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+				<h2 class="text-base font-semibold text-gray-900 dark:text-white mb-4">Account Details</h2>
+				<dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+					<div>
+						<dt class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">User ID</dt>
+						<dd class="mt-1 text-sm text-gray-900 dark:text-white font-mono">{ fmt.Sprintf("#%d", user.ID) }</dd>
+					</div>
+					<div>
+						<dt class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Member Since</dt>
+						<dd class="mt-1 text-sm text-gray-900 dark:text-white">{ user.CreatedAt.Format("January 2, 2006") }</dd>
+					</div>
+				</dl>
+			</div>
+		</div>
+	}
+}
+
+// avatarInitial returns the first letter of the name, uppercased.
+func avatarInitial(name string) string {
+	if name == "" {
+		return "?"
+	}
+	r := []rune(name)
+	return string(r[0])
+}

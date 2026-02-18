@@ -3,11 +3,12 @@ package engine
 import (
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/a-h/templ"
+	authpkg "github.com/bozz33/sublimego/auth"
 	"github.com/bozz33/sublimego/internal/ent"
 	"github.com/bozz33/sublimego/internal/ent/user"
-	authpkg "github.com/bozz33/sublimego/auth"
 	authtemplates "github.com/bozz33/sublimego/views/auth"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -96,6 +97,18 @@ func (h *AuthHandler) handleLogin(w http.ResponseWriter, r *http.Request) {
 	if err := h.authManager.LoginWithRequest(r, authUser); err != nil {
 		http.Error(w, "Login failed", http.StatusInternalServerError)
 		return
+	}
+
+	// Remember Me: extend session lifetime via a long-lived cookie
+	if r.FormValue("remember_me") == "1" || r.FormValue("remember_me") == "on" {
+		http.SetCookie(w, &http.Cookie{
+			Name:     "_remember",
+			Value:    "1",
+			Path:     "/",
+			MaxAge:   int((30 * 24 * time.Hour).Seconds()),
+			HttpOnly: true,
+			SameSite: http.SameSiteLaxMode,
+		})
 	}
 
 	intendedURL := h.getIntendedURL(r)

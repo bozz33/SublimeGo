@@ -1,0 +1,29 @@
+package {{.PackageName}}
+
+import (
+	"github.com/bozz33/sublimego/plugin"
+)
+
+// {{.TypeName}}Plugin implements the plugin.Plugin interface.
+type {{.TypeName}}Plugin struct{}
+
+// init registers the plugin automatically when the package is imported.
+func init() {
+	plugin.Register(&{{.TypeName}}Plugin{})
+}
+
+// Name returns the unique plugin identifier.
+func (p *{{.TypeName}}Plugin) Name() string {
+	return "{{.Slug}}"
+}
+
+// Boot is called once when the panel starts.
+// Use this to register routes, widgets, resources, or run migrations.
+func (p *{{.TypeName}}Plugin) Boot() error {
+	// TODO: implement plugin initialization
+	// Example:
+	// widget.Register(widget.NewProvider("{{.Slug}}-stats").WithWidgets(func(ctx context.Context) []widget.Widget {
+	//     return []widget.Widget{ widget.NewStats(...) }
+	// }))
+	return nil
+}

@@ -1,0 +1,37 @@
+package {{.PackageName}}
+
+import (
+	"context"
+
+	"github.com/a-h/templ"
+	"github.com/bozz33/sublimego/infolist"
+	"github.com/bozz33/sublimego/views/generics"
+)
+
+// View returns the read-only detail view (Infolist) for a {{.Name}}.
+// Implement engine.ResourceViewable to enable GET /{{.Slug}}/{id}.
+func (r *{{.TypeName}}) View(ctx context.Context, item any) templ.Component {
+	il := infolist.New().
+		AddSection(&infolist.Section{
+			Heading: "{{.Label}} Details",
+			Columns: 2,
+			Entries: []*infolist.Entry{
+				infolist.TextEntry("id", "ID", getField(item, "ID")),
+				// TODO: add more entries matching your entity fields
+				// infolist.TextEntry("name", "Name", getField(item, "Name")),
+				// infolist.BadgeEntry("status", "Status", getField(item, "Status"), "green"),
+				// infolist.BooleanEntry("active", "Active", getField(item, "Active")),
+				// infolist.DateEntry("created_at", "Created", getField(item, "CreatedAt"), ""),
+			},
+		})
+
+	return generics.Infolist(il)
+}
+
+// getField is a helper to extract a field value from a struct or map.
+func getField(item any, field string) any {
+	if m, ok := item.(map[string]any); ok {
+		return m[field]
+	}
+	return nil
+}

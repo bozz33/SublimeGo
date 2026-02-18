@@ -5,14 +5,14 @@ import (
 	"time"
 
 	"github.com/bozz33/sublimego/auth"
-	"github.com/bozz33/sublimego/errors"
+	apperrors "github.com/bozz33/sublimego/errors"
 )
 
 // AuthConfig configures the authentication middleware.
 type AuthConfig struct {
 	Manager         *auth.Manager
 	RedirectURL     string
-	ErrorHandler    *errors.Handler
+	ErrorHandler    *apperrors.Handler
 	SaveIntendedURL bool
 }
 
@@ -50,7 +50,7 @@ func RequireAuthWithConfig(config *AuthConfig) Middleware {
 			user, err := config.Manager.UserFromRequest(r)
 			if err != nil || user == nil {
 				if config.ErrorHandler != nil {
-					config.ErrorHandler.Handle(w, r, errors.Unauthorized("Authentication required"))
+					config.ErrorHandler.Handle(w, r, apperrors.Unauthorized("Authentication required"))
 				} else {
 					http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				}
@@ -223,8 +223,8 @@ func Verified(manager *auth.Manager, redirectURL string) Middleware {
 				return
 			}
 
-			user, _ := manager.UserFromRequest(r)
-			if user == nil {
+			user, err := manager.UserFromRequest(r)
+			if err != nil || user == nil {
 				http.Redirect(w, r, "/login", http.StatusFound)
 				return
 			}
@@ -240,9 +240,27 @@ func Verified(manager *auth.Manager, redirectURL string) Middleware {
 	}
 }
 
-// ThrottleLogin limits login attempts per IP.
+// ThrottleLogin limits login attempts per IP using the token bucket algorithm.
+// maxAttempts is the number of allowed attempts per window duration.
 func ThrottleLogin(maxAttempts int, window time.Duration) Middleware {
-	return func(next http.Handler) http.Handler {
-		return next
+	if maxAttempts <= 0 {
+		maxAttempts = 5
 	}
+	if window <= 0 {
+		window = time.Minute
+	}
+
+	rpm := int(float64(maxAttempts) / window.Minutes())
+	if rpm < 1 {
+		rpm = 1
+	}
+
+	rl := NewRateLimiter(&RateLimitConfig{
+		RequestsPerMinute: rpm,
+		Burst:             maxAttempts,
+		KeyFunc:           KeyByIP,
+		CleanupInterval:   5 * time.Minute,
+	})
+
+	return rl.Middleware()
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/bozz33/sublimego/scanner"
+	"github.com/bozz33/sublimego/internal/scanner"
 	"github.com/spf13/cobra"
 )
 

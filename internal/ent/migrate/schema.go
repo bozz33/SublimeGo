@@ -8,6 +8,32 @@ import (
 )
 
 var (
+	// NotificationsColumns holds the columns for the "notifications" table.
+	NotificationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "user_id", Type: field.TypeString},
+		{Name: "title", Type: field.TypeString},
+		{Name: "body", Type: field.TypeString, Nullable: true},
+		{Name: "level", Type: field.TypeString, Default: "info"},
+		{Name: "icon", Type: field.TypeString, Nullable: true},
+		{Name: "action_url", Type: field.TypeString, Nullable: true},
+		{Name: "action_label", Type: field.TypeString, Nullable: true},
+		{Name: "read", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// NotificationsTable holds the schema information for the "notifications" table.
+	NotificationsTable = &schema.Table{
+		Name:       "notifications",
+		Columns:    NotificationsColumns,
+		PrimaryKey: []*schema.Column{NotificationsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "notification_user_id_read",
+				Unique:  false,
+				Columns: []*schema.Column{NotificationsColumns[1], NotificationsColumns[8]},
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -26,6 +52,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		NotificationsTable,
 		UsersTable,
 	}
 )

@@ -2,151 +2,291 @@ package generics
 
 import (
 	"fmt"
-	"github.com/bozz33/SublimeGo/pkg/engine"
-	"github.com/bozz33/SublimeGo/pkg/ui/atoms"
+	"github.com/bozz33/sublimego/engine"
 )
 
-// List is the universal template for all tables.
+// List is the universal template for all resource tables.
+// Supports: dynamic filters, bulk actions, typed columns, export/import, pagination.
 templ List(state engine.TableState) {
-	<div class="space-y-4">
-		// Page header
-		<div class="flex justify-between items-center">
+	<div
+		class="space-y-6"
+		x-data={ fmt.Sprintf(`{ selected: [], allSelected: false, toggleAll(rows){ if(this.allSelected){ this.selected=[] }else{ this.selected=rows.map(r=>r) }; this.allSelected=!this.allSelected }, bulkAction(url){ if(this.selected.length===0){ alert('Select at least one item.'); return }; const f=document.createElement('form'); f.method='POST'; f.action=url; this.selected.forEach(id=>{ const i=document.createElement('input'); i.type='hidden'; i.name='ids[]'; i.value=id; f.appendChild(i) }); document.body.appendChild(f); f.submit() } }`) }
+	>
+		<!-- Page Header -->
+		<div class="flex flex-wrap items-center justify-between gap-3">
 			<h1 class="text-2xl font-bold text-gray-900 dark:text-white">{ state.Title }</h1>
-			if state.NewURL != "" {
-				@atoms.Button(atoms.ButtonProps{
-					Text:    "New",
-					Variant: "primary",
-					Href:    state.NewURL,
-				})
-			}
+			<div class="flex items-center gap-2">
+				if state.ExportURL != "" {
+					<a
+						href={ templ.SafeURL(state.ExportURL) }
+						class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+					>
+						<span class="material-icons-outlined text-base">download</span>
+						Export
+					</a>
+				}
+				if state.ImportURL != "" {
+					<a
+						href={ templ.SafeURL(state.ImportURL) }
+						class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+					>
+						<span class="material-icons-outlined text-base">upload</span>
+						Import
+					</a>
+				}
+				for _, action := range state.HeaderActions {
+					if action.Method == "POST" {
+						<form method="POST" action={ templ.SafeURL(action.URL) } class="inline">
+							<button
+								type="submit"
+								class={ headerActionClass(action.Color) }
+							>
+								if action.Icon != "" {
+									<span class="material-icons-outlined text-base">{ action.Icon }</span>
+								}
+								{ action.Label }
+							</button>
+						</form>
+					} else {
+						<a
+							href={ templ.SafeURL(action.URL) }
+							class={ headerActionClass(action.Color) }
+						>
+							if action.Icon != "" {
+								<span class="material-icons-outlined text-base">{ action.Icon }</span>
+							}
+							{ action.Label }
+						</a>
+					}
+				}
+				if state.NewURL != "" {
+					<a
+						href={ templ.SafeURL(state.NewURL) }
+						class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-xl text-white bg-primary-600 hover:bg-primary-700 transition-colors"
+					>
+						<span class="material-icons-outlined text-base">add</span>
+						New { state.Title }
+					</a>
+				}
+			</div>
 		</div>
 
-		// Table with search and filters
-		<div class="relative overflow-x-auto bg-white shadow-sm rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-			// Search bar and filters
-			<div class="p-4 flex items-center justify-between space-x-4">
-				<label for="input-group-1" class="sr-only">Search</label>
-				<div class="relative">
-					<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-						<svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-							<path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"></path>
-						</svg>
+		<!-- Table Card -->
+		<div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+
+			<!-- Toolbar: search + filters + bulk actions -->
+			<div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex flex-wrap items-center gap-3">
+				<!-- Search -->
+				<form method="GET" class="flex-1 min-w-48">
+					<div class="relative">
+						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+							<span class="material-icons-outlined text-gray-400 text-lg">search</span>
+						</div>
+						<input
+							type="text"
+							name="search"
+							value={ state.Search }
+							placeholder="Search..."
+							class="block w-full pl-9 pr-3 py-2 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+						/>
 					</div>
-					<input 
-						type="text" 
-						id="input-group-1" 
-						class="block w-full max-w-96 ps-9 pe-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-						placeholder="Search"
-					/>
-				</div>
-				<button 
-					id="dropdownDefaultButton" 
-					data-dropdown-toggle="dropdown" 
-					class="shrink-0 inline-flex items-center justify-center text-gray-700 bg-gray-50 border border-gray-300 hover:bg-gray-100 hover:text-gray-900 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-2 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:text-white dark:focus:ring-gray-700" 
-					type="button"
-				>
-					<svg class="w-4 h-4 me-1.5 -ms-0.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-						<path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M18.796 4H5.204a1 1 0 0 0-.753 1.659l5.302 6.058a1 1 0 0 1 .247.659v4.874a.5.5 0 0 0 .2.4l3 2.25a.5.5 0 0 0 .8-.4v-7.124a1 1 0 0 1 .247-.659l5.302-6.059c.566-.646.106-1.658-.753-1.658Z"></path>
-					</svg>
-					Filter by
-					<svg class="w-4 h-4 ms-1.5 -me-0.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"></path>
-					</svg>
-				</button>
-				<div id="dropdown" class="z-10 hidden bg-white border border-gray-200 rounded-lg shadow-lg w-32 dark:bg-gray-800 dark:border-gray-700">
-					<ul class="p-2 text-sm text-gray-700 font-medium dark:text-gray-300" aria-labelledby="dropdownDefaultButton">
-						<li>
-							<a href="#" class="inline-flex items-center w-full p-2 hover:bg-gray-100 hover:text-gray-900 rounded dark:hover:bg-gray-700 dark:hover:text-white">Filter 1</a>
-						</li>
-						<li>
-							<a href="#" class="inline-flex items-center w-full p-2 hover:bg-gray-100 hover:text-gray-900 rounded dark:hover:bg-gray-700 dark:hover:text-white">Filter 2</a>
-						</li>
-					</ul>
-				</div>
+				</form>
+
+				<!-- Dynamic Filters -->
+				if len(state.Filters) > 0 {
+					<form method="GET" class="flex flex-wrap items-center gap-2">
+						for _, f := range state.Filters {
+							if f.Type == "select" || f.Type == "boolean" {
+								<div class="relative">
+									<select
+										name={ f.Key }
+										onchange="this.form.submit()"
+										class="text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-primary-500 appearance-none"
+									>
+										<option value="">{ f.Label }: All</option>
+										for _, opt := range f.Options {
+											<option
+												value={ opt.Value }
+												selected?={ state.ActiveFilters[f.Key] == opt.Value }
+											>{ opt.Label }</option>
+										}
+									</select>
+									<div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+										<span class="material-icons-outlined text-gray-400 text-sm">expand_more</span>
+									</div>
+								</div>
+							}
+						}
+					</form>
+				}
+
+				<!-- Bulk Action Bar (visible when rows selected) -->
+				if len(state.BulkActions) > 0 {
+					<div x-show="selected.length > 0" x-cloak class="flex items-center gap-2 ml-auto">
+						<span class="text-sm text-gray-500 dark:text-gray-400" x-text="selected.length + ' selected'"></span>
+						for _, ba := range state.BulkActions {
+							{{ btnClass := bulkActionClass(ba.Color) }}
+							<button
+								type="button"
+								@click={ fmt.Sprintf("bulkAction('%s')", ba.URL) }
+								class={ "inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-xl transition-colors " + btnClass }
+							>
+								if ba.Icon != "" {
+									<span class="material-icons-outlined text-base">{ ba.Icon }</span>
+								}
+								{ ba.Label }
+							</button>
+						}
+					</div>
+				}
 			</div>
 
-			// Table
-			<table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-				<thead class="text-sm text-gray-700 bg-gray-50 border-b border-t border-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:border-gray-600">
-					<tr>
-						<th scope="col" class="p-4">
-							<div class="flex items-center">
-								<input 
-									id="checkbox-all" 
-									type="checkbox" 
-									class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-2 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600"
-								/>
-								<label for="checkbox-all" class="sr-only">checkbox</label>
-							</div>
-						</th>
-						for _, col := range state.Columns {
-							<th scope="col" class="px-6 py-3 font-medium">{ col.Label }</th>
-						}
-						<th scope="col" class="px-6 py-3 font-medium">Action</th>
-					</tr>
-				</thead>
-				<tbody>
-					for i, row := range state.Rows {
-						<tr class="bg-white border-b border-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-							<td class="w-4 p-4">
-								<div class="flex items-center">
-									<input 
-										id={ fmt.Sprintf("checkbox-%d", i) }
-										type="checkbox" 
-										class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-2 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600"
+			<!-- Table -->
+			<div class="overflow-x-auto">
+				<table class="w-full text-sm text-left text-gray-600 dark:text-gray-400">
+					<thead class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+						<tr>
+							if len(state.BulkActions) > 0 {
+								<th scope="col" class="w-10 px-4 py-3">
+									<input
+										type="checkbox"
+										:checked="allSelected"
+										@click={ fmt.Sprintf("toggleAll(%s)", rowIDsJSON(state.Rows)) }
+										class="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500"
 									/>
-									<label for={ fmt.Sprintf("checkbox-%d", i) } class="sr-only">checkbox</label>
-								</div>
-							</td>
-							for j, cell := range row.Cells {
-								if j == 0 {
-									<th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{ cell }</th>
-								} else {
-									<td class="px-6 py-4">{ cell }</td>
-								}
+								</th>
 							}
-							<td class="px-6 py-4">
-								<a 
-									href={ templ.SafeURL(fmt.Sprintf("%s/%s/edit", state.BaseURL, row.ID)) } 
-									class="font-medium text-blue-600 hover:underline dark:text-blue-500"
-								>
-									Edit
-								</a>
-							</td>
+							for _, col := range state.Columns {
+								<th scope="col" class="px-4 py-3 whitespace-nowrap">
+									if col.Sortable {
+										{{ nextDir := "asc"; sortIcon := "unfold_more"
+										if state.SortKey == col.Key {
+											if state.SortDir == "asc" { nextDir = "desc"; sortIcon = "arrow_upward" } else { nextDir = "asc"; sortIcon = "arrow_downward" }
+										} }}
+										<a
+											href={ templ.SafeURL(fmt.Sprintf("?sort=%s&dir=%s&search=%s", col.Key, nextDir, state.Search)) }
+											class="inline-flex items-center gap-1 hover:text-gray-900 dark:hover:text-white"
+										>
+											{ col.Label }
+											<span class="material-icons-outlined text-xs">{ sortIcon }</span>
+										</a>
+									} else {
+										{ col.Label }
+									}
+								</th>
+							}
+							<th scope="col" class="px-4 py-3 text-right">Actions</th>
 						</tr>
-					}
-				</tbody>
-			</table>
+					</thead>
+					<tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+						if len(state.Rows) == 0 {
+							<tr>
+								<td
+									colspan={ fmt.Sprintf("%d", len(state.Columns)+2) }
+									class="px-4 py-12 text-center text-gray-400 dark:text-gray-500"
+								>
+									<span class="material-icons-outlined text-4xl block mb-2">inbox</span>
+									No records found.
+								</td>
+							</tr>
+						}
+						for i, row := range state.Rows {
+							<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors">
+								if len(state.BulkActions) > 0 {
+									<td class="w-10 px-4 py-3">
+										<input
+											type="checkbox"
+											:checked="selected.includes('{ row.ID }')"
+											@click={ fmt.Sprintf("selected.includes('%s') ? selected.splice(selected.indexOf('%s'),1) : selected.push('%s')", row.ID, row.ID, row.ID) }
+											class="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500"
+										/>
+									</td>
+								}
+								for j, cell := range row.Cells {
+									if j == 0 {
+										<td class="px-4 py-3 font-medium text-gray-900 dark:text-white whitespace-nowrap">
+											<a href={ templ.SafeURL(fmt.Sprintf("%s/%s", state.BaseURL, row.ID)) } class="hover:text-primary-600 dark:hover:text-primary-400">
+												{ cell }
+											</a>
+										</td>
+									} else {
+										<td class="px-4 py-3">
+											@renderCell(state.Columns, j, cell)
+										</td>
+									}
+								}
+								<td class="px-4 py-3">
+									<div class="flex items-center justify-end gap-2">
+										<a
+											href={ templ.SafeURL(fmt.Sprintf("%s/%s/edit", state.BaseURL, row.ID)) }
+											class="p-1.5 rounded-lg text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+											title="Edit"
+										>
+											<span class="material-icons-outlined text-lg">edit</span>
+										</a>
+										if state.CanDelete {
+											<form method="POST" action={ templ.SafeURL(fmt.Sprintf("%s/%s", state.BaseURL, row.ID)) } onsubmit="return confirm('Delete this record?')">
+												<input type="hidden" name="_method" value="DELETE"/>
+												<button
+													type="submit"
+													class="p-1.5 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+													title="Delete"
+												>
+													<span class="material-icons-outlined text-lg">delete_outline</span>
+												</button>
+											</form>
+										}
+									</div>
+								</td>
+							</tr>
+							// suppress unused variable warning
+							{ suppressUnused(i) }
+						}
+					</tbody>
+				</table>
+			</div>
 
-			// Pagination
-			<nav class="flex items-center flex-column flex-wrap md:flex-row justify-between p-4" aria-label="Table navigation">
-				<span class="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
-					Showing <span class="font-semibold text-gray-900 dark:text-white">1-{ fmt.Sprintf("%d", len(state.Rows)) }</span> of <span class="font-semibold text-gray-900 dark:text-white">{ fmt.Sprintf("%d", len(state.Rows)) }</span>
-				</span>
-				<ul class="flex -space-x-px text-sm">
-					<li>
-						<a href="#" class="flex items-center justify-center text-gray-700 bg-gray-50 border border-gray-300 hover:bg-gray-100 hover:text-gray-900 font-medium rounded-s-lg text-sm px-3 h-9 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:text-white">Previous</a>
-					</li>
-					<li>
-						<a href="#" class="flex items-center justify-center text-gray-700 bg-gray-50 border border-gray-300 hover:bg-gray-100 hover:text-gray-900 font-medium text-sm w-9 h-9 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:text-white">1</a>
-					</li>
-					<li>
-						<a href="#" class="flex items-center justify-center text-gray-700 bg-gray-50 border border-gray-300 hover:bg-gray-100 hover:text-gray-900 font-medium text-sm w-9 h-9 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:text-white">2</a>
-					</li>
-					<li>
-						<a href="#" aria-current="page" class="flex items-center justify-center text-blue-600 bg-blue-50 border border-gray-300 hover:bg-blue-100 hover:text-blue-700 font-medium text-sm w-9 h-9 dark:bg-gray-700 dark:text-white dark:border-gray-600">3</a>
-					</li>
-					<li>
-						<a href="#" class="flex items-center justify-center text-gray-700 bg-gray-50 border border-gray-300 hover:bg-gray-100 hover:text-gray-900 font-medium text-sm w-9 h-9 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:text-white">...</a>
-					</li>
-					<li>
-						<a href="#" class="flex items-center justify-center text-gray-700 bg-gray-50 border border-gray-300 hover:bg-gray-100 hover:text-gray-900 font-medium text-sm w-9 h-9 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:text-white">5</a>
-					</li>
-					<li>
-						<a href="#" class="flex items-center justify-center text-gray-700 bg-gray-50 border border-gray-300 hover:bg-gray-100 hover:text-gray-900 font-medium rounded-e-lg text-sm px-3 h-9 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:text-white">Next</a>
-					</li>
-				</ul>
-			</nav>
+			<!-- Pagination -->
+			if state.Pagination != nil && state.Pagination.LastPage > 1 {
+				<div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-3">
+					<span class="text-sm text-gray-500 dark:text-gray-400">
+						Showing { fmt.Sprintf("%d", (state.Pagination.CurrentPage-1)*state.Pagination.PerPage+1) }–{ fmt.Sprintf("%d", min(state.Pagination.CurrentPage*state.Pagination.PerPage, state.Pagination.Total)) } of { fmt.Sprintf("%d", state.Pagination.Total) }
+					</span>
+					<div class="flex items-center gap-1">
+						{{ pageBase := fmt.Sprintf("?sort=%s&dir=%s&search=%s", state.SortKey, state.SortDir, state.Search) }}
+						if state.Pagination.CurrentPage > 1 {
+							<a href={ templ.SafeURL(fmt.Sprintf("%s&page=%d", pageBase, state.Pagination.CurrentPage-1)) } class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Previous</a>
+						}
+						for p := 1; p <= state.Pagination.LastPage; p++ {
+							if p == state.Pagination.CurrentPage {
+								<span class="px-3 py-1.5 text-sm rounded-lg bg-primary-600 text-white font-semibold">{ fmt.Sprintf("%d", p) }</span>
+							} else {
+								<a href={ templ.SafeURL(fmt.Sprintf("%s&page=%d", pageBase, p)) } class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">{ fmt.Sprintf("%d", p) }</a>
+							}
+						}
+						if state.Pagination.CurrentPage < state.Pagination.LastPage {
+							<a href={ templ.SafeURL(fmt.Sprintf("%s&page=%d", pageBase, state.Pagination.CurrentPage+1)) } class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Next</a>
+						}
+					</div>
+				</div>
+			}
 		</div>
 	</div>
+}
+
+// renderCell renders a table cell with type-aware formatting.
+templ renderCell(cols []engine.Column, idx int, value string) {
+	if idx < len(cols) && cols[idx].Type == "boolean" {
+		if value == "true" || value == "Yes" || value == "1" {
+			<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30">
+				<span class="material-icons-outlined text-green-600 dark:text-green-400 text-sm">check</span>
+			</span>
+		} else {
+			<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700">
+				<span class="material-icons-outlined text-gray-400 text-sm">close</span>
+			</span>
+		}
+	} else {
+		{ value }
+	}
 }

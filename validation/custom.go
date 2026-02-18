@@ -7,19 +7,26 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+// Package-level compiled regexes — compiled once, zero alloc on hot path.
+var (
+	rePostalCodeFR = regexp.MustCompile(`^\d{5}$`)
+	rePostalCorsFR = regexp.MustCompile(`^2[AB]\d{3}$`)
+	reSlug         = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
+	reSIRET        = regexp.MustCompile(`^\d{14}$`)
+	reSIREN        = regexp.MustCompile(`^\d{9}$`)
+	reDigit        = regexp.MustCompile(`\d`)
+	reUpper        = regexp.MustCompile(`[A-Z]`)
+	reLower        = regexp.MustCompile(`[a-z]`)
+)
+
 // registerCustomValidators registers all custom validators.
 func (v *Validator) registerCustomValidators() {
-	v.validate.RegisterValidation("phone_fr", validatePhoneFR)
-
-	v.validate.RegisterValidation("postal_code_fr", validatePostalCodeFR)
-
-	v.validate.RegisterValidation("slug", validateSlug)
-
-	v.validate.RegisterValidation("siret", validateSIRET)
-
-	v.validate.RegisterValidation("siren", validateSIREN)
-
-	v.validate.RegisterValidation("strong_password", validateStrongPassword)
+	_ = v.validate.RegisterValidation("phone_fr", validatePhoneFR)
+	_ = v.validate.RegisterValidation("postal_code_fr", validatePostalCodeFR)
+	_ = v.validate.RegisterValidation("slug", validateSlug)
+	_ = v.validate.RegisterValidation("siret", validateSIRET)
+	_ = v.validate.RegisterValidation("siren", validateSIREN)
+	_ = v.validate.RegisterValidation("strong_password", validateStrongPassword)
 }
 
 // validatePhoneFR validates a French phone number.
@@ -68,13 +75,10 @@ func validatePostalCodeFR(fl validator.FieldLevel) bool {
 		return false
 	}
 
-	matched, _ := regexp.MatchString(`^\d{5}$`, postalCode)
-	if matched {
+	if rePostalCodeFR.MatchString(postalCode) {
 		return true
 	}
-
-	matched, _ = regexp.MatchString(`^2[AB]\d{3}$`, postalCode)
-	return matched
+	return rePostalCorsFR.MatchString(postalCode)
 }
 
 // validateSlug validates a slug (URL-friendly).
@@ -92,8 +96,7 @@ func validateSlug(fl validator.FieldLevel) bool {
 		return false
 	}
 
-	matched, _ := regexp.MatchString(`^[a-zA-Z0-9_-]+$`, slug)
-	return matched
+	return reSlug.MatchString(slug)
 }
 
 // validateSIRET validates a SIRET number (14 digits).
@@ -108,8 +111,7 @@ func validateSIRET(fl validator.FieldLevel) bool {
 		return false
 	}
 
-	matched, _ := regexp.MatchString(`^\d{14}$`, siret)
-	if !matched {
+	if !reSIRET.MatchString(siret) {
 		return false
 	}
 
@@ -144,8 +146,7 @@ func validateSIREN(fl validator.FieldLevel) bool {
 		return false
 	}
 
-	matched, _ := regexp.MatchString(`^\d{9}$`, siren)
-	if !matched {
+	if !reSIREN.MatchString(siren) {
 		return false
 	}
 
@@ -177,22 +178,13 @@ func validateStrongPassword(fl validator.FieldLevel) bool {
 		return false
 	}
 
-	hasUpper := regexp.MustCompile(`[A-Z]`).MatchString(password)
-	if !hasUpper {
+	if !reUpper.MatchString(password) {
 		return false
 	}
-
-	hasLower := regexp.MustCompile(`[a-z]`).MatchString(password)
-	if !hasLower {
+	if !reLower.MatchString(password) {
 		return false
 	}
-
-	hasDigit := regexp.MustCompile(`\d`).MatchString(password)
-	if !hasDigit {
-		return false
-	}
-
-	return true
+	return reDigit.MatchString(password)
 }
 
 // Standalone helpers for quick validation
