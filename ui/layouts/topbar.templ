@@ -174,6 +174,18 @@ templ Topbar(ctx context.Context) {
 							<p class="text-xs text-gray-500 dark:text-gray-400">{ userEmail }</p>
 						</div>
 						
+						<!-- Profile link (conditional) -->
+						if GetPanelConfig().Profile {
+							<div class="py-1">
+								<a href="/profile" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+									</svg>
+									My Profile
+								</a>
+							</div>
+						}
+
 						<!-- Logout -->
 						<div class="border-t border-gray-200 dark:border-gray-700 py-1">
 							<a href="/logout" class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20">

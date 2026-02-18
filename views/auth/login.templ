@@ -91,9 +91,11 @@ templ LoginPage(basePath ...string) {
 								Remember me
 							</label>
 						</div>
-						<a href="/forgot-password" class="text-sm font-medium text-green-600 hover:text-green-500">
-							Forgot password?
-						</a>
+						if layouts.GetPanelConfig().PasswordReset {
+							<a href="/forgot-password" class="text-sm font-medium text-green-600 hover:text-green-500">
+								Forgot password?
+							</a>
+						}
 					</div>
 
 					<!-- Submit Button -->

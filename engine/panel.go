@@ -293,6 +293,17 @@ func (p *Panel) Router() http.Handler {
 			mux.Handle("/register", middleware.RequireGuest(p.AuthManager, "/")(authHandler))
 		}
 		mux.Handle("/logout", authHandler)
+
+		if p.Profile {
+			profileHandler := NewProfileHandler(p.AuthManager, p.DB)
+			mux.Handle("/profile", gzipMiddleware(p.protect(profileHandler)))
+		}
+
+		if p.PasswordReset {
+			resetHandler := NewPasswordResetHandler(p.AuthManager, p.DB)
+			mux.Handle("/forgot-password", resetHandler)
+			mux.Handle("/reset-password", resetHandler)
+		}
 	}
 
 	// 5. Dashboard
