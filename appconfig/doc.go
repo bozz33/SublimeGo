@@ -26,4 +26,4 @@
 //	config.Watch("config.yaml", func(newCfg *config.Config) {
 //		// Handle config update
 //	})
-package config
+package appconfig

@@ -1,15 +1,17 @@
 package engine
 
 import (
+	"encoding/json"
 	"net/http"
 	"sort"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/bozz33/sublimego/internal/ent"
-	"github.com/bozz33/sublimego/internal/providers"
 	"github.com/bozz33/sublimego/auth"
+	"github.com/bozz33/sublimego/internal/ent"
+	"github.com/bozz33/sublimego/search"
 	"github.com/bozz33/sublimego/ui/layouts"
 	"github.com/bozz33/sublimego/views/dashboard"
+	"github.com/bozz33/sublimego/widget"
 	"github.com/samber/lo"
 )
 
@@ -175,10 +177,28 @@ func (p *Panel) Router() http.Handler {
 	}
 
 	dashboardHandler := RequireAuth(p.AuthManager, p.DB)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		widgets := providers.GetDashboardStats(r.Context(), p.DB)
+		// Use declarative widget providers instead of hardcoded providers
+		widgets := widget.GetAllWidgets(r.Context())
 		dashboard.Index(widgets).Render(r.Context(), w)
 	}))
 	mux.Handle("/", dashboardHandler)
+
+	// Global search API endpoint
+	mux.Handle("/api/search", RequireAuth(p.AuthManager, p.DB)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.Query().Get("q")
+		if query == "" {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode([]search.Result{})
+			return
+		}
+		results, err := search.QuickSearch(r.Context(), query)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(results)
+	})))
 
 	for _, res := range p.Resources {
 		handler := NewCRUDHandler(res)

@@ -1,4 +1,4 @@
-package config
+package appconfig
 
 // Option is a function that modifies LoadOptions.
 type Option func(*LoadOptions)

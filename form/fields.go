@@ -3,6 +3,7 @@ package form
 import (
 	"fmt"
 	"html/template"
+	"strings"
 )
 
 // BaseField contains common logic.
@@ -29,6 +30,11 @@ func (b *BaseField) IsVisible() bool                  { return !b.Hidden }
 func (b *BaseField) GetComponentType() string         { return "field" }
 func (b *BaseField) GetAttributes() template.HTMLAttr { return "" }
 func (b *BaseField) GetRules() []string               { return b.Rules }
+
+// GetRulesString returns the rules as a pipe-separated string for validation.
+func (b *BaseField) GetRulesString() string {
+	return strings.Join(b.Rules, "|")
+}
 
 // HasValue returns true if the field has a non-nil value.
 func (b *BaseField) HasValue() bool { return b.Value != nil }
