@@ -223,8 +223,8 @@ func Verified(manager *auth.Manager, redirectURL string) Middleware {
 				return
 			}
 
-			user, _ := manager.UserFromRequest(r)
-			if user == nil {
+			user, err := manager.UserFromRequest(r)
+			if err != nil || user == nil {
 				http.Redirect(w, r, "/login", http.StatusFound)
 				return
 			}

@@ -80,7 +80,7 @@ func ETagMiddleware(next http.Handler) http.Handler {
 			if erw.status != http.StatusOK {
 				w.WriteHeader(erw.status)
 			}
-			w.Write(erw.buf.Bytes())
+			_, _ = w.Write(erw.buf.Bytes())
 			return
 		}
 
@@ -96,7 +96,7 @@ func ETagMiddleware(next http.Handler) http.Handler {
 		}
 
 		w.WriteHeader(erw.status)
-		w.Write(body)
+		_, _ = w.Write(body)
 	})
 }
 

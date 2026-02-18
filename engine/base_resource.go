@@ -111,86 +111,19 @@ func (b *BaseResource) SetImportURL(url string) *BaseResource {
 }
 
 // BuildTableState constructs a TableState from the resource's list data.
-// Resolution order for fetching items:
-//  1. ResourceQueryable.ListQuery  — full control (filters+search+sort+pagination)
-//  2. ResourceSearchable.Search    — when ?search= is set
-//  3. ResourceFilterable.ListFiltered — when filter_* params are set
-//  4. List()                       — default
-//
-// Pagination is built from ListQuery context when ResourceQueryable is used.
+// Resolution order: ResourceQueryable > ResourceSearchable > ResourceFilterable > List.
 func (b *BaseResource) BuildTableState(ctx context.Context, canCreate, canDelete bool) (TableState, error) {
 	lq := GetListQuery(ctx)
 	activeFilters := GetActiveFilters(ctx)
 
-	var items []any
-	var total int
-	var err error
-
-	self := interface{}(b)
-
-	switch {
-	case lq != nil:
-		if queryable, ok := self.(ResourceQueryable); ok {
-			items, total, err = queryable.ListQuery(ctx, *lq)
-		} else if lq.Search != "" {
-			if searchable, ok := self.(ResourceSearchable); ok {
-				items, err = searchable.Search(ctx, lq.Search)
-			} else {
-				items, err = b.List(ctx)
-			}
-		} else if len(activeFilters) > 0 {
-			if filterable, ok := self.(ResourceFilterable); ok {
-				items, err = filterable.ListFiltered(ctx, activeFilters)
-			} else {
-				items, err = b.List(ctx)
-			}
-		} else {
-			items, err = b.List(ctx)
-		}
-	default:
-		items, err = b.List(ctx)
-	}
-
+	items, total, err := b.fetchItems(ctx, lq, activeFilters)
 	if err != nil {
 		return TableState{}, err
 	}
 
-	if total == 0 {
-		total = len(items)
-	}
-
-	rows := make([]Row, 0, len(items))
-	for _, item := range items {
-		row := Row{ID: getItemID(item)}
-		for _, col := range b.tableColumns {
-			row.Cells = append(row.Cells, getColumnValue(col, item))
-		}
-		rows = append(rows, row)
-	}
-
-	// Build pagination if ListQuery is present
-	var pagination *Pagination
-	if lq != nil && lq.PerPage > 0 {
-		lastPage := (total + lq.PerPage - 1) / lq.PerPage
-		if lastPage < 1 {
-			lastPage = 1
-		}
-		pagination = &Pagination{
-			CurrentPage: lq.Page,
-			PerPage:     lq.PerPage,
-			Total:       total,
-			LastPage:    lastPage,
-		}
-	}
-
-	// Build active search/sort state for the template
-	var activeSearch string
-	var activeSortKey, activeSortDir string
-	if lq != nil {
-		activeSearch = lq.Search
-		activeSortKey = lq.SortKey
-		activeSortDir = lq.SortDir
-	}
+	rows := b.buildRows(items)
+	pagination := buildPagination(lq, total)
+	search, sortKey, sortDir := extractSortSearch(lq)
 
 	return TableState{
 		Title:         b.pluralLabel,
@@ -207,10 +140,74 @@ func (b *BaseResource) BuildTableState(ctx context.Context, canCreate, canDelete
 		ExportURL:     b.tableExportURL,
 		ImportURL:     b.tableImportURL,
 		Pagination:    pagination,
-		Search:        activeSearch,
-		SortKey:       activeSortKey,
-		SortDir:       activeSortDir,
+		Search:        search,
+		SortKey:       sortKey,
+		SortDir:       sortDir,
 	}, nil
+}
+
+// fetchItems resolves which data-fetching strategy to use based on available interfaces.
+func (b *BaseResource) fetchItems(ctx context.Context, lq *ListQuery, activeFilters map[string]string) ([]any, int, error) {
+	self := interface{}(b)
+	if lq == nil {
+		items, err := b.List(ctx)
+		return items, len(items), err
+	}
+	if q, ok := self.(ResourceQueryable); ok {
+		return q.ListQuery(ctx, *lq)
+	}
+	if lq.Search != "" {
+		if s, ok := self.(ResourceSearchable); ok {
+			items, err := s.Search(ctx, lq.Search)
+			return items, len(items), err
+		}
+	}
+	if len(activeFilters) > 0 {
+		if f, ok := self.(ResourceFilterable); ok {
+			items, err := f.ListFiltered(ctx, activeFilters)
+			return items, len(items), err
+		}
+	}
+	items, err := b.List(ctx)
+	return items, len(items), err
+}
+
+// buildRows converts items to table rows using reflection.
+func (b *BaseResource) buildRows(items []any) []Row {
+	rows := make([]Row, 0, len(items))
+	for _, item := range items {
+		row := Row{ID: getItemID(item)}
+		for _, col := range b.tableColumns {
+			row.Cells = append(row.Cells, getColumnValue(col, item))
+		}
+		rows = append(rows, row)
+	}
+	return rows
+}
+
+// buildPagination constructs a Pagination struct from ListQuery + total count.
+func buildPagination(lq *ListQuery, total int) *Pagination {
+	if lq == nil || lq.PerPage <= 0 {
+		return nil
+	}
+	lastPage := (total + lq.PerPage - 1) / lq.PerPage
+	if lastPage < 1 {
+		lastPage = 1
+	}
+	return &Pagination{
+		CurrentPage: lq.Page,
+		PerPage:     lq.PerPage,
+		Total:       total,
+		LastPage:    lastPage,
+	}
+}
+
+// extractSortSearch pulls search/sort values from ListQuery for template use.
+func extractSortSearch(lq *ListQuery) (search, sortKey, sortDir string) {
+	if lq == nil {
+		return
+	}
+	return lq.Search, lq.SortKey, lq.SortDir
 }
 
 // Badge returns an empty badge by default.

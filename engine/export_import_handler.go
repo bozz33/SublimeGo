@@ -79,7 +79,7 @@ func (h *ImportHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *ImportHandler) showForm(w http.ResponseWriter, r *http.Request) {
 	slug := h.resource.Slug()
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprintf(w, `<!DOCTYPE html><html><body>
+	_, _ = fmt.Fprintf(w, `<!DOCTYPE html><html><body>
 <h2>Import %s</h2>
 <form method="POST" enctype="multipart/form-data">
   <input type="file" name="file" accept=".csv,.xlsx,.json" required />
@@ -99,7 +99,7 @@ func (h *ImportHandler) handleUpload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No file uploaded", http.StatusBadRequest)
 		return
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	// Resource must implement ResourceImportable to handle rows
 	importable, ok := h.resource.(ResourceImportable)
@@ -116,7 +116,7 @@ func (h *ImportHandler) handleUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprintf(w, `<p>Import complete: %d success, %d errors, %d skipped.</p>
+	_, _ = fmt.Fprintf(w, `<p>Import complete: %d success, %d errors, %d skipped.</p>
 <a href="/%s">Back to list</a>`,
 		result.SuccessCount, result.ErrorCount, result.SkippedCount, h.resource.Slug())
 }

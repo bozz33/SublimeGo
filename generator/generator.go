@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"github.com/samber/lo"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 //go:embed stubs/resource.go.tmpl
@@ -67,7 +69,7 @@ func New(opts *Options) (*Generator, error) {
 		"camel":      ToCamelCase,
 		"plural":     Pluralize,
 		"singular":   Singularize,
-		"title":      strings.Title,
+		"title":      cases.Title(language.English).String,
 		"now":        time.Now,
 		"formatTime": func(t time.Time) string { return t.Format("2006-01-02 15:04:05") },
 	}

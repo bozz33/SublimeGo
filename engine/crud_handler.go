@@ -205,43 +205,13 @@ func (h *CRUDHandler) BulkDelete(w http.ResponseWriter, r *http.Request) {
 func (h *CRUDHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimPrefix(r.URL.Path, "/"+h.Resource.Slug())
 	path = strings.TrimPrefix(path, "/")
-
 	parts := strings.Split(path, "/")
 
 	switch r.Method {
 	case http.MethodGet:
-		if path == "" || path == "/" {
-			h.List(w, r)
-		} else if path == "create" {
-			h.Create(w, r)
-		} else if len(parts) == 2 && parts[1] == "edit" {
-			h.Edit(w, r, parts[0])
-		} else if len(parts) == 1 && parts[0] != "" {
-			h.View(w, r, parts[0])
-		} else {
-			http.NotFound(w, r)
-		}
-
+		h.routeGET(w, r, path, parts)
 	case http.MethodPost:
-		r.ParseForm()
-		methodOverride := r.FormValue("_method")
-
-		if methodOverride == "DELETE" && len(parts) >= 1 {
-			h.Delete(w, r, parts[0])
-			return
-		}
-
-		if path == "bulk-delete" {
-			h.BulkDelete(w, r)
-			return
-		}
-
-		if path == "" || path == "/" {
-			h.Store(w, r)
-		} else if len(parts) >= 1 {
-			h.Update(w, r, parts[0])
-		}
-
+		h.routePOST(w, r, path, parts)
 	case http.MethodDelete:
 		if len(parts) >= 1 {
 			h.Delete(w, r, parts[0])
@@ -249,13 +219,44 @@ func (h *CRUDHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// extractID extracts the numeric ID from a path.
-func extractID(s string) (int, error) {
-	return strconv.Atoi(s)
+// routeGET dispatches GET requests.
+func (h *CRUDHandler) routeGET(w http.ResponseWriter, r *http.Request, path string, parts []string) {
+	switch {
+	case path == "" || path == "/":
+		h.List(w, r)
+	case path == "create":
+		h.Create(w, r)
+	case len(parts) == 2 && parts[1] == "edit":
+		h.Edit(w, r, parts[0])
+	case len(parts) == 1 && parts[0] != "":
+		h.View(w, r, parts[0])
+	default:
+		http.NotFound(w, r)
+	}
+}
+
+// routePOST dispatches POST requests (including _method override).
+func (h *CRUDHandler) routePOST(w http.ResponseWriter, r *http.Request, path string, parts []string) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	if r.FormValue("_method") == "DELETE" && len(parts) >= 1 {
+		h.Delete(w, r, parts[0])
+		return
+	}
+	switch {
+	case path == "bulk-delete":
+		h.BulkDelete(w, r)
+	case path == "" || path == "/":
+		h.Store(w, r)
+	case len(parts) >= 1:
+		h.Update(w, r, parts[0])
+	}
 }
 
 // render is a helper to display a component in the layout.
 func render(w http.ResponseWriter, r *http.Request, title string, content templ.Component) {
 	fullPage := layouts.Page(title, content)
-	fullPage.Render(r.Context(), w)
+	_ = fullPage.Render(r.Context(), w)
 }

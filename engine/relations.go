@@ -379,109 +379,116 @@ func (h *RelationManagerHandler) GetManagers() []RelationManager {
 
 // ServeHTTP dispatches relation manager requests.
 func (h *RelationManagerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	path := strings.TrimPrefix(r.URL.Path, "/")
-	parts := strings.SplitN(path, "/", 4)
-	// parts[0]=parentID  parts[1]="relations"  parts[2]=relationName  parts[3]=action/id
-
-	if len(parts) < 3 || parts[1] != "relations" {
+	parentID, relationName, subAction, relatedID, ok := h.parseRelationPath(r)
+	if !ok {
 		http.NotFound(w, r)
 		return
 	}
-
-	parentID := parts[0]
-	relationName := parts[2]
-
-	rm, ok := h.managers[relationName]
-	if !ok {
+	rm, exists := h.managers[relationName]
+	if !exists {
 		http.Error(w, "relation manager not found: "+relationName, http.StatusNotFound)
 		return
 	}
+	ctx := r.Context()
+	switch r.Method {
+	case http.MethodGet:
+		h.handleRelationGET(w, rm, parentID, relationName, ctx)
+	case http.MethodPost:
+		h.handleRelationPOST(w, r, rm, parentID, subAction, ctx)
+	case http.MethodDelete:
+		h.handleRelationDELETE(w, rm, parentID, relatedID, subAction, ctx)
+	default:
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
+}
 
-	var subAction, relatedID string
+// parseRelationPath extracts parentID, relationName, subAction, relatedID from the URL.
+func (h *RelationManagerHandler) parseRelationPath(r *http.Request) (parentID, relationName, subAction, relatedID string, ok bool) {
+	path := strings.TrimPrefix(r.URL.Path, "/")
+	parts := strings.SplitN(path, "/", 4)
+	if len(parts) < 3 || parts[1] != "relations" {
+		return
+	}
+	parentID, relationName = parts[0], parts[2]
 	if len(parts) == 4 {
 		tail := parts[3]
 		switch {
 		case strings.HasPrefix(tail, "detach/"):
-			subAction = "detach"
-			relatedID = strings.TrimPrefix(tail, "detach/")
+			subAction, relatedID = "detach", strings.TrimPrefix(tail, "detach/")
 		case tail == "attach":
 			subAction = "attach"
 		default:
 			relatedID = tail
 		}
 	}
+	return parentID, relationName, subAction, relatedID, true
+}
 
-	ctx := r.Context()
+func (h *RelationManagerHandler) handleRelationGET(w http.ResponseWriter, rm RelationManager, parentID, relationName string, ctx context.Context) {
+	items, err := rm.ListRelated(ctx, parentID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(map[string]any{
+		"relation":   relationName,
+		"columns":    rm.Columns(),
+		"items":      items,
+		"can_create": rm.CanCreate(ctx),
+		"can_attach": rm.CanAttach(ctx),
+		"can_delete": rm.CanDelete(ctx),
+	})
+}
 
-	switch r.Method {
-	case http.MethodGet:
-		items, err := rm.ListRelated(ctx, parentID)
-		if err != nil {
+func (h *RelationManagerHandler) handleRelationPOST(w http.ResponseWriter, r *http.Request, rm RelationManager, parentID, subAction string, ctx context.Context) {
+	if subAction == "attach" {
+		if !rm.CanAttach(ctx) {
+			http.Error(w, "forbidden", http.StatusForbidden)
+			return
+		}
+		relID := r.FormValue("related_id")
+		if relID == "" {
+			http.Error(w, "related_id required", http.StatusBadRequest)
+			return
+		}
+		if err := rm.AttachRelated(ctx, parentID, relID); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]any{
-			"relation":   relationName,
-			"columns":    rm.Columns(),
-			"items":      items,
-			"can_create": rm.CanCreate(ctx),
-			"can_attach": rm.CanAttach(ctx),
-			"can_delete": rm.CanDelete(ctx),
-		})
-
-	case http.MethodPost:
-		switch subAction {
-		case "attach":
-			if !rm.CanAttach(ctx) {
-				http.Error(w, "forbidden", http.StatusForbidden)
-				return
-			}
-			relID := r.FormValue("related_id")
-			if relID == "" {
-				http.Error(w, "related_id required", http.StatusBadRequest)
-				return
-			}
-			if err := rm.AttachRelated(ctx, parentID, relID); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			w.WriteHeader(http.StatusNoContent)
-		default:
-			if !rm.CanCreate(ctx) {
-				http.Error(w, "forbidden", http.StatusForbidden)
-				return
-			}
-			if err := rm.CreateRelated(ctx, parentID, r); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			w.WriteHeader(http.StatusCreated)
-		}
-
-	case http.MethodDelete:
-		if subAction == "detach" {
-			if !rm.CanAttach(ctx) {
-				http.Error(w, "forbidden", http.StatusForbidden)
-				return
-			}
-			if err := rm.DetachRelated(ctx, parentID, relatedID); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-		} else {
-			if !rm.CanDelete(ctx) {
-				http.Error(w, "forbidden", http.StatusForbidden)
-				return
-			}
-			if err := rm.DeleteRelated(ctx, parentID, relatedID); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-		}
 		w.WriteHeader(http.StatusNoContent)
-
-	default:
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
 	}
+	if !rm.CanCreate(ctx) {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+	if err := rm.CreateRelated(ctx, parentID, r); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusCreated)
+}
+
+func (h *RelationManagerHandler) handleRelationDELETE(w http.ResponseWriter, rm RelationManager, parentID, relatedID, subAction string, ctx context.Context) {
+	if subAction == "detach" {
+		if !rm.CanAttach(ctx) {
+			http.Error(w, "forbidden", http.StatusForbidden)
+			return
+		}
+		if err := rm.DetachRelated(ctx, parentID, relatedID); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else {
+		if !rm.CanDelete(ctx) {
+			http.Error(w, "forbidden", http.StatusForbidden)
+			return
+		}
+		if err := rm.DeleteRelated(ctx, parentID, relatedID); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+	w.WriteHeader(http.StatusNoContent)
 }

@@ -65,7 +65,7 @@ func RecoveryWithConfig(config *RecoveryConfig) Middleware {
 
 					// Create AppError
 					err := errors.Internal(nil, "An internal error occurred")
-					err.WithField("panic", fmt.Sprint(rec))
+					_ = err.WithField("panic", fmt.Sprint(rec))
 
 					if config.PrintStack {
 						err.Stack = string(stack)

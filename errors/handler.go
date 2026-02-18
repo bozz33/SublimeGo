@@ -99,7 +99,7 @@ func (h *Handler) HandleFunc(next http.HandlerFunc) http.HandlerFunc {
 		defer func() {
 			if rec := recover(); rec != nil {
 				err := Internal(nil, "An error occurred")
-				err.WithField("panic", rec)
+				_ = err.WithField("panic", rec)
 				h.Handle(w, r, err)
 			}
 		}()
@@ -160,7 +160,7 @@ func (h *Handler) Middleware() func(http.Handler) http.Handler {
 			defer func() {
 				if rec := recover(); rec != nil {
 					err := Internal(nil, "An error occurred")
-					err.WithField("panic", rec)
+					_ = err.WithField("panic", rec)
 					h.Handle(w, r, err)
 				}
 			}()

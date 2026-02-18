@@ -26,12 +26,12 @@ const (
 
 // ImportResult contains the result of an import operation.
 type ImportResult struct {
-	TotalRows     int
-	SuccessCount  int
-	ErrorCount    int
-	SkippedCount  int
-	Errors        []ImportError
-	Duration      time.Duration
+	TotalRows    int
+	SuccessCount int
+	ErrorCount   int
+	SkippedCount int
+	Errors       []ImportError
+	Duration     time.Duration
 }
 
 // ImportError represents an error during import.
@@ -53,16 +53,16 @@ type ColumnMapping struct {
 
 // ImportConfig configures an import operation.
 type ImportConfig struct {
-	Format          Format
-	Mappings        []ColumnMapping
-	SkipHeader      bool
-	SkipEmptyRows   bool
-	StopOnError     bool
-	MaxErrors       int
-	BatchSize       int
-	ValidateRow     func(row map[string]any) error
-	BeforeImport    func(row map[string]any) (map[string]any, error)
-	AfterImport     func(row map[string]any, result any) error
+	Format        Format
+	Mappings      []ColumnMapping
+	SkipHeader    bool
+	SkipEmptyRows bool
+	StopOnError   bool
+	MaxErrors     int
+	BatchSize     int
+	ValidateRow   func(row map[string]any) error
+	BeforeImport  func(row map[string]any) (map[string]any, error)
+	AfterImport   func(row map[string]any, result any) error
 }
 
 // DefaultConfig returns a default import configuration.
@@ -259,7 +259,7 @@ func (i *Importer) importExcel(ctx context.Context, file io.Reader, handler func
 	if err != nil {
 		return nil, fmt.Errorf("failed to open Excel file: %w", err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	// Get the first sheet
 	sheets := f.GetSheetList()

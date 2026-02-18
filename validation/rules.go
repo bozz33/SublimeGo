@@ -356,9 +356,11 @@ func ParseRules(fieldName string, rulesStr string) *RuleSet {
 		case "between":
 			parts := strings.Split(param, ",")
 			if len(parts) == 2 {
-				min, _ := strconv.Atoi(parts[0])
-				max, _ := strconv.Atoi(parts[1])
-				rs.Between(min, max)
+				minVal, err1 := strconv.Atoi(parts[0])
+				maxVal, err2 := strconv.Atoi(parts[1])
+				if err1 == nil && err2 == nil {
+					rs.Between(minVal, maxVal)
+				}
 			}
 		case "in":
 			values := strings.Split(param, ",")

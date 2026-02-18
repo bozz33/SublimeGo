@@ -220,35 +220,33 @@ type navItem struct {
 
 // registerNavItems injects navigation items into the sidebar.
 func (p *Panel) registerNavItems() {
-	// Collect all nav items from resources and pages
-	var allItems []navItem
-
-	for _, r := range p.Resources {
-		allItems = append(allItems, navItem{
-			slug:  r.Slug(),
-			label: r.PluralLabel(),
-			icon:  r.Icon(),
-			group: r.Group(),
-			sort:  r.Sort(),
-		})
-	}
-
-	for _, pg := range p.Pages {
-		allItems = append(allItems, navItem{
-			slug:  pg.Slug(),
-			label: pg.Label(),
-			icon:  pg.Icon(),
-			group: pg.Group(),
-			sort:  pg.Sort(),
-		})
-	}
-
-	// Sort by sort order
+	allItems := p.collectNavItems()
 	sort.Slice(allItems, func(i, j int) bool {
 		return allItems[i].sort < allItems[j].sort
 	})
+	layouts.SetNavGroups(groupNavItems(allItems))
+}
 
-	// Group items by group name using stdlib
+// collectNavItems builds the flat list of nav items from resources and pages.
+func (p *Panel) collectNavItems() []navItem {
+	items := make([]navItem, 0, len(p.Resources)+len(p.Pages))
+	for _, r := range p.Resources {
+		items = append(items, navItem{
+			slug: r.Slug(), label: r.PluralLabel(),
+			icon: r.Icon(), group: r.Group(), sort: r.Sort(),
+		})
+	}
+	for _, pg := range p.Pages {
+		items = append(items, navItem{
+			slug: pg.Slug(), label: pg.Label(),
+			icon: pg.Icon(), group: pg.Group(), sort: pg.Sort(),
+		})
+	}
+	return items
+}
+
+// groupNavItems groups sorted nav items into NavGroups (root first, then named groups).
+func groupNavItems(allItems []navItem) []layouts.NavGroup {
 	grouped := make(map[string][]navItem)
 	for _, item := range allItems {
 		key := item.group
@@ -259,16 +257,10 @@ func (p *Panel) registerNavItems() {
 	}
 
 	var navGroups []layouts.NavGroup
-
 	if rootItems, ok := grouped["_root"]; ok {
-		items := make([]layouts.NavItem, len(rootItems))
-		for i, item := range rootItems {
-			items[i] = layouts.NavItem{Slug: item.slug, Label: item.label, Icon: item.icon}
-		}
-		navGroups = append(navGroups, layouts.NavGroup{Label: "", Items: items})
+		navGroups = append(navGroups, layouts.NavGroup{Label: "", Items: toNavItems(rootItems)})
 	}
 
-	// Sort group names for deterministic order
 	groupNames := make([]string, 0, len(grouped))
 	for k := range grouped {
 		if k != "_root" {
@@ -276,138 +268,129 @@ func (p *Panel) registerNavItems() {
 		}
 	}
 	sort.Strings(groupNames)
-
-	for _, groupName := range groupNames {
-		groupItems := grouped[groupName]
-		navItems := make([]layouts.NavItem, len(groupItems))
-		for i, item := range groupItems {
-			navItems[i] = layouts.NavItem{Slug: item.slug, Label: item.label, Icon: item.icon}
-		}
-		navGroups = append(navGroups, layouts.NavGroup{Label: groupName, Items: navItems})
+	for _, name := range groupNames {
+		navGroups = append(navGroups, layouts.NavGroup{Label: name, Items: toNavItems(grouped[name])})
 	}
+	return navGroups
+}
 
-	layouts.SetNavGroups(navGroups)
+// toNavItems converts internal navItem slice to layouts.NavItem slice.
+func toNavItems(items []navItem) []layouts.NavItem {
+	result := make([]layouts.NavItem, len(items))
+	for i, item := range items {
+		result[i] = layouts.NavItem{Slug: item.slug, Label: item.label, Icon: item.icon}
+	}
+	return result
 }
 
 // Router generates the standard HTTP Handler with automatic CRUD.
 // It also calls syncConfig() and plugin.BootAll() exactly once.
 func (p *Panel) Router() http.Handler {
-	// 1. Sync Panel fields -> global PanelConfig used by all templates
 	p.syncConfig()
-
-	// 2. Boot all registered plugins
 	if err := plugin.Boot(); err != nil {
 		panic("sublimego: plugin boot failed: " + err.Error())
 	}
-
 	mux := http.NewServeMux()
+	p.registerStaticRoutes(mux)
+	p.registerAuthRoutes(mux)
+	p.registerCoreRoutes(mux)
+	p.registerResourceRoutes(mux)
+	p.registerPageRoutes(mux)
+	var handler http.Handler = p.injectConfig(mux)
+	if p.Session != nil {
+		handler = p.Session.LoadAndSave(handler)
+	}
+	return SecurityHeadersMiddleware(handler)
+}
 
-	// 3. Static assets with Cache-Control and gzip
+func (p *Panel) registerStaticRoutes(mux *http.ServeMux) {
 	fs := http.FileServer(http.Dir("ui/assets"))
 	mux.Handle("/assets/", gzipMiddleware(cacheControlMiddleware(http.StripPrefix("/assets/", fs))))
+}
 
-	// 4. Auth routes (conditional)
-	if p.AuthManager != nil {
-		authHandler := NewAuthHandler(p.AuthManager, p.DB)
-		loginLimiter := middleware.NewRateLimiter(&middleware.RateLimitConfig{
-			RequestsPerMinute: 5,
-			Burst:             3,
-			KeyFunc:           middleware.KeyByIP,
-		})
-		mux.Handle("/login", middleware.RequireGuest(p.AuthManager, "/")(loginLimiter.Middleware()(authHandler)))
-		if p.Registration {
-			mux.Handle("/register", middleware.RequireGuest(p.AuthManager, "/")(authHandler))
-		}
-		mux.Handle("/logout", authHandler)
-
-		if p.Profile {
-			profileHandler := NewProfileHandler(p.AuthManager, p.DB)
-			mux.Handle("/profile", gzipMiddleware(p.protect(profileHandler)))
-		}
-
-		if p.PasswordReset {
-			resetHandler := NewPasswordResetHandler(p.AuthManager, p.DB, p.Mailer, p.BaseURL)
-			mux.Handle("/forgot-password", resetHandler)
-			mux.Handle("/reset-password", resetHandler)
-		}
+func (p *Panel) registerAuthRoutes(mux *http.ServeMux) {
+	if p.AuthManager == nil {
+		return
 	}
+	authHandler := NewAuthHandler(p.AuthManager, p.DB)
+	loginLimiter := middleware.NewRateLimiter(&middleware.RateLimitConfig{
+		RequestsPerMinute: 5, Burst: 3, KeyFunc: middleware.KeyByIP,
+	})
+	mux.Handle("/login", middleware.RequireGuest(p.AuthManager, "/")(loginLimiter.Middleware()(authHandler)))
+	mux.Handle("/logout", authHandler)
+	if p.Registration {
+		mux.Handle("/register", middleware.RequireGuest(p.AuthManager, "/")(authHandler))
+	}
+	if p.Profile {
+		mux.Handle("/profile", gzipMiddleware(p.protect(NewProfileHandler(p.AuthManager, p.DB))))
+	}
+	if p.PasswordReset {
+		rh := NewPasswordResetHandler(p.AuthManager, p.DB, p.Mailer, p.BaseURL)
+		mux.Handle("/forgot-password", rh)
+		mux.Handle("/reset-password", rh)
+	}
+}
 
-	// 5. Dashboard
-	dashboardHandler := p.protect(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		widgets := widget.GetAllWidgets(r.Context())
-		dashboard.Index(widgets).Render(r.Context(), w)
-	}))
-	mux.Handle("/", gzipMiddleware(dashboardHandler))
-
-	// 6. Global search API
-	mux.Handle("/api/search", p.protect(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query().Get("q")
-		if query == "" {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode([]search.Result{})
-			return
-		}
-		results, err := search.QuickSearch(r.Context(), query)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(results)
-	})))
-
-	// 7. Notifications API (conditional)
+func (p *Panel) registerCoreRoutes(mux *http.ServeMux) {
+	// Dashboard
+	mux.Handle("/", gzipMiddleware(p.protect(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = dashboard.Index(widget.GetAllWidgets(r.Context())).Render(r.Context(), w)
+	}))))
+	// Global search
+	mux.Handle("/api/search", p.protect(http.HandlerFunc(p.handleSearch)))
+	// Notifications
 	if p.Notifications {
-		userIDFunc := func(r *http.Request) string {
+		notifHandler := notifications.NewHandler(nil, func(r *http.Request) string {
 			if p.AuthManager != nil {
 				if id := p.AuthManager.UserIDFromRequest(r); id > 0 {
 					return fmt.Sprintf("%d", id)
 				}
 			}
 			return ""
-		}
-		notifHandler := notifications.NewHandler(nil, userIDFunc)
+		})
 		notifHandler.Register(mux, "/api/notifications")
 	}
+}
 
-	// 8. Resources
+func (p *Panel) handleSearch(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("q")
+	w.Header().Set("Content-Type", "application/json")
+	if query == "" {
+		_ = json.NewEncoder(w).Encode([]search.Result{})
+		return
+	}
+	results, err := search.QuickSearch(r.Context(), query)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	_ = json.NewEncoder(w).Encode(results)
+}
+
+func (p *Panel) registerResourceRoutes(mux *http.ServeMux) {
 	for _, res := range p.Resources {
-		handler := NewCRUDHandler(res)
-		slug := res.Slug()
-		protectedHandler := p.protect(handler)
-		mux.Handle("/"+slug+"/", gzipMiddleware(protectedHandler))
-		mux.Handle("/"+slug, gzipMiddleware(protectedHandler))
-
-		// Export route (available for all resources, format via ?format=csv|xlsx)
-		exportHandler := NewExportHandler(res, export.FormatCSV)
-		mux.Handle("/"+slug+"/export", p.protect(exportHandler))
-
-		// Import route (only if resource implements ResourceImportable)
-		if _, ok := res.(ResourceImportable); ok {
-			importHandler := NewImportHandler(res)
-			mux.Handle("/"+slug+"/import", p.protect(importHandler))
-		}
-
-		rmHandler := NewRelationManagerHandler(res)
-		if rmHandler.HasManagers() {
-			mux.Handle("/"+slug+"/relations/", p.protect(rmHandler))
-		}
+		p.mountResource(mux, res)
 	}
+}
 
-	// 9. Custom pages
+func (p *Panel) mountResource(mux *http.ServeMux, res Resource) {
+	slug := res.Slug()
+	h := gzipMiddleware(p.protect(NewCRUDHandler(res)))
+	mux.Handle("/"+slug+"/", h)
+	mux.Handle("/"+slug, h)
+	mux.Handle("/"+slug+"/export", p.protect(NewExportHandler(res, export.FormatCSV)))
+	if _, ok := res.(ResourceImportable); ok {
+		mux.Handle("/"+slug+"/import", p.protect(NewImportHandler(res)))
+	}
+	if rm := NewRelationManagerHandler(res); rm.HasManagers() {
+		mux.Handle("/"+slug+"/relations/", p.protect(rm))
+	}
+}
+
+func (p *Panel) registerPageRoutes(mux *http.ServeMux) {
 	for _, pg := range p.Pages {
-		pageHandler := NewPageHandler(pg)
-		slug := pg.Slug()
-		mux.Handle("/"+slug, gzipMiddleware(p.protect(pageHandler)))
+		mux.Handle("/"+pg.Slug(), gzipMiddleware(p.protect(NewPageHandler(pg))))
 	}
-
-	var handler http.Handler = p.injectConfig(mux)
-	if p.Session != nil {
-		handler = p.Session.LoadAndSave(handler)
-	}
-	// Security headers on every response
-	handler = SecurityHeadersMiddleware(handler)
-	return handler
 }
 
 // EnableDebug mounts pprof at /debug/pprof/ (call before Router()).
@@ -439,7 +422,11 @@ func (p *Panel) injectConfig(next http.Handler) http.Handler {
 // gzipPool reuses gzip.Writer instances to avoid per-request allocations.
 var gzipPool = sync.Pool{
 	New: func() any {
-		gz, _ := gzip.NewWriterLevel(io.Discard, gzip.BestSpeed)
+		// BestSpeed never returns an error for valid levels.
+		gz, err := gzip.NewWriterLevel(io.Discard, gzip.BestSpeed)
+		if err != nil {
+			panic("gzip: " + err.Error())
+		}
 		return gz
 	},
 }
@@ -454,10 +441,10 @@ func gzipMiddleware(next http.Handler) http.Handler {
 		}
 		w.Header().Set("Content-Encoding", "gzip")
 		w.Header().Del("Content-Length")
-		gz := gzipPool.Get().(*gzip.Writer)
+		gz := gzipPool.Get().(*gzip.Writer) //nolint:errcheck
 		gz.Reset(w)
 		defer func() {
-			gz.Close()
+			_ = gz.Close()
 			gzipPool.Put(gz)
 		}()
 		next.ServeHTTP(&gzipResponseWriter{ResponseWriter: w, Writer: gz}, r)

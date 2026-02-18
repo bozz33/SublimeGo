@@ -27,12 +27,12 @@ func isChecked(v any) bool {
 }
 
 // hasValue returns true if the value is not nil
-func hasValue(v any) bool {
+func hasValue(v any) bool { //nolint:unused
 	return v != nil
 }
 
 // bulkActionClass returns Tailwind classes for a bulk action button by color.
-func bulkActionClass(color string) string {
+func bulkActionClass(color string) string { //nolint:unused
 	switch color {
 	case "danger":
 		return "text-red-700 bg-red-50 hover:bg-red-100 dark:text-red-400 dark:bg-red-900/20 dark:hover:bg-red-900/40"
@@ -44,7 +44,7 @@ func bulkActionClass(color string) string {
 }
 
 // rowIDsJSON returns a JSON array of row IDs for Alpine.js toggleAll.
-func rowIDsJSON(rows []engine.Row) string {
+func rowIDsJSON(rows []engine.Row) string { //nolint:unused
 	if len(rows) == 0 {
 		return "[]"
 	}
@@ -56,10 +56,10 @@ func rowIDsJSON(rows []engine.Row) string {
 }
 
 // suppressUnused silences the "declared but not used" error for loop index.
-func suppressUnused(_ int) string { return "" }
+func suppressUnused(_ int) string { return "" } //nolint:unused
 
 // min returns the smaller of two ints (Go 1.20 stdlib min is generic, keep local for compat).
-func min(a, b int) int {
+func min(a, b int) int { //nolint:unused
 	if a < b {
 		return a
 	}

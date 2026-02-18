@@ -94,7 +94,9 @@ func defaultMessages() map[string]string {
 	}
 }
 
-// frenchMessages returns validation messages in French
+// frenchMessages returns validation messages in French.
+//
+//nolint:unused
 func frenchMessages() map[string]string {
 	return map[string]string{
 		// Required & Presence

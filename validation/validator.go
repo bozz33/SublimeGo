@@ -183,7 +183,7 @@ func RegisterCustomMessage(tag, message string) {
 
 // RegisterValidation registers a custom validator.
 func RegisterValidation(tag string, fn validator.Func) {
-	validator.New().RegisterValidation(tag, fn)
+	_ = validator.New().RegisterValidation(tag, fn)
 }
 
 // Global variables for custom messages.

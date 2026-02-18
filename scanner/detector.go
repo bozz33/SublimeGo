@@ -5,7 +5,12 @@ import (
 	"strings"
 
 	"github.com/samber/lo"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
+
+// titleCaser is a package-level caser to avoid re-allocating on every call.
+var titleCaser = cases.Title(language.English)
 
 // ConflictType represents the type of conflict detected.
 type ConflictType int
@@ -102,7 +107,7 @@ func (d *Detector) detectGenericNames() []Conflict {
 				Type:       ConflictGenericName,
 				Severity:   "warning",
 				Message:    fmt.Sprintf("Generic type name '%s' should be more specific", resource.TypeName),
-				Suggestion: fmt.Sprintf("Rename '%s' to '%s%s'", resource.TypeName, strings.Title(resource.PackageName), resource.TypeName),
+				Suggestion: fmt.Sprintf("Rename '%s' to '%s%s'", resource.TypeName, titleCaser.String(resource.PackageName), resource.TypeName),
 				DocsURL:    "https://docs.sublimego.dev/resources/naming",
 				Resources:  []ResourceMetadata{resource},
 				AutoFix:    true,
@@ -120,7 +125,7 @@ func (d *Detector) detectNamingConventions() []Conflict {
 	var conflicts []Conflict
 
 	for _, resource := range d.resources {
-		expectedName := fmt.Sprintf("%s%s", strings.Title(resource.PackageName), "Resource")
+		expectedName := fmt.Sprintf("%s%s", titleCaser.String(resource.PackageName), "Resource")
 
 		if resource.TypeName != expectedName {
 			conflict := Conflict{

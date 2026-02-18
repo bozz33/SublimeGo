@@ -97,7 +97,7 @@ func (h *Handler) handleStream(w http.ResponseWriter, r *http.Request) {
 
 	// Send current unread count as first event
 	unread := h.store.UnreadCount(userID)
-	fmt.Fprintf(w, "event: connected\ndata: {\"unread_count\": %d}\n\n", unread)
+	_, _ = fmt.Fprintf(w, "event: connected\ndata: {\"unread_count\": %d}\n\n", unread)
 	flusher.Flush()
 
 	ch := h.store.Subscribe(r.Context(), userID)
@@ -114,7 +114,7 @@ func (h *Handler) handleStream(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				continue
 			}
-			w.Write(msg)
+			_, _ = w.Write(msg)
 			flusher.Flush()
 		}
 	}
