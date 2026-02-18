@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/bozz33/sublimego/auth"
@@ -427,7 +428,16 @@ func (p *Panel) injectConfig(next http.Handler) http.Handler {
 	})
 }
 
+// gzipPool reuses gzip.Writer instances to avoid per-request allocations.
+var gzipPool = sync.Pool{
+	New: func() any {
+		gz, _ := gzip.NewWriterLevel(io.Discard, gzip.BestSpeed)
+		return gz
+	},
+}
+
 // gzipMiddleware compresses responses when the client supports it.
+// Uses a sync.Pool to reuse gzip.Writer instances (zero allocation hot path).
 func gzipMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
@@ -436,8 +446,12 @@ func gzipMiddleware(next http.Handler) http.Handler {
 		}
 		w.Header().Set("Content-Encoding", "gzip")
 		w.Header().Del("Content-Length")
-		gz := gzip.NewWriter(w)
-		defer gz.Close()
+		gz := gzipPool.Get().(*gzip.Writer)
+		gz.Reset(w)
+		defer func() {
+			gz.Close()
+			gzipPool.Put(gz)
+		}()
 		next.ServeHTTP(&gzipResponseWriter{ResponseWriter: w, Writer: gz}, r)
 	})
 }
