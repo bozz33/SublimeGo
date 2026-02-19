@@ -20,11 +20,14 @@ jobs:
     - name: Install dependencies
       run: go mod download
 
-    - name: Verify Code Generation (Ent & Templ)
-      run: |
-        go install github.com/a-h/templ/cmd/templ@latest
-        templ generate
-        go generate ./...
+    - name: Install Templ
+      run: go install github.com/a-h/templ/cmd/templ@latest
+
+    - name: Generate Templ
+      run: templ generate
+
+    - name: Generate Go (scanner, ent)
+      run: go generate ./...
 
     - name: Build
       run: go build -v ./cmd/sublimego

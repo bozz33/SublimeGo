@@ -23,19 +23,19 @@ func RenderComponent(c form.Component) templ.Component {
 		// Fields
 		case *form.TextInput:
 			return TextInput(v).Render(ctx, w)
-		case *form.Textarea:
+		case *form.TextareaInput:
 			return Textarea(v).Render(ctx, w)
-		case *form.Select:
+		case *form.SelectInput:
 			return SelectField(v).Render(ctx, w)
-		case *form.Checkbox:
+		case *form.CheckboxInput:
 			return CheckboxField(v).Render(ctx, w)
-		case *form.FileUpload:
+		case *form.FileUploadInput:
 			return FileUploadField(v).Render(ctx, w)
 		case *form.DatePicker:
 			return DatePickerField(v).Render(ctx, w)
 		case *form.HiddenField:
 			return HiddenInputField(v).Render(ctx, w)
-		case *form.Toggle:
+		case *form.ToggleInput:
 			return ToggleField(v).Render(ctx, w)
 		case *form.RepeaterField:
 			return RepeaterFieldView(v).Render(ctx, w)

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	apperrors "github.com/bozz33/sublimego/errors"
+	"github.com/bozz33/sublimego/apperrors"
 	"github.com/bozz33/sublimego/logger"
 )
 

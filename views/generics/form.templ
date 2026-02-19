@@ -105,7 +105,7 @@ templ TextInput(f *form.TextInput) {
 	</div>
 }
 
-templ Textarea(t *form.Textarea) {
+templ Textarea(t *form.TextareaInput) {
 	<div>
 		<label for={ t.Name() } class="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
 			{ t.LabelStr }
@@ -136,7 +136,7 @@ templ Textarea(t *form.Textarea) {
 	</div>
 }
 
-templ SelectField(s *form.Select) {
+templ SelectField(s *form.SelectInput) {
 	<div>
 		<label for={ s.Name() } class="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
 			{ s.LabelStr }
@@ -168,7 +168,7 @@ templ SelectField(s *form.Select) {
 	</div>
 }
 
-templ CheckboxField(c *form.Checkbox) {
+templ CheckboxField(c *form.CheckboxInput) {
 	<div class="flex items-center">
 		<input 
 			type="checkbox" 
@@ -189,7 +189,7 @@ templ CheckboxField(c *form.Checkbox) {
 	</div>
 }
 
-templ FileUploadField(f *form.FileUpload) {
+templ FileUploadField(f *form.FileUploadInput) {
 	<div>
 		<label for={ f.Name() } class="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
 			{ f.LabelStr }
@@ -262,7 +262,7 @@ templ HiddenInputField(f *form.HiddenField) {
 	<input type="hidden" name={ f.Name() } id={ f.Name() } value={ getValueStr(f.Value()) }/>
 }
 
-templ ToggleField(f *form.Toggle) {
+templ ToggleField(f *form.ToggleInput) {
 	<div class="flex items-center justify-between">
 		<label for={ f.Name() } class="text-sm font-medium text-gray-900 dark:text-gray-300">
 			{ f.LabelStr }

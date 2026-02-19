@@ -131,34 +131,34 @@ func (f *TextInput) Default(val any) *TextInput {
 	return f
 }
 
-// Textarea represents a textarea field.
-type Textarea struct {
+// TextareaInput represents a textarea field.
+type TextareaInput struct {
 	BaseField
 	RowCount int
 }
 
-// NewTextarea creates a textarea field.
-func NewTextarea(name string) *Textarea {
-	return &Textarea{
+// Textarea creates a textarea field.
+func Textarea(name string) *TextareaInput {
+	return &TextareaInput{
 		BaseField: BaseField{fieldName: name, LabelStr: name},
 		RowCount:  3,
 	}
 }
 
 // Label sets the label.
-func (t *Textarea) Label(label string) *Textarea {
+func (t *TextareaInput) Label(label string) *TextareaInput {
 	t.LabelStr = label
 	return t
 }
 
 // Rows sets the number of rows.
-func (t *Textarea) Rows(rows int) *Textarea {
+func (t *TextareaInput) Rows(rows int) *TextareaInput {
 	t.RowCount = rows
 	return t
 }
 
 // Required makes the field required.
-func (t *Textarea) Required() *Textarea {
+func (t *TextareaInput) Required() *TextareaInput {
 	t.BaseField.Required = true
 	t.fieldRules = append(t.fieldRules, "required")
 	return t
@@ -170,22 +170,22 @@ type SelectOption struct {
 	Value string
 }
 
-// Select represents a select field.
-type Select struct {
+// SelectInput represents a select field.
+type SelectInput struct {
 	BaseField
 	selectOptions []SelectOption
 }
 
-// NewSelect creates a select field.
-func NewSelect(name string) *Select {
-	return &Select{
+// Select creates a select field.
+func Select(name string) *SelectInput {
+	return &SelectInput{
 		BaseField:     BaseField{fieldName: name, LabelStr: name},
 		selectOptions: make([]SelectOption, 0),
 	}
 }
 
 // Options sets the select options.
-func (s *Select) Options(options map[string]string) *Select {
+func (s *SelectInput) Options(options map[string]string) *SelectInput {
 	for v, l := range options {
 		s.selectOptions = append(s.selectOptions, SelectOption{Value: v, Label: l})
 	}
@@ -193,92 +193,92 @@ func (s *Select) Options(options map[string]string) *Select {
 }
 
 // Label sets the label.
-func (s *Select) Label(label string) *Select {
+func (s *SelectInput) Label(label string) *SelectInput {
 	s.LabelStr = label
 	return s
 }
 
 // SelectOptions returns the available options.
-func (s *Select) SelectOptions() []SelectOption { return s.selectOptions }
+func (s *SelectInput) SelectOptions() []SelectOption { return s.selectOptions }
 
 // Required makes the field required.
-func (s *Select) Required() *Select {
+func (s *SelectInput) Required() *SelectInput {
 	s.BaseField.Required = true
 	s.fieldRules = append(s.fieldRules, "required")
 	return s
 }
 
 // Default sets the default value.
-func (s *Select) Default(val any) *Select {
+func (s *SelectInput) Default(val any) *SelectInput {
 	s.fieldValue = val
 	return s
 }
 
-// Checkbox represents a checkbox field.
-type Checkbox struct {
+// CheckboxInput represents a checkbox field.
+type CheckboxInput struct {
 	BaseField
 }
 
-// NewCheckbox creates a checkbox field.
-func NewCheckbox(name string) *Checkbox {
-	return &Checkbox{
+// Checkbox creates a checkbox field.
+func Checkbox(name string) *CheckboxInput {
+	return &CheckboxInput{
 		BaseField: BaseField{fieldName: name, LabelStr: name},
 	}
 }
 
 // Label sets the label.
-func (c *Checkbox) Label(label string) *Checkbox {
+func (c *CheckboxInput) Label(label string) *CheckboxInput {
 	c.LabelStr = label
 	return c
 }
 
 // Default sets the default value.
-func (c *Checkbox) Default(val bool) *Checkbox {
+func (c *CheckboxInput) Default(val bool) *CheckboxInput {
 	c.fieldValue = val
 	return c
 }
 
-// FileUpload represents a file upload field.
-type FileUpload struct {
+// FileUploadInput represents a file upload field.
+type FileUploadInput struct {
 	BaseField
 	AcceptTypes   string
 	MaxFileSize   int64
 	AllowMultiple bool
 }
 
-// NewFileUpload creates a file upload field.
-func NewFileUpload(name string) *FileUpload {
-	return &FileUpload{
+// FileUpload creates a file upload field.
+func FileUpload(name string) *FileUploadInput {
+	return &FileUploadInput{
 		BaseField: BaseField{fieldName: name, LabelStr: name},
 	}
 }
 
 // Label sets the label.
-func (f *FileUpload) Label(label string) *FileUpload {
+func (f *FileUploadInput) Label(label string) *FileUploadInput {
 	f.LabelStr = label
 	return f
 }
 
 // Accept sets the accepted file types.
-func (f *FileUpload) Accept(accept string) *FileUpload {
+func (f *FileUploadInput) Accept(accept string) *FileUploadInput {
 	f.AcceptTypes = accept
 	return f
 }
 
 // MaxSize sets the maximum size in bytes.
-func (f *FileUpload) MaxSize(size int64) *FileUpload {
+func (f *FileUploadInput) MaxSize(size int64) *FileUploadInput {
 	f.MaxFileSize = size
 	return f
 }
 
 // Multiple allows multiple files.
-func (f *FileUpload) Multiple() *FileUpload {
+func (f *FileUploadInput) Multiple() *FileUploadInput {
 	f.AllowMultiple = true
 	return f
 }
 
 // Required makes the field required.
-func (f *FileUpload) Required() *FileUpload {
+func (f *FileUploadInput) Required() *FileUploadInput {
 	f.BaseField.Required = true
 	f.fieldRules = append(f.fieldRules, "required")
 	return f
@@ -360,16 +360,16 @@ func Hidden(name string, value any) *HiddenField {
 	}
 }
 
-// Toggle represents a toggle switch (boolean, rendered differently from Checkbox).
-type Toggle struct {
+// ToggleInput represents a toggle switch (boolean, rendered differently from Checkbox).
+type ToggleInput struct {
 	BaseField
 	OnLabel  string
 	OffLabel string
 }
 
-// NewToggle creates a toggle switch field.
-func NewToggle(name string) *Toggle {
-	return &Toggle{
+// Toggle creates a toggle switch field.
+func Toggle(name string) *ToggleInput {
+	return &ToggleInput{
 		BaseField: BaseField{fieldName: name, LabelStr: name},
 		OnLabel:   "Yes",
 		OffLabel:  "No",
@@ -377,20 +377,20 @@ func NewToggle(name string) *Toggle {
 }
 
 // Label sets the label.
-func (t *Toggle) Label(label string) *Toggle {
+func (t *ToggleInput) Label(label string) *ToggleInput {
 	t.LabelStr = label
 	return t
 }
 
 // Labels sets the on/off labels.
-func (t *Toggle) Labels(on, off string) *Toggle {
+func (t *ToggleInput) Labels(on, off string) *ToggleInput {
 	t.OnLabel = on
 	t.OffLabel = off
 	return t
 }
 
 // Default sets the default boolean value.
-func (t *Toggle) Default(val bool) *Toggle {
+func (t *ToggleInput) Default(val bool) *ToggleInput {
 	t.fieldValue = val
 	return t
 }
@@ -444,163 +444,163 @@ func (r *RepeaterField) AddButtonLabel(label string) *RepeaterField {
 // RichEditor — renders a WYSIWYG editor (e.g. Trix, TipTap, Quill).
 // ---------------------------------------------------------------------------
 
-// RichEditor represents a rich-text / WYSIWYG editor field.
-type RichEditor struct {
+// RichEditorInput represents a rich-text / WYSIWYG editor field.
+type RichEditorInput struct {
 	BaseField
 	Toolbar   []string // e.g. ["bold","italic","link","heading","list","image"]
 	MaxLength int
 }
 
-// NewRichEditor creates a rich editor field.
-func NewRichEditor(name string) *RichEditor {
-	return &RichEditor{
+// RichEditor creates a rich editor field.
+func RichEditor(name string) *RichEditorInput {
+	return &RichEditorInput{
 		BaseField: BaseField{fieldName: name, LabelStr: name},
 		Toolbar:   []string{"bold", "italic", "underline", "link", "heading", "list", "image", "code"},
 	}
 }
 
 // Label sets the label.
-func (r *RichEditor) Label(label string) *RichEditor {
+func (r *RichEditorInput) Label(label string) *RichEditorInput {
 	r.LabelStr = label
 	return r
 }
 
 // WithToolbar overrides the default toolbar buttons.
-func (r *RichEditor) WithToolbar(items ...string) *RichEditor {
+func (r *RichEditorInput) WithToolbar(items ...string) *RichEditorInput {
 	r.Toolbar = items
 	return r
 }
 
 // WithMaxLength sets the maximum character count.
-func (r *RichEditor) WithMaxLength(n int) *RichEditor {
+func (r *RichEditorInput) WithMaxLength(n int) *RichEditorInput {
 	r.MaxLength = n
 	return r
 }
 
 // Required makes the field required.
-func (r *RichEditor) Required() *RichEditor {
+func (r *RichEditorInput) Required() *RichEditorInput {
 	r.BaseField.Required = true
 	r.fieldRules = append(r.fieldRules, "required")
 	return r
 }
 
 // Default sets the default HTML value.
-func (r *RichEditor) Default(val string) *RichEditor {
+func (r *RichEditorInput) Default(val string) *RichEditorInput {
 	r.fieldValue = val
 	return r
 }
 
 // ComponentType returns the component type identifier.
-func (r *RichEditor) ComponentType() string { return "rich_editor" }
+func (r *RichEditorInput) ComponentType() string { return "rich_editor" }
 
 // ---------------------------------------------------------------------------
 // MarkdownEditor — renders a Markdown editor with preview.
 // ---------------------------------------------------------------------------
 
-// MarkdownEditor represents a Markdown editor field with live preview.
-type MarkdownEditor struct {
+// MarkdownEditorInput represents a Markdown editor field with live preview.
+type MarkdownEditorInput struct {
 	BaseField
 	RowCount int
 }
 
-// NewMarkdownEditor creates a Markdown editor field.
-func NewMarkdownEditor(name string) *MarkdownEditor {
-	return &MarkdownEditor{
+// MarkdownEditor creates a Markdown editor field.
+func MarkdownEditor(name string) *MarkdownEditorInput {
+	return &MarkdownEditorInput{
 		BaseField: BaseField{fieldName: name, LabelStr: name},
 		RowCount:  10,
 	}
 }
 
 // Label sets the label.
-func (m *MarkdownEditor) Label(label string) *MarkdownEditor {
+func (m *MarkdownEditorInput) Label(label string) *MarkdownEditorInput {
 	m.LabelStr = label
 	return m
 }
 
 // Rows sets the number of visible rows.
-func (m *MarkdownEditor) Rows(rows int) *MarkdownEditor {
+func (m *MarkdownEditorInput) Rows(rows int) *MarkdownEditorInput {
 	m.RowCount = rows
 	return m
 }
 
 // Required makes the field required.
-func (m *MarkdownEditor) Required() *MarkdownEditor {
+func (m *MarkdownEditorInput) Required() *MarkdownEditorInput {
 	m.BaseField.Required = true
 	m.fieldRules = append(m.fieldRules, "required")
 	return m
 }
 
 // Default sets the default Markdown value.
-func (m *MarkdownEditor) Default(val string) *MarkdownEditor {
+func (m *MarkdownEditorInput) Default(val string) *MarkdownEditorInput {
 	m.fieldValue = val
 	return m
 }
 
 // ComponentType returns the component type identifier.
-func (m *MarkdownEditor) ComponentType() string { return "markdown_editor" }
+func (m *MarkdownEditorInput) ComponentType() string { return "markdown_editor" }
 
 // ---------------------------------------------------------------------------
 // TagsInput — multi-value tag/chip input.
 // ---------------------------------------------------------------------------
 
-// TagsInput represents a tag/chip input field that stores multiple string values.
-type TagsInput struct {
+// TagsField represents a tag/chip input field that stores multiple string values.
+type TagsField struct {
 	BaseField
 	Suggestions []string
 	MaxTags     int
 	Separator   string // delimiter for form submission, default ","
 }
 
-// NewTagsInput creates a tags input field.
-func NewTagsInput(name string) *TagsInput {
-	return &TagsInput{
+// Tags creates a tags input field.
+func Tags(name string) *TagsField {
+	return &TagsField{
 		BaseField: BaseField{fieldName: name, LabelStr: name},
 		Separator: ",",
 	}
 }
 
 // Label sets the label.
-func (t *TagsInput) Label(label string) *TagsInput {
+func (t *TagsField) Label(label string) *TagsField {
 	t.LabelStr = label
 	return t
 }
 
 // WithSuggestions sets the autocomplete suggestions.
-func (t *TagsInput) WithSuggestions(suggestions ...string) *TagsInput {
+func (t *TagsField) WithSuggestions(suggestions ...string) *TagsField {
 	t.Suggestions = suggestions
 	return t
 }
 
 // WithMaxTags limits the number of tags.
-func (t *TagsInput) WithMaxTags(n int) *TagsInput {
+func (t *TagsField) WithMaxTags(n int) *TagsField {
 	t.MaxTags = n
 	return t
 }
 
 // WithSeparator sets the delimiter used in form submission (default ",").
-func (t *TagsInput) WithSeparator(sep string) *TagsInput {
+func (t *TagsField) WithSeparator(sep string) *TagsField {
 	t.Separator = sep
 	return t
 }
 
 // Required makes the field required.
-func (t *TagsInput) Required() *TagsInput {
+func (t *TagsField) Required() *TagsField {
 	t.BaseField.Required = true
 	t.fieldRules = append(t.fieldRules, "required")
 	return t
 }
 
 // Default sets the default tags.
-func (t *TagsInput) Default(tags []string) *TagsInput {
+func (t *TagsField) Default(tags []string) *TagsField {
 	t.fieldValue = tags
 	return t
 }
 
 // ComponentType returns the component type identifier.
-func (t *TagsInput) ComponentType() string { return "tags_input" }
+func (t *TagsField) ComponentType() string { return "tags_input" }
 
 // Tags returns the current value as a string slice.
-func (t *TagsInput) Tags() []string {
+func (t *TagsField) TagValues() []string {
 	if v, ok := t.fieldValue.([]string); ok {
 		return v
 	}
@@ -617,8 +617,8 @@ type KeyValuePair struct {
 	Value string
 }
 
-// KeyValue represents a dynamic key-value pair input field.
-type KeyValue struct {
+// KeyValueInput represents a dynamic key-value pair input field.
+type KeyValueInput struct {
 	BaseField
 	KeyLabel   string
 	ValueLabel string
@@ -626,9 +626,9 @@ type KeyValue struct {
 	AddLabel   string
 }
 
-// NewKeyValue creates a key-value input field.
-func NewKeyValue(name string) *KeyValue {
-	return &KeyValue{
+// KeyValue creates a key-value input field.
+func KeyValue(name string) *KeyValueInput {
+	return &KeyValueInput{
 		BaseField:  BaseField{fieldName: name, LabelStr: name},
 		KeyLabel:   "Key",
 		ValueLabel: "Value",
@@ -637,90 +637,90 @@ func NewKeyValue(name string) *KeyValue {
 }
 
 // Label sets the label.
-func (kv *KeyValue) Label(label string) *KeyValue {
+func (kv *KeyValueInput) Label(label string) *KeyValueInput {
 	kv.LabelStr = label
 	return kv
 }
 
 // WithLabels sets the key and value column labels.
-func (kv *KeyValue) WithLabels(keyLabel, valueLabel string) *KeyValue {
+func (kv *KeyValueInput) WithLabels(keyLabel, valueLabel string) *KeyValueInput {
 	kv.KeyLabel = keyLabel
 	kv.ValueLabel = valueLabel
 	return kv
 }
 
 // WithMaxPairs limits the number of pairs.
-func (kv *KeyValue) WithMaxPairs(n int) *KeyValue {
+func (kv *KeyValueInput) WithMaxPairs(n int) *KeyValueInput {
 	kv.MaxPairs = n
 	return kv
 }
 
 // AddButtonLabel sets the label for the "add pair" button.
-func (kv *KeyValue) AddButtonLabel(label string) *KeyValue {
+func (kv *KeyValueInput) AddButtonLabel(label string) *KeyValueInput {
 	kv.AddLabel = label
 	return kv
 }
 
 // Default sets the default pairs.
-func (kv *KeyValue) Default(pairs []KeyValuePair) *KeyValue {
+func (kv *KeyValueInput) Default(pairs []KeyValuePair) *KeyValueInput {
 	kv.fieldValue = pairs
 	return kv
 }
 
 // ComponentType returns the component type identifier.
-func (kv *KeyValue) ComponentType() string { return "key_value" }
+func (kv *KeyValueInput) ComponentType() string { return "key_value" }
 
 // ---------------------------------------------------------------------------
 // ColorPicker — color selection input.
 // ---------------------------------------------------------------------------
 
-// ColorPicker represents a color picker input field.
-type ColorPicker struct {
+// ColorPickerInput represents a color picker input field.
+type ColorPickerInput struct {
 	BaseField
 	Swatches []string // predefined color swatches (hex)
 }
 
-// NewColorPicker creates a color picker field.
-func NewColorPicker(name string) *ColorPicker {
-	return &ColorPicker{
+// ColorPicker creates a color picker field.
+func ColorPicker(name string) *ColorPickerInput {
+	return &ColorPickerInput{
 		BaseField: BaseField{fieldName: name, LabelStr: name},
 	}
 }
 
 // Label sets the label.
-func (c *ColorPicker) Label(label string) *ColorPicker {
+func (c *ColorPickerInput) Label(label string) *ColorPickerInput {
 	c.LabelStr = label
 	return c
 }
 
 // WithSwatches sets predefined color swatches.
-func (c *ColorPicker) WithSwatches(colors ...string) *ColorPicker {
+func (c *ColorPickerInput) WithSwatches(colors ...string) *ColorPickerInput {
 	c.Swatches = colors
 	return c
 }
 
 // Required makes the field required.
-func (c *ColorPicker) Required() *ColorPicker {
+func (c *ColorPickerInput) Required() *ColorPickerInput {
 	c.BaseField.Required = true
 	c.fieldRules = append(c.fieldRules, "required")
 	return c
 }
 
 // Default sets the default color (hex string, e.g. "#22c55e").
-func (c *ColorPicker) Default(hex string) *ColorPicker {
+func (c *ColorPickerInput) Default(hex string) *ColorPickerInput {
 	c.fieldValue = hex
 	return c
 }
 
 // ComponentType returns the component type identifier.
-func (c *ColorPicker) ComponentType() string { return "color_picker" }
+func (c *ColorPickerInput) ComponentType() string { return "color_picker" }
 
 // ---------------------------------------------------------------------------
 // Slider — range slider input.
 // ---------------------------------------------------------------------------
 
-// Slider represents a range slider input field.
-type Slider struct {
+// SliderInput represents a range slider input field.
+type SliderInput struct {
 	BaseField
 	Min  float64
 	Max  float64
@@ -728,9 +728,9 @@ type Slider struct {
 	Unit string // optional display unit (e.g. "%", "px", "kg")
 }
 
-// NewSlider creates a slider field.
-func NewSlider(name string) *Slider {
-	return &Slider{
+// Slider creates a slider field.
+func Slider(name string) *SliderInput {
+	return &SliderInput{
 		BaseField: BaseField{fieldName: name, LabelStr: name},
 		Min:       0,
 		Max:       100,
@@ -739,35 +739,35 @@ func NewSlider(name string) *Slider {
 }
 
 // Label sets the label.
-func (s *Slider) Label(label string) *Slider {
+func (s *SliderInput) Label(label string) *SliderInput {
 	s.LabelStr = label
 	return s
 }
 
 // Range sets the min and max values.
-func (s *Slider) Range(min, max float64) *Slider {
+func (s *SliderInput) Range(min, max float64) *SliderInput {
 	s.Min = min
 	s.Max = max
 	return s
 }
 
 // WithStep sets the step increment.
-func (s *Slider) WithStep(step float64) *Slider {
+func (s *SliderInput) WithStep(step float64) *SliderInput {
 	s.Step = step
 	return s
 }
 
 // WithUnit sets the display unit suffix.
-func (s *Slider) WithUnit(unit string) *Slider {
+func (s *SliderInput) WithUnit(unit string) *SliderInput {
 	s.Unit = unit
 	return s
 }
 
 // Default sets the default value.
-func (s *Slider) Default(val float64) *Slider {
+func (s *SliderInput) Default(val float64) *SliderInput {
 	s.fieldValue = val
 	return s
 }
 
 // ComponentType returns the component type identifier.
-func (s *Slider) ComponentType() string { return "slider" }
+func (s *SliderInput) ComponentType() string { return "slider" }

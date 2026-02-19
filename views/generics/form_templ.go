@@ -5,11 +5,11 @@ package generics
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
-import "github.com/a-h/templ"
-import templruntime "github.com/a-h/templ/runtime"
-
 import (
 	"fmt"
+
+	"github.com/a-h/templ"
+	templruntime "github.com/a-h/templ/runtime"
 	"github.com/bozz33/sublimego/form"
 )
 
@@ -463,7 +463,7 @@ func TextInput(f *form.TextInput) templ.Component {
 	})
 }
 
-func Textarea(t *form.Textarea) templ.Component {
+func Textarea(t *form.TextareaInput) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -632,7 +632,7 @@ func Textarea(t *form.Textarea) templ.Component {
 	})
 }
 
-func SelectField(s *form.Select) templ.Component {
+func SelectField(s *form.SelectInput) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -808,7 +808,7 @@ func SelectField(s *form.Select) templ.Component {
 	})
 }
 
-func CheckboxField(c *form.Checkbox) templ.Component {
+func CheckboxField(c *form.CheckboxInput) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -905,7 +905,7 @@ func CheckboxField(c *form.Checkbox) templ.Component {
 	})
 }
 
-func FileUploadField(f *form.FileUpload) templ.Component {
+func FileUploadField(f *form.FileUploadInput) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -1322,7 +1322,7 @@ func HiddenInputField(f *form.HiddenField) templ.Component {
 	})
 }
 
-func ToggleField(f *form.Toggle) templ.Component {
+func ToggleField(f *form.ToggleInput) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
