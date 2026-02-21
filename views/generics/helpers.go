@@ -68,6 +68,18 @@ func rowIDsJSON(rows []engine.Row) string { //nolint:unused
 	return "[" + strings.Join(parts, ",") + "]"
 }
 
+// hiddenColsJSON returns a JSON array of hidden column keys for Alpine.js.
+func hiddenColsJSON(keys []string) string { //nolint:unused
+	if len(keys) == 0 {
+		return "[]"
+	}
+	parts := make([]string, len(keys))
+	for i, k := range keys {
+		parts[i] = fmt.Sprintf("%q", k)
+	}
+	return "[" + strings.Join(parts, ",") + "]"
+}
+
 // suppressUnused silences the "declared but not used" error for loop index.
 func suppressUnused(_ int) string { return "" } //nolint:unused
 

@@ -89,27 +89,31 @@ type EmptyState struct {
 
 // TableState contains the complete state of a table.
 type TableState struct {
-	Title         string
-	Slug          string
-	Columns       []Column
-	Rows          []Row
-	CanCreate     bool
-	CanDelete     bool
-	CanView       bool // show a view (eye) button per row
-	NewURL        string
-	BaseURL       string
-	Pagination    *Pagination
-	Filters       []FilterDef       // available filter definitions
-	ActiveFilters map[string]string // currently active filter values (key -> value)
-	BulkActions   []BulkActionDef   // available bulk actions
-	ExportURL     string            // non-empty = show export button
-	ImportURL     string            // non-empty = show import button
-	Search        string            // current ?search= value
-	SortKey       string            // current ?sort= column key
-	SortDir       string            // current ?dir= (asc|desc)
-	HeaderActions []HeaderAction    // always-visible action buttons in header
-	PollInterval  int               // HTMX polling interval in seconds (0 = disabled)
-	EmptyState    *EmptyState       // custom empty state (nil = default)
+	Title          string
+	Slug           string
+	Columns        []Column
+	Rows           []Row
+	CanCreate      bool
+	CanDelete      bool
+	CanView        bool // show a view (eye) button per row
+	NewURL         string
+	BaseURL        string
+	Pagination     *Pagination
+	Filters        []FilterDef       // available filter definitions
+	ActiveFilters  map[string]string // currently active filter values (key -> value)
+	BulkActions    []BulkActionDef   // available bulk actions
+	ExportURL      string            // non-empty = show export button
+	ImportURL      string            // non-empty = show import button
+	Search         string            // current ?search= value
+	SortKey        string            // current ?sort= column key
+	SortDir        string            // current ?dir= (asc|desc)
+	HeaderActions  []HeaderAction    // always-visible action buttons in header
+	PollInterval   int               // HTMX polling interval in seconds (0 = disabled)
+	EmptyState     *EmptyState       // custom empty state (nil = default)
+	HiddenColumns  []string          // column keys hidden by default (user can toggle)
+	ColumnManager  bool              // show column visibility toggle button
+	ColumnOrder    []string          // ordered list of column keys (empty = default order)
+	ReorderColumns bool              // allow drag & drop column reordering
 }
 
 // FilterDef describes a filter available on the table.

@@ -1,0 +1,29 @@
+package {{.PackageName}}
+
+import (
+	"context"
+
+	"github.com/bozz33/sublimego/widget"
+)
+
+// {{.TypeName}}Widget is a dashboard widget.
+type {{.TypeName}}Widget struct{}
+
+// New{{.TypeName}}Widget creates a new instance of {{.TypeName}}Widget.
+func New{{.TypeName}}Widget() *{{.TypeName}}Widget {
+	return &{{.TypeName}}Widget{}
+}
+
+// Make returns the widget definition.
+func (w *{{.TypeName}}Widget) Make() *widget.Widget {
+	return widget.New("{{.Slug}}").
+		Label("{{.Label}}").
+		Icon("bar_chart").
+		Provider(func(ctx context.Context) (any, error) {
+			// TODO: return your widget data here
+			return map[string]any{
+				"value": 0,
+				"label": "{{.Label}}",
+			}, nil
+		})
+}

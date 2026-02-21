@@ -1,0 +1,29 @@
+package {{.PackageName}}
+
+import (
+	"context"
+	"net/http"
+
+	"github.com/bozz33/sublimego/actions"
+	"github.com/bozz33/sublimego/notifications"
+)
+
+// {{.TypeName}}Action defines the {{.Label}} action.
+var {{.TypeName}}Action = actions.New("{{.Slug}}").
+	Label("{{.Label}}").
+	Icon("play_arrow").
+	Color("primary").
+	RequiresConfirmation(
+		"Confirmer l'action",
+		"Êtes-vous sûr de vouloir effectuer cette action ?",
+	).
+	Handler(func(ctx context.Context, r *http.Request, item any) error {
+		// TODO: implement your action logic here
+		_ = item
+
+		notifications.Send(
+			"", // TODO: pass userID from context
+			notifications.Success("{{.Label}}", "Action effectuée avec succès"),
+		)
+		return nil
+	})
