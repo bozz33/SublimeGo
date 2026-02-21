@@ -13,6 +13,9 @@ const (
 	EntryTypeImage    EntryType = "image"
 	EntryTypeColor    EntryType = "color"
 	EntryTypeKeyValue EntryType = "keyvalue"
+	EntryTypeIcon     EntryType = "icon"
+	EntryTypeList     EntryType = "list"
+	EntryTypeLink     EntryType = "link"
 )
 
 // Entry is a single read-only field in an Infolist.
@@ -21,8 +24,12 @@ type Entry struct {
 	LabelStr   string
 	Value      any
 	Type       EntryType
-	BadgeColor string // for EntryTypeBadge
-	Format     string // for EntryTypeDate (Go time format)
+	BadgeColor string   // for EntryTypeBadge
+	Format     string   // for EntryTypeDate (Go time format)
+	IconColor  string   // for EntryTypeIcon (Tailwind color name)
+	ListItems  []string // for EntryTypeList
+	LinkURL    string   // for EntryTypeLink
+	LinkTarget string   // for EntryTypeLink ("_blank" etc.)
 	IsCopyable bool
 	Hidden     bool
 	HelpText   string
@@ -44,9 +51,33 @@ func (e *Entry) IsVisible() bool { return !e.Hidden }
 
 // Section groups entries under a heading.
 type Section struct {
-	Heading string
-	Columns int // 1, 2, or 3 — default 2
-	Entries []*Entry
+	Heading     string
+	Description string
+	Columns     int // 1, 2, or 3 — default 2
+	Entries     []*Entry
+}
+
+// NewSection creates a new section with a heading.
+func NewSection(heading string) *Section {
+	return &Section{Heading: heading, Columns: 2}
+}
+
+// WithDescription sets the section description.
+func (s *Section) WithDescription(desc string) *Section {
+	s.Description = desc
+	return s
+}
+
+// WithColumns sets the number of columns (1, 2, or 3).
+func (s *Section) WithColumns(n int) *Section {
+	s.Columns = n
+	return s
+}
+
+// Add appends entries to the section.
+func (s *Section) Add(entries ...*Entry) *Section {
+	s.Entries = append(s.Entries, entries...)
+	return s
 }
 
 // Infolist is the top-level container for a read-only detail view.
@@ -101,6 +132,27 @@ func ImageEntry(name, label string, value any) *Entry {
 // ColorEntry creates a color swatch entry.
 func ColorEntry(name, label string, value any) *Entry {
 	return &Entry{Name: name, LabelStr: label, Value: value, Type: EntryTypeColor}
+}
+
+// IconEntry creates a Material Icons Outlined entry.
+func IconEntry(name, label string, icon string, color string) *Entry {
+	return &Entry{Name: name, LabelStr: label, Value: icon, Type: EntryTypeIcon, IconColor: color}
+}
+
+// ListEntry creates a list entry (renders as a bullet list).
+func ListEntry(name, label string, items []string) *Entry {
+	return &Entry{Name: name, LabelStr: label, Type: EntryTypeList, ListItems: items}
+}
+
+// LinkEntry creates a clickable link entry.
+func LinkEntry(name, label string, url string, displayText string) *Entry {
+	return &Entry{Name: name, LabelStr: label, Value: displayText, Type: EntryTypeLink, LinkURL: url}
+}
+
+// OpenInNewTab makes a LinkEntry open in a new tab.
+func (e *Entry) OpenInNewTab() *Entry {
+	e.LinkTarget = "_blank"
+	return e
 }
 
 // WithCopy marks the entry as copyable (adds a copy button).

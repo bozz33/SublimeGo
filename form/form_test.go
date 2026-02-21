@@ -98,7 +98,7 @@ func TestPasswordInput(t *testing.T) {
 }
 
 func TestSelect(t *testing.T) {
-	field := NewSelect("role").
+	field := Select("role").
 		Label("User Role").
 		Options(map[string]string{
 			"admin": "Administrator",
@@ -121,7 +121,7 @@ func TestSelect(t *testing.T) {
 }
 
 func TestCheckbox(t *testing.T) {
-	field := NewCheckbox("active").
+	field := Checkbox("active").
 		Label("Is Active").
 		Default(true)
 
@@ -134,7 +134,7 @@ func TestCheckbox(t *testing.T) {
 }
 
 func TestTextarea(t *testing.T) {
-	field := NewTextarea("description").
+	field := Textarea("description").
 		Label("Description").
 		Rows(5).
 		Required()
@@ -151,7 +151,7 @@ func TestTextarea(t *testing.T) {
 }
 
 func TestFileUpload(t *testing.T) {
-	field := NewFileUpload("avatar").
+	field := FileUpload("avatar").
 		Label("Profile Picture").
 		Accept("image/*").
 		MaxSize(5 * 1024 * 1024).

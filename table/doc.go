@@ -22,7 +22,7 @@
 //			table.Badge("status").Label("Status"),
 //			table.Date("created_at").Label("Created").Format("2006-01-02"),
 //		).
-//		SetActions(
+//		WithActions(
 //			actions.EditAction("/users"),
 //			actions.DeleteAction("/users"),
 //		).

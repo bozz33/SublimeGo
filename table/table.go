@@ -41,14 +41,14 @@ func (t *Table) WithColumns(cols ...Column) *Table {
 	return t
 }
 
-// SetActions sets the available actions.
-func (t *Table) SetActions(acts ...*actions.Action) *Table {
+// WithActions sets the available actions.
+func (t *Table) WithActions(acts ...*actions.Action) *Table {
 	t.Actions = append(t.Actions, acts...)
 	return t
 }
 
-// SetBaseURL sets the base URL.
-func (t *Table) SetBaseURL(url string) *Table {
+// WithBaseURL sets the base URL.
+func (t *Table) WithBaseURL(url string) *Table {
 	t.BaseURL = url
 	return t
 }

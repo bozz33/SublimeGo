@@ -48,6 +48,16 @@ func NewWithConfig(config ScannerConfig) *Scanner {
 // Scan analyzes all Go files with conflict detection.
 func (s *Scanner) Scan() ScanResult {
 	start := time.Now()
+
+	// If resources directory doesn't exist, return success with zero resources.
+	if _, err := os.Stat(s.config.ResourcesPath); os.IsNotExist(err) {
+		return ScanResult{
+			Success:  true,
+			Message:  fmt.Sprintf("Resources directory %s not found, nothing to scan", s.config.ResourcesPath),
+			Duration: time.Since(start),
+		}
+	}
+
 	var allMetadata []ResourceMetadata
 
 	err := filepath.Walk(s.config.ResourcesPath, func(path string, info os.FileInfo, err error) error {

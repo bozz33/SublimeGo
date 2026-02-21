@@ -37,7 +37,7 @@ func Page403(data Error403Data) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"h-full\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>403 - Access Denied</title><script src=\"https://cdn.tailwindcss.com\"></script></head><body class=\"h-full bg-gray-50\"><div class=\"min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8\"><div class=\"sm:mx-auto sm:w-full sm:max-w-md\"><!-- Logo / Brand --><div class=\"flex justify-center\"><div class=\"flex items-center space-x-3\"><div class=\"w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center\"><svg class=\"w-8 h-8 text-white\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z\"></path></svg></div><span class=\"text-2xl font-bold text-gray-900\">SublimeGo</span></div></div><!-- Error code --><div class=\"mt-8 text-center\"><h1 class=\"text-9xl font-extrabold text-amber-600\">403</h1><h2 class=\"mt-4 text-3xl font-bold text-gray-900\">Access Denied</h2><p class=\"mt-2 text-base text-gray-600\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"h-full\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>403 - Access Denied</title><script src=\"https://cdn.tailwindcss.com\"></script></head><body class=\"h-full bg-gray-50\"><div class=\"min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8\"><div class=\"sm:mx-auto sm:w-full sm:max-w-md\"><!-- Logo / Brand --><div class=\"flex justify-center\"><div class=\"flex items-center space-x-3\"><div class=\"w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center\"><span class=\"material-icons-outlined text-white text-3xl\">lock</span></div><span class=\"text-2xl font-bold text-gray-900\">SublimeGo</span></div></div><!-- Error code --><div class=\"mt-8 text-center\"><h1 class=\"text-9xl font-extrabold text-amber-600\">403</h1><h2 class=\"mt-4 text-3xl font-bold text-gray-900\">Access Denied</h2><p class=\"mt-2 text-base text-gray-600\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -45,7 +45,7 @@ func Page403(data Error403Data) templ.Component {
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(data.Message)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/errors/403.templ`, Line: 41, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/errors/403.templ`, Line: 39, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -74,7 +74,7 @@ func Page403(data Error403Data) templ.Component {
 				var templ_7745c5c3_Var3 string
 				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.Path)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/errors/403.templ`, Line: 55, Col: 57}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/errors/403.templ`, Line: 53, Col: 57}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
@@ -93,7 +93,7 @@ func Page403(data Error403Data) templ.Component {
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.RequestID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/errors/403.templ`, Line: 61, Col: 70}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/errors/403.templ`, Line: 59, Col: 70}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -109,7 +109,7 @@ func Page403(data Error403Data) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<!-- Possible reasons --><div class=\"mt-6 bg-amber-50 border border-amber-200 rounded-lg px-4 py-4\"><h3 class=\"text-sm font-semibold text-amber-900 mb-2\">Possible reasons</h3><ul class=\"text-sm text-amber-700 space-y-1 list-disc list-inside\"><li>You are not logged in</li><li>Your session has expired</li><li>You do not have the required permissions</li><li>The resource is restricted</li></ul></div><!-- Actions --><div class=\"mt-8 space-y-3\"><a href=\"/login\" class=\"w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition\"><svg class=\"-ml-1 mr-2 h-5 w-5\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path fill-rule=\"evenodd\" d=\"M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z\" clip-rule=\"evenodd\"></path></svg> Sign in</a> <a href=\"/\" class=\"w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition\"><svg class=\"-ml-1 mr-2 h-5 w-5\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path d=\"M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z\"></path></svg> Back to home</a></div><!-- Help text --><div class=\"mt-6 text-center text-sm text-gray-500\"><p>Need help?  <a href=\"/support\" class=\"font-medium text-amber-600 hover:text-amber-500\">Contact support</a> to request access.</p></div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<!-- Possible reasons --><div class=\"mt-6 bg-amber-50 border border-amber-200 rounded-lg px-4 py-4\"><h3 class=\"text-sm font-semibold text-amber-900 mb-2\">Possible reasons</h3><ul class=\"text-sm text-amber-700 space-y-1 list-disc list-inside\"><li>You are not logged in</li><li>Your session has expired</li><li>You do not have the required permissions</li><li>The resource is restricted</li></ul></div><!-- Actions --><div class=\"mt-8 space-y-3\"><a href=\"/login\" class=\"w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition\"><span class=\"material-icons-outlined mr-2\">login</span> Se connecter</a> <a href=\"/\" class=\"w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition\"><span class=\"material-icons-outlined mr-2\">home</span> Retour à l'accueil</a></div><!-- Help text --><div class=\"mt-6 text-center text-sm text-gray-500\"><p>Need help?  <a href=\"/support\" class=\"font-medium text-amber-600 hover:text-amber-500\">Contact support</a> to request access.</p></div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

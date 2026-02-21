@@ -1,0 +1,32 @@
+package layouts
+
+// Footer - Faithful conversion of dashboard/index.html footer
+templ Footer() {
+	{{ cfg := GetPanelConfig() }}
+	<footer class="mt-auto border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+		<div class="max-w-7xl mx-auto px-4 lg:px-6 py-4">
+			<div class="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+				<p>
+					if cfg.FooterCopyright != "" {
+						{ cfg.FooterCopyright }
+					} else {
+						© 2024 { cfg.Name }. Tous droits réservés.
+					}
+				</p>
+				if len(cfg.FooterLinks) > 0 {
+					<div class="flex gap-6">
+						for _, link := range cfg.FooterLinks {
+							<a href={ templ.SafeURL(link.URL) } class="hover:text-primary-600">{ link.Label }</a>
+						}
+					</div>
+				} else {
+					<div class="flex gap-6">
+						<a href="#" class="hover:text-primary-600">Documentation</a>
+						<a href="#" class="hover:text-primary-600">Support</a>
+						<a href="#" class="hover:text-primary-600">Confidentialité</a>
+					</div>
+				}
+			</div>
+		</div>
+	</footer>
+}

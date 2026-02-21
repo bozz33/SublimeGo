@@ -1,7 +1,10 @@
 package actions
 
 import (
+	"context"
 	"fmt"
+	"net/http"
+	"time"
 )
 
 // ActionType defines the action style.
@@ -22,10 +25,33 @@ type Action struct {
 	Color       string
 	UrlResolver func(item any) string
 
+	// Confirmation modal
 	RequiresConfirmation bool
 	ModalTitle           string
 	ModalDescription     string
 	ConfirmLabel         string
+	CancelLabel          string
+
+	// Lifecycle hooks
+	BeforeFunc    func(ctx context.Context, item any) error
+	AfterFunc     func(ctx context.Context, item any) error
+	OnSuccessFunc func(ctx context.Context, item any)
+	OnFailureFunc func(ctx context.Context, item any, err error)
+
+	// Authorization
+	AuthorizeFunc func(ctx context.Context, item any) bool
+
+	// Rate limiting
+	RateLimitMax    int           // max calls per window (0 = disabled)
+	RateLimitWindow time.Duration // window duration
+
+	// Notification
+	SuccessMessage string
+	FailureMessage string
+
+	// Redirect
+	RedirectURL      string                // static redirect after action; empty = back to list
+	RedirectResolver func(item any) string // dynamic redirect
 }
 
 // New creates a new base action.
@@ -69,8 +95,138 @@ func (a *Action) RequiresDialog(title, desc string) *Action {
 	a.ModalTitle = title
 	a.ModalDescription = desc
 	a.ConfirmLabel = "Confirm"
+	a.CancelLabel = "Cancel"
 	a.Type = Button
 	return a
+}
+
+// WithConfirmLabels customises the confirm/cancel button labels.
+func (a *Action) WithConfirmLabels(confirm, cancel string) *Action {
+	a.ConfirmLabel = confirm
+	a.CancelLabel = cancel
+	return a
+}
+
+// Before registers a hook called before the action executes.
+// Return a non-nil error to abort execution.
+func (a *Action) Before(fn func(ctx context.Context, item any) error) *Action {
+	a.BeforeFunc = fn
+	return a
+}
+
+// After registers a hook called after the action executes (regardless of outcome).
+func (a *Action) After(fn func(ctx context.Context, item any) error) *Action {
+	a.AfterFunc = fn
+	return a
+}
+
+// OnSuccess registers a callback invoked when the action succeeds.
+func (a *Action) OnSuccess(fn func(ctx context.Context, item any)) *Action {
+	a.OnSuccessFunc = fn
+	return a
+}
+
+// OnFailure registers a callback invoked when the action fails.
+func (a *Action) OnFailure(fn func(ctx context.Context, item any, err error)) *Action {
+	a.OnFailureFunc = fn
+	return a
+}
+
+// Authorize sets a function that returns false to hide/disable the action.
+func (a *Action) Authorize(fn func(ctx context.Context, item any) bool) *Action {
+	a.AuthorizeFunc = fn
+	return a
+}
+
+// IsAuthorized returns true if the action is allowed for the given context and item.
+func (a *Action) IsAuthorized(ctx context.Context, item any) bool {
+	if a.AuthorizeFunc == nil {
+		return true
+	}
+	return a.AuthorizeFunc(ctx, item)
+}
+
+// RateLimit sets a rate limit (max calls per window).
+func (a *Action) RateLimit(max int, window time.Duration) *Action {
+	a.RateLimitMax = max
+	a.RateLimitWindow = window
+	return a
+}
+
+// WithSuccessMessage sets the flash message shown on success.
+func (a *Action) WithSuccessMessage(msg string) *Action {
+	a.SuccessMessage = msg
+	return a
+}
+
+// WithFailureMessage sets the flash message shown on failure.
+func (a *Action) WithFailureMessage(msg string) *Action {
+	a.FailureMessage = msg
+	return a
+}
+
+// RedirectTo sets a static redirect URL after the action completes.
+func (a *Action) RedirectTo(url string) *Action {
+	a.RedirectURL = url
+	return a
+}
+
+// RedirectWith sets a dynamic redirect URL resolver.
+func (a *Action) RedirectWith(fn func(item any) string) *Action {
+	a.RedirectResolver = fn
+	return a
+}
+
+// ResolveRedirect returns the redirect URL for a given item.
+func (a *Action) ResolveRedirect(item any) string {
+	if a.RedirectResolver != nil {
+		return a.RedirectResolver(item)
+	}
+	return a.RedirectURL
+}
+
+// Execute runs the action lifecycle: Before → handler → After → OnSuccess/OnFailure.
+// The handler func encapsulates the actual HTTP action (e.g. delete, update).
+func (a *Action) Execute(ctx context.Context, item any, handler func() error) error {
+	if a.BeforeFunc != nil {
+		if err := a.BeforeFunc(ctx, item); err != nil {
+			if a.OnFailureFunc != nil {
+				a.OnFailureFunc(ctx, item, err)
+			}
+			return fmt.Errorf("action %s before hook: %w", a.Name, err)
+		}
+	}
+
+	err := handler()
+
+	if a.AfterFunc != nil {
+		_ = a.AfterFunc(ctx, item)
+	}
+
+	if err != nil {
+		if a.OnFailureFunc != nil {
+			a.OnFailureFunc(ctx, item, err)
+		}
+		return fmt.Errorf("action %s: %w", a.Name, err)
+	}
+
+	if a.OnSuccessFunc != nil {
+		a.OnSuccessFunc(ctx, item)
+	}
+	return nil
+}
+
+// URL resolves the action URL for a given item.
+func (a *Action) URL(item any) string {
+	if a.UrlResolver != nil {
+		return a.UrlResolver(item)
+	}
+	return ""
+}
+
+// ServeHTTP allows an Action to act as an http.Handler for standalone endpoints.
+func (a *Action) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	http.Error(w, "action not configured as handler", http.StatusNotImplemented)
 }
 
 // EditAction creates a standard Edit button.

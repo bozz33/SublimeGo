@@ -8,6 +8,8 @@ package layouts
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import "fmt"
+
 // Base is the main skeleton of the SublimeGo application.
 // Hybrid configuration: Tailwind CDN + local assets (Alpine.js, HTMX, app.js, custom.css)
 func Base(title string) templ.Component {
@@ -31,27 +33,28 @@ func Base(title string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		cfg := GetPanelConfig()
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"h-full\" x-data=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(initAppData(GetPanelConfig().DarkMode))
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(initAppData(cfg.DarkMode, cfg.SidebarCollapsible))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/base.templ`, Line: 10, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/base.templ`, Line: 13, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" x-init=\"$watch('darkMode', val => localStorage.setItem('theme', val ? 'dark' : 'light'))\" :class=\"{ 'dark': darkMode }\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta name=\"color-scheme\" content=\"light dark\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" x-init=\"$watch('darkMode', val => localStorage.setItem('theme', val ? 'dark' : 'light')); $watch('sidebarCollapsed', val => localStorage.setItem('sidebarCollapsed', val))\" :class=\"{ 'dark': darkMode }\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta name=\"color-scheme\" content=\"light dark\"><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/base.templ`, Line: 18, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/base.templ`, Line: 21, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -62,9 +65,9 @@ func Base(title string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(GetPanelConfig().Name)
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(cfg.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/base.templ`, Line: 18, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/base.templ`, Line: 21, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -74,15 +77,15 @@ func Base(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if GetPanelConfig().Favicon != "" {
+		if cfg.Favicon != "" {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<link rel=\"icon\" href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 templ.SafeURL
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(GetPanelConfig().Favicon)
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(cfg.Favicon)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/base.templ`, Line: 22, Col: 51}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/base.templ`, Line: 25, Col: 38}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -98,7 +101,15 @@ func Base(title string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<!-- Tailwind CSS CDN --><script src=\"https://cdn.tailwindcss.com\"></script><script>\r\n\t\t\ttailwind.config = {\r\n\t\t\t\tdarkMode: 'class',\r\n\t\t\t\ttheme: {\r\n\t\t\t\t\textend: {\r\n\t\t\t\t\t\tcolors: {\r\n\t\t\t\t\t\t\tprimary: @primaryColorPalette(GetPanelConfig().PrimaryColor)\r\n\t\t\t\t\t\t},\r\n\t\t\t\t\t\tfontFamily: { sans: ['Inter', 'sans-serif'] }\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t</script><!-- Fonts (CDN) --><link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap\" rel=\"stylesheet\"><link href=\"https://fonts.googleapis.com/icon?family=Material+Icons+Outlined\" rel=\"stylesheet\"><!-- Custom styles (local) --><link href=\"/assets/css/custom.css\" rel=\"stylesheet\"><!-- Alpine.js (local) --><script src=\"/assets/js/alpine.min.js\" defer></script><!-- HTMX (local) --><script src=\"/assets/js/htmx.min.js\"></script><!-- ApexCharts (CDN) --><script src=\"https://cdn.jsdelivr.net/npm/apexcharts\"></script><!-- App JS (local) --><script src=\"/assets/js/app.js\" defer></script><style>[x-cloak] { display: none !important; }</style></head><body class=\"h-full bg-gray-50 dark:bg-gray-900 font-sans antialiased text-gray-900 dark:text-gray-100 transition-colors duration-300\"><!-- Mobile Sidebar Overlay --><div id=\"sidebar-overlay\" x-show=\"sidebarOpen && window.innerWidth < 1024\" x-cloak @click=\"sidebarOpen = false\" class=\"fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden\" x-transition:enter=\"transition ease-out duration-300\" x-transition:enter-start=\"opacity-0\" x-transition:enter-end=\"opacity-100\" x-transition:leave=\"transition ease-in duration-200\" x-transition:leave-start=\"opacity-100\" x-transition:leave-end=\"opacity-0\"></div><!-- Sidebar -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<!-- Dynamic CSS Variables (Filament-style: color injected from PanelConfig) -->")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templ.Raw(fmt.Sprintf("<style>%s</style>", primaryCSSVars(cfg.PrimaryColor))).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<!-- Tailwind CSS (compilé localement — Tailwind v4) --><link href=\"/assets/css/output.css\" rel=\"stylesheet\"><!-- Fonts (CDN) --><link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap\" rel=\"stylesheet\"><link href=\"https://fonts.googleapis.com/icon?family=Material+Icons+Outlined\" rel=\"stylesheet\"><!-- Custom styles (local) --><link href=\"/assets/css/custom.css\" rel=\"stylesheet\"><!-- Alpine.js (local) --><script src=\"/assets/js/alpine.min.js\" defer></script><!-- HTMX (local) --><script src=\"/assets/js/htmx.min.js\"></script><!-- ApexCharts (CDN) --><script src=\"https://cdn.jsdelivr.net/npm/apexcharts\"></script><!-- App JS (local) --><script src=\"/assets/js/app.js\" defer></script><!-- Charts JS (local) --><script src=\"/assets/js/charts.js\" defer></script><style>[x-cloak] { display: none !important; }</style></head><body class=\"font-sans bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased\"><!-- Layout: Sidebar + Main --><div class=\"flex min-h-screen\"><!-- Sidebar (desktop + mobile) -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -106,7 +117,7 @@ func Base(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<!-- Main Content Area --><div id=\"main-content\" class=\"min-h-screen transition-all duration-300 lg:pl-64\"><!-- Header -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<!-- Main Content Area --><div id=\"main-content\" :class=\"sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'\" class=\"flex-1 flex flex-col min-h-screen transition-all duration-300\"><!-- Header -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -114,7 +125,7 @@ func Base(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<!-- Main Content --><main class=\"p-4 md:p-6 lg:p-8\"><!-- Flash Messages Container --><div id=\"flash-container\" class=\"mb-6\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<!-- Main Content --><main class=\"flex-1 p-4 lg:p-6\"><!-- Flash Messages Container --><div id=\"flash-container\" class=\"mb-6\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -122,7 +133,7 @@ func Base(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div><!-- Page Content -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div><!-- Page Content --><div class=\"max-w-7xl mx-auto\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -130,20 +141,15 @@ func Base(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</main><!-- Footer --><footer class=\"px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-800\"><p>© 2024 ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div></main><!-- Footer -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(GetPanelConfig().Name)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/base.templ`, Line: 104, Col: 38}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		templ_7745c5c3_Err = Footer().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, ". All rights reserved.</p></footer></div><!-- Toast Container --><div id=\"toast-container\" class=\"fixed bottom-4 right-4 z-[9999] space-y-2 pointer-events-none\"></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div></div><!-- Toast Container --><div id=\"toast-container\" class=\"fixed bottom-4 right-4 z-[9999] space-y-2 pointer-events-none\"></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

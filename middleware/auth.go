@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/bozz33/sublimego/apperrors"
 	"github.com/bozz33/sublimego/auth"
-	apperrors "github.com/bozz33/sublimego/errors"
 )
 
 // AuthConfig configures the authentication middleware.

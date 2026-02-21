@@ -1,0 +1,90 @@
+package atoms
+
+import "fmt"
+
+// ProgressBarProps configures a progress bar.
+type ProgressBarProps struct {
+	Value       int    // 0-100
+	Max         int    // default 100
+	Color       string // "primary" | "success" | "error" | "warning" | "info"
+	Size        string // "xs" | "sm" | "md" | "lg" | "xl"
+	ShowLabel   bool   // show percentage label
+	Label       string // custom label (overrides percentage)
+	Indeterminate bool // animated indeterminate bar
+	Striped     bool
+	Animated    bool // striped + animated
+}
+
+func progressBarColor(color string) string {
+	switch color {
+	case "success":
+		return "bg-green-500"
+	case "error", "danger":
+		return "bg-red-500"
+	case "warning":
+		return "bg-yellow-500"
+	case "info":
+		return "bg-blue-500"
+	default:
+		return "bg-primary-500"
+	}
+}
+
+func progressBarHeight(size string) string {
+	switch size {
+	case "xs":
+		return "h-1"
+	case "sm":
+		return "h-1.5"
+	case "lg":
+		return "h-4"
+	case "xl":
+		return "h-6"
+	default:
+		return "h-2.5"
+	}
+}
+
+// ProgressBar renders a styled progress bar.
+templ ProgressBar(p ProgressBarProps) {
+	{{ max := p.Max; if max <= 0 { max = 100 }
+	pct := p.Value * 100 / max
+	if pct > 100 { pct = 100 }
+	if pct < 0 { pct = 0 }
+	colorClass := progressBarColor(p.Color)
+	heightClass := progressBarHeight(p.Size) }}
+	<div class="w-full">
+		if p.ShowLabel || p.Label != "" {
+			<div class="flex justify-between items-center mb-1">
+				if p.Label != "" {
+					<span class="text-sm font-medium text-gray-700 dark:text-gray-300">{ p.Label }</span>
+				} else {
+					<span class="text-sm font-medium text-gray-700 dark:text-gray-300">{ fmt.Sprintf("%d%%", pct) }</span>
+				}
+			</div>
+		}
+		<div class={ "w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden " + heightClass }>
+			if p.Indeterminate {
+				<div class={ "h-full rounded-full animate-pulse " + colorClass } style="width: 60%"></div>
+			} else {
+				<div
+					class={ "h-full rounded-full transition-all duration-500 " + colorClass }
+					style={ fmt.Sprintf("width: %d%%", pct) }
+					role="progressbar"
+					aria-valuenow={ fmt.Sprintf("%d", pct) }
+					aria-valuemin="0"
+					aria-valuemax="100"
+				></div>
+			}
+		</div>
+	</div>
+}
+
+// ProgressBarGroup renders multiple labeled progress bars stacked.
+templ ProgressBarGroup(items []ProgressBarProps) {
+	<div class="space-y-3">
+		for _, item := range items {
+			@ProgressBar(item)
+		}
+	</div>
+}

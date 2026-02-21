@@ -20,6 +20,9 @@ templ InfoSection(s *infolist.Section) {
 		if s.Heading != "" {
 			<div class="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
 				<h3 class="text-base font-semibold text-gray-900 dark:text-white">{ s.Heading }</h3>
+				if s.Description != "" {
+					<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{ s.Description }</p>
+				}
 			</div>
 		}
 		<div class={ infoGridClass(s.Columns) }>
@@ -47,12 +50,12 @@ templ InfoEntry(e *infolist.Entry) {
 				case infolist.EntryTypeBoolean:
 					if e.ValueStr() == "true" || e.ValueStr() == "1" {
 						<span class="inline-flex items-center gap-1 text-green-600 dark:text-green-400 font-medium text-sm">
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+							<span class="material-icons-outlined text-base">check_circle</span>
 							Yes
 						</span>
 					} else {
 						<span class="inline-flex items-center gap-1 text-red-500 dark:text-red-400 font-medium text-sm">
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+							<span class="material-icons-outlined text-base">cancel</span>
 							No
 						</span>
 					}
@@ -70,6 +73,34 @@ templ InfoEntry(e *infolist.Entry) {
 						></span>
 						<span class="text-sm text-gray-900 dark:text-white font-mono">{ e.ValueStr() }</span>
 					</div>
+				case infolist.EntryTypeIcon:
+					<span class={ fmt.Sprintf("material-icons-outlined text-2xl %s", infoIconColor(e.IconColor)) }>{ e.ValueStr() }</span>
+				case infolist.EntryTypeList:
+					if len(e.ListItems) > 0 {
+						<ul class="space-y-1">
+							for _, item := range e.ListItems {
+								<li class="flex items-center gap-2 text-sm text-gray-900 dark:text-white">
+									<span class="material-icons-outlined text-xs text-gray-400">fiber_manual_record</span>
+									{ item }
+								</li>
+							}
+						</ul>
+					} else {
+						<span class="text-sm text-gray-400 dark:text-gray-500 italic">—</span>
+					}
+				case infolist.EntryTypeLink:
+					if e.LinkURL != "" {
+						<a
+							href={ templ.SafeURL(e.LinkURL) }
+							if e.LinkTarget != "" {
+								target={ e.LinkTarget }
+								rel="noopener noreferrer"
+							}
+							class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 underline"
+						>{ e.ValueStr() }</a>
+					} else {
+						<span class="text-sm text-gray-400 italic">—</span>
+					}
 				default:
 					<div class="flex items-center gap-2">
 						if e.ValueStr() != "" {
@@ -85,7 +116,7 @@ templ InfoEntry(e *infolist.Entry) {
 								class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
 								title="Copy"
 							>
-								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+								<span class="material-icons-outlined text-sm">content_copy</span>
 							</button>
 						}
 					</div>
@@ -105,6 +136,25 @@ func infoGridClass(cols int) string {
 		return "grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-gray-100 dark:divide-gray-700"
 	default:
 		return "grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-100 dark:divide-gray-700"
+	}
+}
+
+func infoIconColor(color string) string {
+	switch color {
+	case "green", "success":
+		return "text-green-600 dark:text-green-400"
+	case "red", "danger":
+		return "text-red-600 dark:text-red-400"
+	case "yellow", "warning":
+		return "text-yellow-600 dark:text-yellow-400"
+	case "blue", "info":
+		return "text-blue-600 dark:text-blue-400"
+	case "purple":
+		return "text-purple-600 dark:text-purple-400"
+	case "primary":
+		return "text-primary-600 dark:text-primary-400"
+	default:
+		return "text-gray-500 dark:text-gray-400"
 	}
 }
 

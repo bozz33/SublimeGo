@@ -46,8 +46,8 @@ func TestTableWithColumns(t *testing.T) {
 	}
 }
 
-func TestTableSetBaseURL(t *testing.T) {
-	tbl := New(nil).SetBaseURL("/users")
+func TestTableWithBaseURL(t *testing.T) {
+	tbl := New(nil).WithBaseURL("/users")
 
 	if tbl.BaseURL != "/users" {
 		t.Errorf("Expected BaseURL '/users', got '%s'", tbl.BaseURL)

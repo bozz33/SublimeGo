@@ -1,0 +1,59 @@
+package {{.PackageName}}
+
+// {{.TypeName}} is an enumeration type.
+type {{.TypeName}} int
+
+const (
+	{{.TypeName}}Option1 {{.TypeName}} = iota
+	{{.TypeName}}Option2
+	{{.TypeName}}Option3
+)
+
+// Label returns the human-readable label for the enum value.
+func (e {{.TypeName}}) Label() string {
+	switch e {
+	case {{.TypeName}}Option1:
+		return "Option 1"
+	case {{.TypeName}}Option2:
+		return "Option 2"
+	case {{.TypeName}}Option3:
+		return "Option 3"
+	}
+	return "Unknown"
+}
+
+// Color returns the Tailwind color name for the enum value.
+func (e {{.TypeName}}) Color() string {
+	switch e {
+	case {{.TypeName}}Option1:
+		return "green"
+	case {{.TypeName}}Option2:
+		return "blue"
+	case {{.TypeName}}Option3:
+		return "yellow"
+	}
+	return "gray"
+}
+
+// Icon returns the Material Icons name for the enum value.
+func (e {{.TypeName}}) Icon() string {
+	switch e {
+	case {{.TypeName}}Option1:
+		return "check_circle"
+	case {{.TypeName}}Option2:
+		return "info"
+	case {{.TypeName}}Option3:
+		return "schedule"
+	}
+	return "help"
+}
+
+// String implements fmt.Stringer.
+func (e {{.TypeName}}) String() string { return e.Label() }
+
+// All{{.TypeName}}Values returns all enum values (for use with enum.Options, enum.Colors, etc.).
+var All{{.TypeName}}Values = []{{.TypeName}}{
+	{{.TypeName}}Option1,
+	{{.TypeName}}Option2,
+	{{.TypeName}}Option3,
+}

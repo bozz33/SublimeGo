@@ -18,13 +18,13 @@ install-tools:
 tailwind-download:
 	go run ./cmd/tools/tailwind download
 
-# Compilation CSS avec Tailwind (production - minifie)
+# Compilation CSS avec Tailwind v4 (production - minifie)
 css:
-	go run ./cmd/tools/tailwind build
+	.\tailwindcss.exe -i ui\assets\css\input.css -o ui\assets\css\output.css --minify
 
 # Compilation CSS en mode watch (developpement)
 css-watch:
-	go run ./cmd/tools/tailwind watch
+	.\tailwindcss.exe -i ui\assets\css\input.css -o ui\assets\css\output.css --watch
 
 # Generation du code (Templ)
 generate:

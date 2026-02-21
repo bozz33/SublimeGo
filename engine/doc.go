@@ -17,8 +17,8 @@
 // Basic usage:
 //
 //	panel := engine.NewPanel("admin").
-//		SetDatabase(db).
-//		SetAuthManager(authManager).
+//		WithDatabase(db).
+//		WithAuthManager(authManager).
 //		AddResources(&UserResource{}, &ProductResource{}).
 //		AddPages(settingsPage, reportsPage)
 //

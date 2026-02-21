@@ -62,6 +62,13 @@ type Panel struct {
 
 	// Custom middleware applied to all protected routes
 	Middlewares []func(http.Handler) http.Handler
+
+	// Lifecycle hooks
+	beforeBootHooks []BootHook
+	afterBootHooks  []BootHook
+
+	// Color scheme for semantic colors (primary, danger, success, warning, info, secondary)
+	colorScheme *ColorScheme
 }
 
 // NewPanel initializes a Panel with sensible defaults.
@@ -112,8 +119,21 @@ func (p *Panel) WithFavicon(url string) *Panel {
 
 // WithPrimaryColor sets the UI accent color.
 // Accepted values: "green", "blue", "red", "purple", "orange", "pink", "indigo"
+// For custom colors, use WithCustomColor() instead.
 func (p *Panel) WithPrimaryColor(color string) *Panel {
 	p.PrimaryColor = color
+	return p
+}
+
+// WithCustomColor sets a custom primary color from hex or RGB.
+// Examples:
+//   - panel.WithCustomColor("#3b82f6")
+//   - panel.WithCustomColor("rgb(59, 130, 246)")
+//
+// This generates a full Tailwind-style palette and registers it as "primary".
+func (p *Panel) WithCustomColor(colorValue string) *Panel {
+	// This will be handled by the color manager during syncConfig
+	p.PrimaryColor = colorValue
 	return p
 }
 
@@ -287,6 +307,9 @@ func toNavItems(items []navItem) []layouts.NavItem {
 // Router generates the standard HTTP Handler with automatic CRUD.
 // It also calls syncConfig() and plugin.BootAll() exactly once.
 func (p *Panel) Router() http.Handler {
+	if err := p.runBeforeBoot(); err != nil {
+		panic("sublimego: before_boot hook failed: " + err.Error())
+	}
 	p.syncConfig()
 	if err := plugin.Boot(); err != nil {
 		panic("sublimego: plugin boot failed: " + err.Error())
@@ -301,7 +324,11 @@ func (p *Panel) Router() http.Handler {
 	if p.Session != nil {
 		handler = p.Session.LoadAndSave(handler)
 	}
-	return SecurityHeadersMiddleware(handler)
+	handler = SecurityHeadersMiddleware(handler)
+	if err := p.runAfterBoot(); err != nil {
+		panic("sublimego: after_boot hook failed: " + err.Error())
+	}
+	return handler
 }
 
 func (p *Panel) registerStaticRoutes(mux *http.ServeMux) {

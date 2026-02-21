@@ -463,7 +463,7 @@ func TextInput(f *form.TextInput) templ.Component {
 	})
 }
 
-func Textarea(t *form.Textarea) templ.Component {
+func Textarea(t *form.TextareaInput) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -632,7 +632,7 @@ func Textarea(t *form.Textarea) templ.Component {
 	})
 }
 
-func SelectField(s *form.Select) templ.Component {
+func SelectField(s *form.SelectInput) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -808,7 +808,7 @@ func SelectField(s *form.Select) templ.Component {
 	})
 }
 
-func CheckboxField(c *form.Checkbox) templ.Component {
+func CheckboxField(c *form.CheckboxInput) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -905,7 +905,7 @@ func CheckboxField(c *form.Checkbox) templ.Component {
 	})
 }
 
-func FileUploadField(f *form.FileUpload) templ.Component {
+func FileUploadField(f *form.FileUploadInput) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -1322,7 +1322,7 @@ func HiddenInputField(f *form.HiddenField) templ.Component {
 	})
 }
 
-func ToggleField(f *form.Toggle) templ.Component {
+func ToggleField(f *form.ToggleInput) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -1501,7 +1501,7 @@ func RepeaterFieldView(f *form.RepeaterField) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, "<button type=\"button\" @click=\"items.splice(index, 1)\" class=\"absolute top-2 right-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div></template><button type=\"button\" @click=\"if (max === 0 || items.length < max) items.push({})\" class=\"inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, "<button type=\"button\" @click=\"items.splice(index, 1)\" class=\"absolute top-2 right-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400\"><span class=\"material-icons-outlined text-base\">close</span></button></div></template><button type=\"button\" @click=\"if (max === 0 || items.length < max) items.push({})\" class=\"inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400\"><span class=\"material-icons-outlined text-base\">add</span> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

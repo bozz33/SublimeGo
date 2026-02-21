@@ -39,7 +39,7 @@ func Page500(data Error500Data) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"h-full\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>500 - Server Error</title><script src=\"https://cdn.tailwindcss.com\"></script></head><body class=\"h-full bg-gray-50\"><div class=\"min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8\"><div class=\"sm:mx-auto sm:w-full sm:max-w-2xl\"><!-- Logo / Brand --><div class=\"flex justify-center\"><div class=\"flex items-center space-x-3\"><div class=\"w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center\"><svg class=\"w-8 h-8 text-white\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z\"></path></svg></div><span class=\"text-2xl font-bold text-gray-900\">SublimeGo</span></div></div><!-- Error code --><div class=\"mt-8 text-center\"><h1 class=\"text-9xl font-extrabold text-red-600\">500</h1><h2 class=\"mt-4 text-3xl font-bold text-gray-900\">Server Error</h2><p class=\"mt-2 text-base text-gray-600\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"h-full\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>500 - Server Error</title><script src=\"https://cdn.tailwindcss.com\"></script></head><body class=\"h-full bg-gray-50\"><div class=\"min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8\"><div class=\"sm:mx-auto sm:w-full sm:max-w-2xl\"><!-- Logo / Brand --><div class=\"flex justify-center\"><div class=\"flex items-center space-x-3\"><div class=\"w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center\"><span class=\"material-icons-outlined text-white text-3xl\">error</span></div><span class=\"text-2xl font-bold text-gray-900\">SublimeGo</span></div></div><!-- Error code --><div class=\"mt-8 text-center\"><h1 class=\"text-9xl font-extrabold text-red-600\">500</h1><h2 class=\"mt-4 text-3xl font-bold text-gray-900\">Server Error</h2><p class=\"mt-2 text-base text-gray-600\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -47,7 +47,7 @@ func Page500(data Error500Data) templ.Component {
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(data.Message)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/errors/500.templ`, Line: 43, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/errors/500.templ`, Line: 41, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -71,7 +71,7 @@ func Page500(data Error500Data) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.RequestID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/errors/500.templ`, Line: 57, Col: 99}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/errors/500.templ`, Line: 55, Col: 99}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -90,7 +90,7 @@ func Page500(data Error500Data) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.Path)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/errors/500.templ`, Line: 63, Col: 56}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/errors/500.templ`, Line: 61, Col: 56}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -106,14 +106,14 @@ func Page500(data Error500Data) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if data.ShowStack && data.Stack != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"mt-4 bg-gray-900 rounded-lg shadow overflow-hidden\"><div class=\"px-4 py-3 bg-gray-800 border-b border-gray-700\"><h3 class=\"text-sm font-semibold text-white flex items-center\"><svg class=\"w-5 h-5 mr-2 text-yellow-400\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg> Stack Trace (Development mode)</h3></div><div class=\"px-4 py-3 overflow-x-auto\"><pre class=\"text-xs text-gray-300 whitespace-pre-wrap font-mono\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"mt-4 bg-gray-900 rounded-lg shadow overflow-hidden\"><div class=\"px-4 py-3 bg-gray-800 border-b border-gray-700\"><h3 class=\"text-sm font-semibold text-white flex items-center\"><span class=\"material-icons-outlined mr-2 text-yellow-400\">bug_report</span> Stack Trace (Development mode)</h3></div><div class=\"px-4 py-3 overflow-x-auto\"><pre class=\"text-xs text-gray-300 whitespace-pre-wrap font-mono\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(data.Stack)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/errors/500.templ`, Line: 85, Col: 85}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/errors/500.templ`, Line: 81, Col: 85}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -124,7 +124,7 @@ func Page500(data Error500Data) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<!-- Actions --><div class=\"mt-8 space-y-3\"><a href=\"/\" class=\"w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition\"><svg class=\"-ml-1 mr-2 h-5 w-5\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path d=\"M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z\"></path></svg> Back to home</a> <button onclick=\"location.reload()\" class=\"w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition\"><svg class=\"-ml-1 mr-2 h-5 w-5\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path fill-rule=\"evenodd\" d=\"M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z\" clip-rule=\"evenodd\"></path></svg> Retry</button></div><!-- Help text --><div class=\"mt-6 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3\"><div class=\"flex\"><div class=\"flex-shrink-0\"><svg class=\"h-5 w-5 text-yellow-400\" fill=\"currentColor\" viewBox=\"0 0 20 20\"><path fill-rule=\"evenodd\" d=\"M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z\" clip-rule=\"evenodd\"></path></svg></div><div class=\"ml-3\"><h3 class=\"text-sm font-medium text-yellow-800\">What to do?</h3><div class=\"mt-2 text-sm text-yellow-700\"><ul class=\"list-disc list-inside space-y-1\"><li>Try again in a few moments</li><li>If the problem persists, contact support</li>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<!-- Actions --><div class=\"mt-8 space-y-3\"><a href=\"/\" class=\"w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition\"><span class=\"material-icons-outlined mr-2\">home</span> Retour à l'accueil</a> <button onclick=\"location.reload()\" class=\"w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition\"><span class=\"material-icons-outlined mr-2\">refresh</span> Réessayer</button></div><!-- Help text --><div class=\"mt-6 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3\"><div class=\"flex\"><div class=\"flex-shrink-0\"><span class=\"material-icons-outlined text-yellow-400\">warning</span></div><div class=\"ml-3\"><h3 class=\"text-sm font-medium text-yellow-800\">What to do?</h3><div class=\"mt-2 text-sm text-yellow-700\"><ul class=\"list-disc list-inside space-y-1\"><li>Try again in a few moments</li><li>If the problem persists, contact support</li>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -136,7 +136,7 @@ func Page500(data Error500Data) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(data.RequestID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/errors/500.templ`, Line: 128, Col: 106}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/errors/500.templ`, Line: 118, Col: 106}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
