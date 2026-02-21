@@ -116,8 +116,21 @@ func (p *Panel) WithFavicon(url string) *Panel {
 
 // WithPrimaryColor sets the UI accent color.
 // Accepted values: "green", "blue", "red", "purple", "orange", "pink", "indigo"
+// For custom colors, use WithCustomColor() instead.
 func (p *Panel) WithPrimaryColor(color string) *Panel {
 	p.PrimaryColor = color
+	return p
+}
+
+// WithCustomColor sets a custom primary color from hex or RGB.
+// Examples:
+//   - panel.WithCustomColor("#3b82f6")
+//   - panel.WithCustomColor("rgb(59, 130, 246)")
+//
+// This generates a full Tailwind-style palette and registers it as "primary".
+func (p *Panel) WithCustomColor(colorValue string) *Panel {
+	// This will be handled by the color manager during syncConfig
+	p.PrimaryColor = colorValue
 	return p
 }
 

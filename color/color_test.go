@@ -90,3 +90,59 @@ func TestManagerGetNotFound(t *testing.T) {
 		t.Error("expected nil for nonexistent palette")
 	}
 }
+
+func TestColorHex(t *testing.T) {
+	c := color.Color{}
+	palette := c.Hex("#3b82f6")
+	if palette == nil {
+		t.Fatal("expected non-nil palette")
+	}
+	if len(palette.Shades) != 11 {
+		t.Errorf("expected 11 shades, got %d", len(palette.Shades))
+	}
+	// Verify 500 shade exists
+	found := false
+	for _, shade := range palette.Shades {
+		if shade.Number == 500 {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("expected shade 500 in palette")
+	}
+}
+
+func TestColorRGB(t *testing.T) {
+	c := color.Color{}
+	palette := c.RGB("rgb(59, 130, 246)")
+	if palette == nil {
+		t.Fatal("expected non-nil palette")
+	}
+	if len(palette.Shades) != 11 {
+		t.Errorf("expected 11 shades, got %d", len(palette.Shades))
+	}
+}
+
+func TestColorFromRGB(t *testing.T) {
+	c := color.Color{}
+	palette := c.FromRGB(59, 130, 246)
+	if palette == nil {
+		t.Fatal("expected non-nil palette")
+	}
+	if len(palette.Shades) != 11 {
+		t.Errorf("expected 11 shades, got %d", len(palette.Shades))
+	}
+}
+
+func TestColorInvalidHex(t *testing.T) {
+	c := color.Color{}
+	palette := c.Hex("invalid")
+	if palette == nil {
+		t.Fatal("expected fallback palette")
+	}
+	// Should return gray fallback
+	if len(palette.Shades) != 11 {
+		t.Errorf("expected 11 shades in fallback, got %d", len(palette.Shades))
+	}
+}
