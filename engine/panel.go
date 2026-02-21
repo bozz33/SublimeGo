@@ -66,6 +66,9 @@ type Panel struct {
 	// Lifecycle hooks
 	beforeBootHooks []BootHook
 	afterBootHooks  []BootHook
+
+	// Color scheme for semantic colors (primary, danger, success, warning, info, secondary)
+	colorScheme *ColorScheme
 }
 
 // NewPanel initializes a Panel with sensible defaults.
