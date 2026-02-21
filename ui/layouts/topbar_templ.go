@@ -14,7 +14,8 @@ import (
 	"strings"
 )
 
-// Topbar - Version 2.0 with Alpine.js and new design
+// Topbar - Version 4.0 — Faithful conversion of dashboard/index.html header
+// Uses Material Icons Outlined exclusively (no SVG inline)
 func Topbar(ctx context.Context) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -36,58 +37,98 @@ func Topbar(ctx context.Context) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		userEmail := "guest@example.com"
-		userInitials := "GU"
+		userEmail := "admin@nourriture-solidaire.fr"
+		userName := "Admin User"
+		userRole := "Super Administrateur"
+		avatarURL := "https://ui-avatars.com/api/?name=Admin+User&background=22c55e&color=fff"
 
 		// Get user from context
 		user := auth.UserFromContext(ctx)
 		if user != nil && user.IsAuthenticated() {
 			userEmail = user.Email
-			// Generate initials from email
-			if len(user.Email) > 0 {
-				emailParts := strings.Split(user.Email, "@")
-				if len(emailParts) > 0 && len(emailParts[0]) >= 2 {
-					userInitials = strings.ToUpper(emailParts[0][:2])
-				}
+			emailParts := strings.Split(user.Email, "@")
+			if len(emailParts) > 0 && len(emailParts[0]) > 0 {
+				namePart := emailParts[0]
+				userName = strings.ToUpper(namePart[:1]) + namePart[1:]
+				avatarURL = "https://ui-avatars.com/api/?name=" + namePart + "&background=22c55e&color=fff"
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<header class=\"sticky top-0 z-40 h-16 flex items-center border-b border-gray-200 bg-white/80 backdrop-blur-lg dark:border-gray-700 dark:bg-gray-800/80\"><div class=\"flex flex-1 items-center justify-between px-4 lg:px-6\"><!-- Left: Mobile Menu Button + Global Search --><div class=\"flex items-center gap-4 flex-1\"><!-- Mobile Menu Toggle --><button @click=\"sidebarOpen = !sidebarOpen\" class=\"lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors\"><svg class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5\"></path></svg></button><!-- Global Search --><div x-data=\"{ query: '', results: [], open: false }\" class=\"relative hidden sm:block w-full max-w-xs\"><div class=\"relative\"><div class=\"absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none\"><svg class=\"w-4 h-4 text-gray-400\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z\"></path></svg></div><input type=\"text\" x-model=\"query\" @input.debounce.300ms=\"if(query.length>1){fetch('/api/search?q='+encodeURIComponent(query)).then(r=>r.json()).then(d=>{results=d;open=d.length>0})}\" @keydown.escape=\"open=false;query=''\" @click.outside=\"open=false\" placeholder=\"Search...\" class=\"w-full pl-9 pr-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 border-0 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:bg-white dark:focus:bg-gray-600 transition-colors\"></div><!-- Search Results Dropdown --><div x-show=\"open\" x-cloak @click.outside=\"open=false\" class=\"absolute top-full mt-1 left-0 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50\"><template x-for=\"result in results\" :key=\"result.id\"><a :href=\"result.url\" @click=\"open=false;query=''\" class=\"flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors\"><div class=\"flex-1 min-w-0\"><p class=\"text-sm font-medium text-gray-900 dark:text-white truncate\" x-text=\"result.title\"></p><p class=\"text-xs text-gray-500 dark:text-gray-400 truncate\" x-text=\"result.subtitle || result.type\"></p></div></a></template></div></div></div><!-- Right: Actions --><div class=\"flex items-center gap-2\"><!-- Notification Bell --><div x-data=\"{ unread: 0, open: false, init() { const es = new EventSource('/api/notifications/stream'); es.onmessage = e => { const d = JSON.parse(e.data); if(d.unread_count !== undefined) this.unread = d.unread_count; }; } }\" class=\"relative\"><button @click=\"open = !open; if(open){ fetch('/api/notifications/unread').then(r=>r.json()).then(d=>{ unread=d.length||0 }) }\" class=\"relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors\" title=\"Notifications\"><svg class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0\"></path></svg> <span x-show=\"unread > 0\" x-cloak x-text=\"unread > 9 ? '9+' : unread\" class=\"absolute -top-0.5 -right-0.5 min-w-[1.1rem] h-[1.1rem] flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-0.5\"></span></button><div x-show=\"open\" x-cloak @click.outside=\"open=false\" x-transition:enter=\"transition ease-out duration-200\" x-transition:enter-start=\"opacity-0 scale-95\" x-transition:enter-end=\"opacity-100 scale-100\" x-transition:leave=\"transition ease-in duration-150\" x-transition:leave-start=\"opacity-100 scale-100\" x-transition:leave-end=\"opacity-0 scale-95\" class=\"absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50\"><div class=\"flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700\"><span class=\"text-sm font-semibold text-gray-900 dark:text-white\">Notifications</span> <a href=\"/api/notifications/read-all\" class=\"text-xs text-primary-600 dark:text-primary-400 hover:underline\">Mark all read</a></div><div class=\"max-h-72 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700\"><p class=\"px-4 py-6 text-sm text-center text-gray-400 dark:text-gray-500\">No notifications</p></div><div class=\"border-t border-gray-200 dark:border-gray-700 px-4 py-2\"><a href=\"/notifications\" class=\"text-xs text-primary-600 dark:text-primary-400 hover:underline\">View all</a></div></div></div><!-- Dark Mode Toggle --><button @click=\"darkMode = !darkMode\" class=\"p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors\" title=\"Toggle theme\"><svg x-show=\"!darkMode\" class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z\"></path></svg> <svg x-show=\"darkMode\" x-cloak class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z\"></path></svg></button><!-- User Menu --><div x-data=\"{ open: false }\" class=\"relative\"><button @click=\"open = !open\" class=\"flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors\"><div class=\"w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center\"><span class=\"text-sm font-semibold text-primary-600 dark:text-primary-400\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<header class=\"sticky top-0 z-30 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700\"><div class=\"flex items-center justify-between h-16 px-4 lg:px-6\"><!-- Left: Mobile Menu + Search --><div class=\"flex items-center gap-4\"><!-- Mobile Menu Toggle --><button @click=\"sidebarMobileOpen = true\" class=\"lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700\"><span class=\"material-icons-outlined\">menu</span></button><!-- Global Search --><div class=\"hidden md:block relative\"><span class=\"absolute left-3 top-1/2 -translate-y-1/2 text-gray-400\"><span class=\"material-icons-outlined text-xl\">search</span></span> <input type=\"text\" placeholder=\"Rechercher...\" class=\"w-64 lg:w-80 h-10 pl-10 pr-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500\"></div></div><!-- Right: Actions --><div class=\"flex items-center gap-2 lg:gap-4\"><!-- Dark Mode Toggle --><button @click=\"darkMode = !darkMode\" class=\"p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors\"><span x-show=\"!darkMode\" class=\"material-icons-outlined\">dark_mode</span> <span x-show=\"darkMode\" x-cloak class=\"material-icons-outlined\">light_mode</span></button><!-- Notification Bell --><div x-data=\"{ unread: 0, open: false, init() { const es = new EventSource('/api/notifications/stream'); es.onmessage = e => { const d = JSON.parse(e.data); if(d.unread_count !== undefined) this.unread = d.unread_count; }; } }\" class=\"relative\"><button @click=\"open = !open\" class=\"relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors\"><span class=\"material-icons-outlined\">notifications</span> <span x-show=\"unread > 0\" x-cloak class=\"absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full\"></span></button><!-- Notification Dropdown --><div x-show=\"open\" x-cloak @click.away=\"open = false\" class=\"absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden\"><div class=\"px-4 py-3 border-b border-gray-200 dark:border-gray-700\"><h3 class=\"font-semibold\">Notifications</h3></div><div class=\"max-h-80 overflow-y-auto\"><p class=\"px-4 py-6 text-sm text-center text-gray-400 dark:text-gray-500\">Aucune notification</p></div><div class=\"px-4 py-3 border-t border-gray-200 dark:border-gray-700\"><a href=\"/notifications\" class=\"text-sm text-primary-600 hover:underline\">Voir toutes les notifications</a></div></div></div><!-- Separator --><div class=\"hidden lg:block w-px h-6 bg-gray-200 dark:bg-gray-700\"></div><!-- User Menu --><div x-data=\"{ open: false }\" class=\"relative\"><button @click=\"open = !open\" class=\"flex items-center gap-3 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors\"><div class=\"hidden lg:block text-right\"><p class=\"text-sm font-semibold\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(userInitials)
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(userName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/topbar.templ`, Line: 152, Col: 96}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/topbar.templ`, Line: 110, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</span></div><svg class=\"w-4 h-4 text-gray-400\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M19 9l-7 7-7-7\"></path></svg></button><!-- User Dropdown --><div x-show=\"open\" x-cloak @click.outside=\"open = false\" x-transition:enter=\"transition ease-out duration-200\" x-transition:enter-start=\"opacity-0 scale-95\" x-transition:enter-end=\"opacity-100 scale-100\" x-transition:leave=\"transition ease-in duration-150\" x-transition:leave-start=\"opacity-100 scale-100\" x-transition:leave-end=\"opacity-0 scale-95\" class=\"absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-dropdown border border-gray-200 dark:border-gray-700 overflow-hidden\"><!-- User Info --><div class=\"px-4 py-3 border-b border-gray-200 dark:border-gray-700\"><p class=\"text-xs text-gray-500 dark:text-gray-400\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</p><p class=\"text-xs text-gray-500\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(userEmail)
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(userRole)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/topbar.templ`, Line: 174, Col: 70}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/topbar.templ`, Line: 111, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p></div><!-- Profile link (conditional) -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p></div><img src=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 string
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(avatarURL)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/topbar.templ`, Line: 113, Col: 26}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" alt=\"Avatar\" class=\"w-9 h-9 rounded-full\"></button><!-- User Dropdown --><div x-show=\"open\" x-cloak @click.away=\"open = false\" class=\"absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden\"><div class=\"px-4 py-3 border-b border-gray-200 dark:border-gray-700\"><p class=\"text-sm font-semibold\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(userName)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/topbar.templ`, Line: 123, Col: 50}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</p><p class=\"text-xs text-gray-500\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(userEmail)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/topbar.templ`, Line: 124, Col: 51}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</p></div><div class=\"py-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if GetPanelConfig().Profile {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"py-1\"><a href=\"/profile\" class=\"flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z\"></path></svg> My Profile</a></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<a href=\"/profile\" class=\"flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700\"><span class=\"material-icons-outlined text-lg\">person</span> Mon Profil</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<!-- Logout --><div class=\"border-t border-gray-200 dark:border-gray-700 py-1\"><a href=\"/logout\" class=\"flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75\"></path></svg> Logout</a></div></div></div></div></div></header>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<a href=\"/settings\" class=\"flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700\"><span class=\"material-icons-outlined text-lg\">settings</span> Paramètres</a></div><div class=\"py-2 border-t border-gray-200 dark:border-gray-700\"><a href=\"/logout\" class=\"flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-gray-50 dark:hover:bg-gray-700\"><span class=\"material-icons-outlined text-lg\">logout</span> Déconnexion</a></div></div></div></div></div></header>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

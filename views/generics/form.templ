@@ -309,7 +309,7 @@ templ RepeaterFieldView(f *form.RepeaterField) {
 					@click="items.splice(index, 1)"
 					class="absolute top-2 right-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400"
 				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+					<span class="material-icons-outlined text-base">close</span>
 				</button>
 			</div>
 		</template>
@@ -318,7 +318,7 @@ templ RepeaterFieldView(f *form.RepeaterField) {
 			@click="if (max === 0 || items.length < max) items.push({})"
 			class="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400"
 		>
-			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+			<span class="material-icons-outlined text-base">add</span>
 			{ f.AddLabel }
 		</button>
 	</div>

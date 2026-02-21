@@ -5,11 +5,11 @@ package generics
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
+import "github.com/a-h/templ"
+import templruntime "github.com/a-h/templ/runtime"
+
 import (
 	"fmt"
-
-	"github.com/a-h/templ"
-	templruntime "github.com/a-h/templ/runtime"
 	"github.com/bozz33/sublimego/form"
 )
 
@@ -1501,7 +1501,7 @@ func RepeaterFieldView(f *form.RepeaterField) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, "<button type=\"button\" @click=\"items.splice(index, 1)\" class=\"absolute top-2 right-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div></template><button type=\"button\" @click=\"if (max === 0 || items.length < max) items.push({})\" class=\"inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, "<button type=\"button\" @click=\"items.splice(index, 1)\" class=\"absolute top-2 right-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400\"><span class=\"material-icons-outlined text-base\">close</span></button></div></template><button type=\"button\" @click=\"if (max === 0 || items.length < max) items.push({})\" class=\"inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400\"><span class=\"material-icons-outlined text-base\">add</span> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

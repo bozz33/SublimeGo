@@ -13,6 +13,7 @@ type TextColumn struct {
 	SortableFlag bool
 	SearchFlag   bool
 	CopyFlag     bool
+	ValueFunc    func(item any) string // optional: replaces reflect-based lookup
 }
 
 // Text creates a new text column.
@@ -21,6 +22,12 @@ func Text(key string) *TextColumn {
 		colKey:   key,
 		LabelStr: key,
 	}
+}
+
+// Using sets a custom accessor function, bypassing reflection.
+func (c *TextColumn) Using(fn func(item any) string) *TextColumn {
+	c.ValueFunc = fn
+	return c
 }
 
 // WithLabel sets the column label.
@@ -55,6 +62,9 @@ func (c *TextColumn) IsSortable() bool   { return c.SortableFlag }
 func (c *TextColumn) IsSearchable() bool { return c.SearchFlag }
 func (c *TextColumn) IsCopyable() bool   { return c.CopyFlag }
 func (c *TextColumn) Value(item any) string {
+	if c.ValueFunc != nil {
+		return c.ValueFunc(item)
+	}
 	v := reflect.ValueOf(item)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
@@ -72,6 +82,7 @@ type BadgeColumn struct {
 	LabelStr     string
 	SortableFlag bool
 	ColorMap     map[string]string
+	ValueFunc    func(item any) string // optional: replaces reflect-based lookup
 }
 
 // Badge creates a new badge column.
@@ -92,6 +103,12 @@ func (c *BadgeColumn) WithLabel(label string) *BadgeColumn {
 // Sortable makes the column sortable.
 func (c *BadgeColumn) Sortable() *BadgeColumn {
 	c.SortableFlag = true
+	return c
+}
+
+// Using sets a custom accessor function, bypassing reflection.
+func (c *BadgeColumn) Using(fn func(item any) string) *BadgeColumn {
+	c.ValueFunc = fn
 	return c
 }
 
@@ -117,6 +134,9 @@ func (c *BadgeColumn) IsSortable() bool   { return c.SortableFlag }
 func (c *BadgeColumn) IsSearchable() bool { return false }
 func (c *BadgeColumn) IsCopyable() bool   { return false }
 func (c *BadgeColumn) Value(item any) string {
+	if c.ValueFunc != nil {
+		return c.ValueFunc(item)
+	}
 	v := reflect.ValueOf(item)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
@@ -130,9 +150,10 @@ func (c *BadgeColumn) Value(item any) string {
 
 // ImageColumn represents an image column.
 type ImageColumn struct {
-	colKey   string
-	LabelStr string
-	Rounded  bool
+	colKey    string
+	LabelStr  string
+	Rounded   bool
+	ValueFunc func(item any) string // optional: replaces reflect-based lookup
 }
 
 // Image creates a new image column.
@@ -155,6 +176,12 @@ func (c *ImageColumn) Round() *ImageColumn {
 	return c
 }
 
+// Using sets a custom accessor function, bypassing reflection.
+func (c *ImageColumn) Using(fn func(item any) string) *ImageColumn {
+	c.ValueFunc = fn
+	return c
+}
+
 // Column interface implementation
 func (c *ImageColumn) Key() string        { return c.colKey }
 func (c *ImageColumn) Label() string      { return c.LabelStr }
@@ -163,6 +190,9 @@ func (c *ImageColumn) IsSortable() bool   { return false }
 func (c *ImageColumn) IsSearchable() bool { return false }
 func (c *ImageColumn) IsCopyable() bool   { return false }
 func (c *ImageColumn) Value(item any) string {
+	if c.ValueFunc != nil {
+		return c.ValueFunc(item)
+	}
 	v := reflect.ValueOf(item)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
@@ -181,6 +211,7 @@ type BooleanColumn struct {
 	SortableFlag bool
 	TrueLabel    string
 	FalseLabel   string
+	ValueFunc    func(item any) string // optional: replaces reflect-based lookup
 }
 
 // BoolCol creates a new boolean column.
@@ -205,6 +236,12 @@ func (c *BooleanColumn) Sortable() *BooleanColumn {
 	return c
 }
 
+// Using sets a custom accessor function, bypassing reflection.
+func (c *BooleanColumn) Using(fn func(item any) string) *BooleanColumn {
+	c.ValueFunc = fn
+	return c
+}
+
 // Labels sets custom true/false display labels.
 func (c *BooleanColumn) Labels(trueLabel, falseLabel string) *BooleanColumn {
 	c.TrueLabel = trueLabel
@@ -220,6 +257,9 @@ func (c *BooleanColumn) IsSortable() bool   { return c.SortableFlag }
 func (c *BooleanColumn) IsSearchable() bool { return false }
 func (c *BooleanColumn) IsCopyable() bool   { return false }
 func (c *BooleanColumn) Value(item any) string {
+	if c.ValueFunc != nil {
+		return c.ValueFunc(item)
+	}
 	v := reflect.ValueOf(item)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
@@ -248,8 +288,9 @@ type DateColumn struct {
 	colKey       string
 	LabelStr     string
 	SortableFlag bool
-	Format       string // Go time format string, default "2006-01-02"
-	Relative     bool   // Show relative time ("2 hours ago")
+	Format       string           // Go time format string, default "2006-01-02"
+	Relative     bool             // Show relative time ("2 hours ago")
+	ValueFunc    func(any) string // optional: replaces reflect-based lookup
 }
 
 // DateCol creates a new date column.
@@ -285,6 +326,12 @@ func (c *DateColumn) ShowRelative() *DateColumn {
 	return c
 }
 
+// Using sets a custom accessor function, bypassing reflection.
+func (c *DateColumn) Using(fn func(any) string) *DateColumn {
+	c.ValueFunc = fn
+	return c
+}
+
 // Column interface implementation
 func (c *DateColumn) Key() string        { return c.colKey }
 func (c *DateColumn) Label() string      { return c.LabelStr }
@@ -293,6 +340,9 @@ func (c *DateColumn) IsSortable() bool   { return c.SortableFlag }
 func (c *DateColumn) IsSearchable() bool { return false }
 func (c *DateColumn) IsCopyable() bool   { return false }
 func (c *DateColumn) Value(item any) string {
+	if c.ValueFunc != nil {
+		return c.ValueFunc(item)
+	}
 	v := reflect.ValueOf(item)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()

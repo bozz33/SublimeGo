@@ -1,0 +1,179 @@
+package generics
+
+import (
+	"github.com/bozz33/sublimego/actions"
+)
+
+// ActionConfirmModal renders a reusable confirmation modal driven by Alpine.js events.
+// Place once in the layout; trigger via $dispatch('open-action-modal', { ... }).
+templ ActionConfirmModal() {
+	<div
+		x-data="{ open: false, url: '', method: 'POST', title: '', desc: '', confirmLabel: 'Confirm', cancelLabel: 'Cancel', confirmColor: 'red' }"
+		@open-action-modal.window="
+			open = true;
+			url = $event.detail.url;
+			method = $event.detail.method || 'POST';
+			title = $event.detail.title || 'Confirm';
+			desc = $event.detail.desc || '';
+			confirmLabel = $event.detail.confirmLabel || 'Confirm';
+			cancelLabel = $event.detail.cancelLabel || 'Cancel';
+			confirmColor = $event.detail.color || 'red';
+		"
+		@keydown.escape.window="open = false"
+		x-show="open"
+		class="relative z-50"
+		role="dialog"
+		aria-modal="true"
+		style="display: none;"
+		x-cloak
+	>
+		<!-- Backdrop -->
+		<div
+			class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+			x-transition:enter="transition ease-out duration-200"
+			x-transition:enter-start="opacity-0"
+			x-transition:enter-end="opacity-100"
+			x-transition:leave="transition ease-in duration-150"
+			x-transition:leave-start="opacity-100"
+			x-transition:leave-end="opacity-0"
+			@click="open = false"
+		></div>
+
+		<!-- Modal panel -->
+		<div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+			<div class="flex min-h-full items-center justify-center p-4">
+				<div
+					class="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-xl transition-all"
+					x-transition:enter="transition ease-out duration-200"
+					x-transition:enter-start="opacity-0 scale-95"
+					x-transition:enter-end="opacity-100 scale-100"
+					x-transition:leave="transition ease-in duration-150"
+					x-transition:leave-start="opacity-100 scale-100"
+					x-transition:leave-end="opacity-0 scale-95"
+					@click.stop
+				>
+					<!-- Header -->
+					<div class="flex items-start gap-4 p-6">
+						<div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
+							<span class="material-icons-outlined text-xl text-red-600 dark:text-red-400">warning</span>
+						</div>
+						<div class="flex-1 min-w-0">
+							<h3 class="text-base font-semibold text-gray-900 dark:text-white" x-text="title"></h3>
+							<p class="mt-1 text-sm text-gray-500 dark:text-gray-400" x-text="desc" x-show="desc !== ''"></p>
+						</div>
+						<button
+							@click="open = false"
+							class="flex-shrink-0 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+						>
+							<span class="material-icons-outlined text-xl">close</span>
+						</button>
+					</div>
+
+					<!-- Footer -->
+					<div class="flex items-center justify-end gap-3 px-6 pb-6">
+						<button
+							@click="open = false"
+							type="button"
+							class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+							x-text="cancelLabel"
+						></button>
+						<form :action="url" method="POST" class="inline" @submit="open = false">
+							<input type="hidden" name="_method" :value="method"/>
+							<button
+								type="submit"
+								class="inline-flex items-center px-4 py-2 text-sm font-semibold rounded-xl text-white bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 transition-colors"
+								x-text="confirmLabel"
+							></button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+// ActionButton renders a button or link that triggers an action.
+// For confirmation actions, dispatches an Alpine.js event to open ActionConfirmModal.
+templ ActionButton(a *actions.Action, item any) {
+	if a.RequiresConfirmation {
+		<button
+			type="button"
+			@click={ actionModalDispatch(a, item) }
+			class={ actionButtonClass(a.Color) }
+			title={ a.Label }
+		>
+			if a.Icon != "" {
+				<span class="material-icons-outlined text-lg">{ a.Icon }</span>
+			}
+			if a.Label != "" {
+				<span>{ a.Label }</span>
+			}
+		</button>
+	} else if a.Type == actions.Button {
+		<form method="POST" action={ templ.SafeURL(a.URL(item)) } class="inline">
+			if a.Method != "POST" && a.Method != "" {
+				<input type="hidden" name="_method" value={ a.Method }/>
+			}
+			<button
+				type="submit"
+				class={ actionButtonClass(a.Color) }
+				title={ a.Label }
+			>
+				if a.Icon != "" {
+					<span class="material-icons-outlined text-lg">{ a.Icon }</span>
+				}
+				if a.Label != "" {
+					<span>{ a.Label }</span>
+				}
+			</button>
+		</form>
+	} else {
+		<a
+			href={ templ.SafeURL(a.URL(item)) }
+			class={ actionButtonClass(a.Color) }
+			title={ a.Label }
+		>
+			if a.Icon != "" {
+				<span class="material-icons-outlined text-lg">{ a.Icon }</span>
+			}
+			if a.Label != "" {
+				<span>{ a.Label }</span>
+			}
+		</a>
+	}
+}
+
+// ActionIconButton renders a compact icon-only action button (for table rows).
+templ ActionIconButton(a *actions.Action, item any) {
+	if a.RequiresConfirmation {
+		<button
+			type="button"
+			@click={ actionModalDispatch(a, item) }
+			class={ actionIconClass(a.Color) }
+			title={ a.Label }
+		>
+			<span class="material-icons-outlined text-lg">{ actionIcon(a) }</span>
+		</button>
+	} else if a.Type == actions.Button {
+		<form method="POST" action={ templ.SafeURL(a.URL(item)) } class="inline">
+			if a.Method != "POST" && a.Method != "" {
+				<input type="hidden" name="_method" value={ a.Method }/>
+			}
+			<button
+				type="submit"
+				class={ actionIconClass(a.Color) }
+				title={ a.Label }
+			>
+				<span class="material-icons-outlined text-lg">{ actionIcon(a) }</span>
+			</button>
+		</form>
+	} else {
+		<a
+			href={ templ.SafeURL(a.URL(item)) }
+			class={ actionIconClass(a.Color) }
+			title={ a.Label }
+		>
+			<span class="material-icons-outlined text-lg">{ actionIcon(a) }</span>
+		</a>
+	}
+}

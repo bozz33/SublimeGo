@@ -73,8 +73,18 @@ type Column struct {
 
 // Row represents a table row.
 type Row struct {
-	ID    string
-	Cells []string
+	ID        string
+	Cells     []string
+	RecordURL string // optional: custom URL when clicking the row/first cell
+}
+
+// EmptyState configures the empty table placeholder.
+type EmptyState struct {
+	Icon        string // Material Icon name, default "inbox"
+	Title       string // heading text
+	Description string // sub-text
+	ActionLabel string // optional CTA button label
+	ActionURL   string // optional CTA button URL
 }
 
 // TableState contains the complete state of a table.
@@ -85,6 +95,7 @@ type TableState struct {
 	Rows          []Row
 	CanCreate     bool
 	CanDelete     bool
+	CanView       bool // show a view (eye) button per row
 	NewURL        string
 	BaseURL       string
 	Pagination    *Pagination
@@ -97,6 +108,8 @@ type TableState struct {
 	SortKey       string            // current ?sort= column key
 	SortDir       string            // current ?dir= (asc|desc)
 	HeaderActions []HeaderAction    // always-visible action buttons in header
+	PollInterval  int               // HTMX polling interval in seconds (0 = disabled)
+	EmptyState    *EmptyState       // custom empty state (nil = default)
 }
 
 // FilterDef describes a filter available on the table.
@@ -138,54 +151,6 @@ type Pagination struct {
 	PerPage     int
 	Total       int
 	LastPage    int
-}
-
-// FieldType defines the type of a field.
-type FieldType string
-
-const (
-	FieldText     FieldType = "text"
-	FieldEmail    FieldType = "email"
-	FieldPassword FieldType = "password"
-	FieldNumber   FieldType = "number"
-	FieldTextarea FieldType = "textarea"
-	FieldSelect   FieldType = "select"
-	FieldCheckbox FieldType = "checkbox"
-	FieldDate     FieldType = "date"
-	FieldFile     FieldType = "file"
-)
-
-// Field defines a form field.
-type Field struct {
-	Name        string
-	Label       string
-	Type        FieldType
-	Value       string
-	Placeholder string
-	Required    bool
-	Disabled    bool
-	Options     []Option
-	Validation  []string
-	Error       string
-}
-
-// Option for select fields.
-type Option struct {
-	Value    string
-	Label    string
-	Selected bool
-}
-
-// FormState contains the complete state of a form.
-type FormState struct {
-	Title     string
-	Slug      string
-	ID        string
-	ActionURL string
-	Method    string
-	Fields    []Field
-	Errors    map[string]string
-	OldValues map[string]string
 }
 
 // contextKey is the type for context keys.
@@ -250,4 +215,15 @@ type ResourceQueryable interface {
 // full-text search via the ?search= query param.
 type ResourceSearchable interface {
 	Search(ctx context.Context, query string) ([]any, error)
+}
+
+// ResourceHookable is an optional interface for resources that need
+// lifecycle hooks around CRUD operations.
+type ResourceHookable interface {
+	BeforeCreate(ctx context.Context, r *http.Request) error
+	AfterCreate(ctx context.Context, item any) error
+	BeforeUpdate(ctx context.Context, id string, r *http.Request) error
+	AfterUpdate(ctx context.Context, id string, item any) error
+	BeforeDelete(ctx context.Context, id string) error
+	AfterDelete(ctx context.Context, id string) error
 }

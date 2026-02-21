@@ -11,6 +11,11 @@ templ List(state engine.TableState) {
 	<div
 		class="space-y-6"
 		x-data={ fmt.Sprintf(`{ selected: [], allSelected: false, toggleAll(rows){ if(this.allSelected){ this.selected=[] }else{ this.selected=rows.map(r=>r) }; this.allSelected=!this.allSelected }, bulkAction(url){ if(this.selected.length===0){ alert('Select at least one item.'); return }; const f=document.createElement('form'); f.method='POST'; f.action=url; this.selected.forEach(id=>{ const i=document.createElement('input'); i.type='hidden'; i.name='ids[]'; i.value=id; f.appendChild(i) }); document.body.appendChild(f); f.submit() } }`) }
+		if state.PollInterval > 0 {
+			hx-get={ templ.SafeURL(fmt.Sprintf("%s?search=%s&sort=%s&dir=%s", state.BaseURL, state.Search, state.SortKey, state.SortDir)) }
+			hx-trigger={ fmt.Sprintf("every %ds", state.PollInterval) }
+			hx-swap="outerHTML"
+		}
 	>
 		<!-- Page Header -->
 		<div class="flex flex-wrap items-center justify-between gap-3">
@@ -183,10 +188,9 @@ templ List(state engine.TableState) {
 							<tr>
 								<td
 									colspan={ fmt.Sprintf("%d", len(state.Columns)+2) }
-									class="px-4 py-12 text-center text-gray-400 dark:text-gray-500"
+									class="px-4 py-16 text-center"
 								>
-									<span class="material-icons-outlined text-4xl block mb-2">inbox</span>
-									No records found.
+									@listEmptyState(state)
 								</td>
 							</tr>
 						}
@@ -205,7 +209,8 @@ templ List(state engine.TableState) {
 								for j, cell := range row.Cells {
 									if j == 0 {
 										<td class="px-4 py-3 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-											<a href={ templ.SafeURL(fmt.Sprintf("%s/%s", state.BaseURL, row.ID)) } class="hover:text-primary-600 dark:hover:text-primary-400">
+											{{ recordURL := row.RecordURL; if recordURL == "" { recordURL = fmt.Sprintf("%s/%s", state.BaseURL, row.ID) } }}
+											<a href={ templ.SafeURL(recordURL) } class="hover:text-primary-600 dark:hover:text-primary-400">
 												{ cell }
 											</a>
 										</td>
@@ -217,6 +222,15 @@ templ List(state engine.TableState) {
 								}
 								<td class="px-4 py-3">
 									<div class="flex items-center justify-end gap-2">
+										if state.CanView {
+											<a
+												href={ templ.SafeURL(fmt.Sprintf("%s/%s", state.BaseURL, row.ID)) }
+												class="p-1.5 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+												title="View"
+											>
+												<span class="material-icons-outlined text-lg">visibility</span>
+											</a>
+										}
 										<a
 											href={ templ.SafeURL(fmt.Sprintf("%s/%s/edit", state.BaseURL, row.ID)) }
 											class="p-1.5 rounded-lg text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
@@ -225,16 +239,14 @@ templ List(state engine.TableState) {
 											<span class="material-icons-outlined text-lg">edit</span>
 										</a>
 										if state.CanDelete {
-											<form method="POST" action={ templ.SafeURL(fmt.Sprintf("%s/%s", state.BaseURL, row.ID)) } onsubmit="return confirm('Delete this record?')">
-												<input type="hidden" name="_method" value="DELETE"/>
-												<button
-													type="submit"
-													class="p-1.5 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-													title="Delete"
-												>
-													<span class="material-icons-outlined text-lg">delete_outline</span>
-												</button>
-											</form>
+											<button
+												type="button"
+												@click={ fmt.Sprintf("$dispatch('open-action-modal', { url: '%s/%s', method: 'DELETE', title: 'Delete this record?', desc: 'This action cannot be undone.', confirmLabel: 'Delete', cancelLabel: 'Cancel', color: 'red' })", state.BaseURL, row.ID) }
+												class="p-1.5 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+												title="Delete"
+											>
+												<span class="material-icons-outlined text-lg">delete_outline</span>
+											</button>
 										}
 									</div>
 								</td>
@@ -271,6 +283,33 @@ templ List(state engine.TableState) {
 				</div>
 			}
 		</div>
+	</div>
+}
+
+// listEmptyState renders the empty table placeholder.
+templ listEmptyState(state engine.TableState) {
+	{{ icon := "inbox"; title := "No records found."; desc := ""; actionLabel := ""; actionURL := ""
+	if state.EmptyState != nil {
+		if state.EmptyState.Icon != "" { icon = state.EmptyState.Icon }
+		if state.EmptyState.Title != "" { title = state.EmptyState.Title }
+		desc = state.EmptyState.Description
+		actionLabel = state.EmptyState.ActionLabel
+		actionURL = state.EmptyState.ActionURL
+	} }}
+	<div class="flex flex-col items-center gap-3 text-gray-400 dark:text-gray-500">
+		<span class="material-icons-outlined text-5xl">{ icon }</span>
+		<p class="text-base font-medium text-gray-500 dark:text-gray-400">{ title }</p>
+		if desc != "" {
+			<p class="text-sm">{ desc }</p>
+		}
+		if actionLabel != "" && actionURL != "" {
+			<a
+				href={ templ.SafeURL(actionURL) }
+				class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-xl text-white bg-primary-600 hover:bg-primary-700 transition-colors"
+			>
+				{ actionLabel }
+			</a>
+		}
 	</div>
 }
 

@@ -20,22 +20,23 @@ const (
 
 // Notification represents a single notification message.
 type Notification struct {
-	ID        string    `json:"id"`
-	UserID    string    `json:"user_id"`
-	Title     string    `json:"title"`
-	Body      string    `json:"body,omitempty"`
-	Level     Level     `json:"level"`
-	Icon      string    `json:"icon,omitempty"`
-	ActionURL string    `json:"action_url,omitempty"`
-	ActionLabel string  `json:"action_label,omitempty"`
-	Read      bool      `json:"read"`
-	CreatedAt time.Time `json:"created_at"`
+	ID          string    `json:"id"`
+	UserID      string    `json:"user_id"`
+	Title       string    `json:"title"`
+	Body        string    `json:"body,omitempty"`
+	Level       Level     `json:"level"`
+	Icon        string    `json:"icon,omitempty"`
+	ActionURL   string    `json:"action_url,omitempty"`
+	ActionLabel string    `json:"action_label,omitempty"`
+	Duration    int       `json:"duration,omitempty"` // auto-dismiss ms (0 = persistent)
+	Read        bool      `json:"read"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 // Store manages notifications for all users.
 type Store struct {
 	mu            sync.RWMutex
-	notifications map[string][]*Notification // userID -> notifications
+	notifications map[string][]*Notification      // userID -> notifications
 	subscribers   map[string][]chan *Notification // userID -> SSE channels
 	maxPerUser    int
 }
@@ -225,22 +226,22 @@ func (s *Store) Subscribe(ctx context.Context, userID string) <-chan *Notificati
 
 // Info creates an info-level notification.
 func Info(title string) *Notification {
-	return &Notification{Title: title, Level: LevelInfo, Icon: "information-circle"}
+	return &Notification{Title: title, Level: LevelInfo, Icon: "info", Duration: 5000}
 }
 
 // Success creates a success-level notification.
 func Success(title string) *Notification {
-	return &Notification{Title: title, Level: LevelSuccess, Icon: "check-circle"}
+	return &Notification{Title: title, Level: LevelSuccess, Icon: "check_circle", Duration: 4000}
 }
 
 // Warning creates a warning-level notification.
 func Warning(title string) *Notification {
-	return &Notification{Title: title, Level: LevelWarning, Icon: "exclamation-triangle"}
+	return &Notification{Title: title, Level: LevelWarning, Icon: "warning", Duration: 6000}
 }
 
 // Danger creates a danger-level notification.
 func Danger(title string) *Notification {
-	return &Notification{Title: title, Level: LevelDanger, Icon: "x-circle"}
+	return &Notification{Title: title, Level: LevelDanger, Icon: "error", Duration: 0}
 }
 
 // WithBody sets the notification body.
@@ -262,9 +263,50 @@ func (n *Notification) WithIcon(icon string) *Notification {
 	return n
 }
 
+// WithDuration sets the auto-dismiss duration in milliseconds (0 = persistent).
+func (n *Notification) WithDuration(ms int) *Notification {
+	n.Duration = ms
+	return n
+}
+
+// Persistent marks the notification as non-dismissible (duration = 0).
+func (n *Notification) Persistent() *Notification {
+	n.Duration = 0
+	return n
+}
+
 // SendTo sends this notification to a user via the global store.
 func (n *Notification) SendTo(userID string) {
 	Send(userID, n)
+}
+
+// SendToAll broadcasts this notification to all users in the given list.
+func (n *Notification) SendToAll(userIDs []string) {
+	for _, id := range userIDs {
+		copy := *n
+		copy.ID = fmt.Sprintf("%d-%s", time.Now().UnixNano(), id)
+		Send(id, &copy)
+	}
+}
+
+// Broadcast sends a notification to all users currently tracked in the global store.
+func Broadcast(n *Notification) {
+	globalStore.Broadcast(n)
+}
+
+// Broadcast sends a notification to all users currently tracked in this store.
+func (s *Store) Broadcast(n *Notification) {
+	s.mu.RLock()
+	userIDs := make([]string, 0, len(s.notifications))
+	for id := range s.notifications {
+		userIDs = append(userIDs, id)
+	}
+	s.mu.RUnlock()
+	for _, id := range userIDs {
+		copy := *n
+		copy.ID = fmt.Sprintf("%d-%s", time.Now().UnixNano(), id)
+		s.Send(id, &copy)
+	}
 }
 
 // MarshalSSE formats the notification as a Server-Sent Events message.

@@ -62,6 +62,10 @@ type Panel struct {
 
 	// Custom middleware applied to all protected routes
 	Middlewares []func(http.Handler) http.Handler
+
+	// Lifecycle hooks
+	beforeBootHooks []BootHook
+	afterBootHooks  []BootHook
 }
 
 // NewPanel initializes a Panel with sensible defaults.
@@ -287,6 +291,9 @@ func toNavItems(items []navItem) []layouts.NavItem {
 // Router generates the standard HTTP Handler with automatic CRUD.
 // It also calls syncConfig() and plugin.BootAll() exactly once.
 func (p *Panel) Router() http.Handler {
+	if err := p.runBeforeBoot(); err != nil {
+		panic("sublimego: before_boot hook failed: " + err.Error())
+	}
 	p.syncConfig()
 	if err := plugin.Boot(); err != nil {
 		panic("sublimego: plugin boot failed: " + err.Error())
@@ -301,7 +308,11 @@ func (p *Panel) Router() http.Handler {
 	if p.Session != nil {
 		handler = p.Session.LoadAndSave(handler)
 	}
-	return SecurityHeadersMiddleware(handler)
+	handler = SecurityHeadersMiddleware(handler)
+	if err := p.runAfterBoot(); err != nil {
+		panic("sublimego: after_boot hook failed: " + err.Error())
+	}
+	return handler
 }
 
 func (p *Panel) registerStaticRoutes(mux *http.ServeMux) {

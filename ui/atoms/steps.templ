@@ -40,9 +40,7 @@ templ stepsHorizontal(steps []Step) {
 				<div class="flex items-center">
 					<span class={ stepsCircleClass(step.Status) }>
 						if step.Status == StepCompleted {
-							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-							</svg>
+							<span class="material-icons-outlined text-sm">check</span>
 						} else {
 							{ stepNumber(steps, step.ID) }
 						}
@@ -64,9 +62,7 @@ templ stepsVertical(steps []Step) {
 			<li class="mb-8 ml-6">
 				<span class={ stepsVerticalCircleClass(step.Status) }>
 					if step.Status == StepCompleted {
-						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-						</svg>
+						<span class="material-icons-outlined text-sm">check</span>
 					} else {
 						{ stepNumber(steps, step.ID) }
 					}
