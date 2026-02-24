@@ -315,14 +315,20 @@ func (p *Panel) Router() http.Handler {
 		panic("sublimego: plugin boot failed: " + err.Error())
 	}
 	mux := http.NewServeMux()
-	// Redirect root / to panel base path
+	// Redirect bare paths (without base) to their canonical form under p.Path
 	if p.Path != "" && p.Path != "/" {
+		base := strings.TrimRight(p.Path, "/")
 		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path == "/" {
+			// Redirect known auth paths entered without base prefix
+			bare := r.URL.Path
+			switch bare {
+			case "/login", "/register", "/logout", "/forgot-password", "/reset-password", "/profile", "/settings":
+				http.Redirect(w, r, base+bare, http.StatusMovedPermanently)
+			case "/":
 				http.Redirect(w, r, p.Path, http.StatusFound)
-				return
+			default:
+				http.NotFound(w, r)
 			}
-			http.NotFound(w, r)
 		})
 	}
 	p.registerStaticRoutes(mux)
