@@ -31,7 +31,7 @@ templ Base(title string) {
 		@templ.Raw(fmt.Sprintf("<style>%s</style>", primaryCSSVars(cfg.PrimaryColor)))
 
 		<!-- Tailwind CSS (compilé localement — Tailwind v4) -->
-		<link href={ assetPath(cfg.Path, "/assets/css/output.css") } rel="stylesheet"/>
+		<link href={ assetPath(cfg.Path, "/assets/styles.css") } rel="stylesheet"/>
 
 		<!-- Fonts (CDN) -->
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
