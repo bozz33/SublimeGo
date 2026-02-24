@@ -315,6 +315,16 @@ func (p *Panel) Router() http.Handler {
 		panic("sublimego: plugin boot failed: " + err.Error())
 	}
 	mux := http.NewServeMux()
+	// Redirect root / to panel base path
+	if p.Path != "" && p.Path != "/" {
+		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/" {
+				http.Redirect(w, r, p.Path, http.StatusFound)
+				return
+			}
+			http.NotFound(w, r)
+		})
+	}
 	p.registerStaticRoutes(mux)
 	p.registerAuthRoutes(mux)
 	p.registerCoreRoutes(mux)
@@ -333,39 +343,43 @@ func (p *Panel) Router() http.Handler {
 
 func (p *Panel) registerStaticRoutes(mux *http.ServeMux) {
 	fs := http.FileServer(http.FS(assets.FS))
-	mux.Handle("/assets/", gzipMiddleware(cacheControlMiddleware(http.StripPrefix("/assets", fs))))
+	base := strings.TrimRight(p.Path, "/")
+	assetPrefix := base + "/assets/"
+	mux.Handle(assetPrefix, gzipMiddleware(cacheControlMiddleware(http.StripPrefix(base+"/assets", fs))))
 }
 
 func (p *Panel) registerAuthRoutes(mux *http.ServeMux) {
 	if p.AuthManager == nil {
 		return
 	}
-	authHandler := NewAuthHandler(p.AuthManager, p.DB)
+	base := strings.TrimRight(p.Path, "/")
+	authHandler := NewAuthHandler(p.AuthManager, p.DB, base)
 	loginLimiter := middleware.NewRateLimiter(&middleware.RateLimitConfig{
 		RequestsPerMinute: 5, Burst: 3, KeyFunc: middleware.KeyByIP,
 	})
-	mux.Handle("/login", middleware.RequireGuest(p.AuthManager, "/")(loginLimiter.Middleware()(authHandler)))
-	mux.Handle("/logout", authHandler)
+	mux.Handle(base+"/login", middleware.RequireGuest(p.AuthManager, base+"/")(loginLimiter.Middleware()(authHandler)))
+	mux.Handle(base+"/logout", authHandler)
 	if p.Registration {
-		mux.Handle("/register", middleware.RequireGuest(p.AuthManager, "/")(authHandler))
+		mux.Handle(base+"/register", middleware.RequireGuest(p.AuthManager, base+"/")(authHandler))
 	}
 	if p.Profile {
-		mux.Handle("/profile", gzipMiddleware(p.protect(NewProfileHandler(p.AuthManager, p.DB))))
+		mux.Handle(base+"/profile", gzipMiddleware(p.protect(NewProfileHandler(p.AuthManager, p.DB))))
 	}
 	if p.PasswordReset {
 		rh := NewPasswordResetHandler(p.AuthManager, p.DB, p.Mailer, p.BaseURL)
-		mux.Handle("/forgot-password", rh)
-		mux.Handle("/reset-password", rh)
+		mux.Handle(base+"/forgot-password", rh)
+		mux.Handle(base+"/reset-password", rh)
 	}
 }
 
 func (p *Panel) registerCoreRoutes(mux *http.ServeMux) {
+	base := strings.TrimRight(p.Path, "/")
 	// Dashboard
-	mux.Handle("/", gzipMiddleware(p.protect(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle(base+"/", gzipMiddleware(p.protect(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_ = dashboard.Index(widget.GetAllWidgets(r.Context())).Render(r.Context(), w)
 	}))))
 	// Global search
-	mux.Handle("/api/search", p.protect(http.HandlerFunc(p.handleSearch)))
+	mux.Handle(base+"/api/search", p.protect(http.HandlerFunc(p.handleSearch)))
 	// Notifications
 	if p.Notifications {
 		notifHandler := notifications.NewHandler(nil, func(r *http.Request) string {
@@ -376,7 +390,7 @@ func (p *Panel) registerCoreRoutes(mux *http.ServeMux) {
 			}
 			return ""
 		})
-		notifHandler.Register(mux, "/api/notifications")
+		notifHandler.Register(mux, base+"/api/notifications")
 	}
 }
 
@@ -402,22 +416,24 @@ func (p *Panel) registerResourceRoutes(mux *http.ServeMux) {
 }
 
 func (p *Panel) mountResource(mux *http.ServeMux, res Resource) {
+	base := strings.TrimRight(p.Path, "/")
 	slug := res.Slug()
 	h := gzipMiddleware(p.protect(NewCRUDHandler(res)))
-	mux.Handle("/"+slug+"/", h)
-	mux.Handle("/"+slug, h)
-	mux.Handle("/"+slug+"/export", p.protect(NewExportHandler(res, export.FormatCSV)))
+	mux.Handle(base+"/"+slug+"/", h)
+	mux.Handle(base+"/"+slug, h)
+	mux.Handle(base+"/"+slug+"/export", p.protect(NewExportHandler(res, export.FormatCSV)))
 	if _, ok := res.(ResourceImportable); ok {
-		mux.Handle("/"+slug+"/import", p.protect(NewImportHandler(res)))
+		mux.Handle(base+"/"+slug+"/import", p.protect(NewImportHandler(res)))
 	}
 	if rm := NewRelationManagerHandler(res); rm.HasManagers() {
-		mux.Handle("/"+slug+"/relations/", p.protect(rm))
+		mux.Handle(base+"/"+slug+"/relations/", p.protect(rm))
 	}
 }
 
 func (p *Panel) registerPageRoutes(mux *http.ServeMux) {
+	base := strings.TrimRight(p.Path, "/")
 	for _, pg := range p.Pages {
-		mux.Handle("/"+pg.Slug(), gzipMiddleware(p.protect(NewPageHandler(pg))))
+		mux.Handle(base+"/"+pg.Slug(), gzipMiddleware(p.protect(NewPageHandler(pg))))
 	}
 }
 
@@ -429,7 +445,12 @@ func (p *Panel) EnableDebug(mux *http.ServeMux) {
 
 // protect wraps a handler with auth + any custom middlewares.
 func (p *Panel) protect(h http.Handler) http.Handler {
-	h = middleware.RequireAuth(p.AuthManager)(h)
+	base := strings.TrimRight(p.Path, "/")
+	h = middleware.RequireAuthWithConfig(&middleware.AuthConfig{
+		Manager:         p.AuthManager,
+		RedirectURL:     base + "/login",
+		SaveIntendedURL: true,
+	})(h)
 	for i := len(p.Middlewares) - 1; i >= 0; i-- {
 		h = p.Middlewares[i](h)
 	}

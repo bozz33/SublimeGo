@@ -1,0 +1,39 @@
+# SublimeGo Configuration
+environment: development
+
+app:
+  debug: true
+
+server:
+  host: localhost
+  port: 8080
+
+database:
+  driver: sqlite
+  url: "file:sublimego.db?_fk=1"
+  max_open_conns: 25
+  max_idle_conns: 5
+  conn_max_lifetime: 5m
+  auto_migrate: true
+
+engine:
+  base_path: /admin
+  brand_name: SublimeGo Admin
+  default_page_size: 15
+  max_page_size: 100
+
+logging:
+  level: debug
+  format: text
+  output: stdout
+
+security:
+  secret_key: dev-secret-key-change-me-in-production-min-32-chars
+  enable_csrf: true
+  enable_cors: false
+
+features:
+  enable_hot_reload: true
+  enable_metrics: false
+  enable_profiling: false
+  enable_swagger: false

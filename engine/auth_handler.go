@@ -17,20 +17,23 @@ import (
 type AuthHandler struct {
 	authManager *authpkg.Manager
 	db          *ent.Client
+	basePath    string
 }
 
 // NewAuthHandler creates a new authentication handler.
-func NewAuthHandler(authManager *authpkg.Manager, db *ent.Client) *AuthHandler {
+func NewAuthHandler(authManager *authpkg.Manager, db *ent.Client, basePath string) *AuthHandler {
 	return &AuthHandler{
 		authManager: authManager,
 		db:          db,
+		basePath:    strings.TrimRight(basePath, "/"),
 	}
 }
 
 // ServeHTTP implements http.Handler for routing.
 func (h *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch r.URL.Path {
-	case "/login":
+	path := r.URL.Path
+	switch {
+	case path == h.basePath+"/login":
 		switch r.Method {
 		case http.MethodGet:
 			h.showLogin(w, r)
@@ -39,7 +42,7 @@ func (h *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		default:
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
-	case "/register":
+	case path == h.basePath+"/register":
 		switch r.Method {
 		case http.MethodGet:
 			h.showRegister(w, r)
@@ -48,7 +51,7 @@ func (h *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		default:
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
-	case "/logout":
+	case path == h.basePath+"/logout":
 		h.handleLogout(w, r)
 	default:
 		http.NotFound(w, r)
@@ -58,7 +61,7 @@ func (h *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // showLogin displays the login page.
 func (h *AuthHandler) showLogin(w http.ResponseWriter, r *http.Request) {
 	if h.authManager.IsAuthenticatedFromRequest(r) {
-		http.Redirect(w, r, "/admin", http.StatusFound)
+		http.Redirect(w, r, h.basePath+"/", http.StatusFound)
 		return
 	}
 
@@ -113,7 +116,7 @@ func (h *AuthHandler) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	intendedURL := h.getIntendedURL(r)
 	if intendedURL == "" {
-		intendedURL = "/admin"
+		intendedURL = h.basePath + "/"
 	}
 	http.Redirect(w, r, intendedURL, http.StatusFound)
 }
@@ -121,7 +124,7 @@ func (h *AuthHandler) handleLogin(w http.ResponseWriter, r *http.Request) {
 // showRegister displays the registration page.
 func (h *AuthHandler) showRegister(w http.ResponseWriter, r *http.Request) {
 	if h.authManager.IsAuthenticatedFromRequest(r) {
-		http.Redirect(w, r, "/admin", http.StatusFound)
+		http.Redirect(w, r, h.basePath+"/", http.StatusFound)
 		return
 	}
 
@@ -183,7 +186,7 @@ func (h *AuthHandler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/admin", http.StatusFound)
+	http.Redirect(w, r, h.basePath+"/", http.StatusFound)
 }
 
 // handleLogout logs out the user.
@@ -193,7 +196,7 @@ func (h *AuthHandler) handleLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/login", http.StatusFound)
+	http.Redirect(w, r, h.basePath+"/login", http.StatusFound)
 }
 
 // Helpers

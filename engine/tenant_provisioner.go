@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/bozz33/sublimego/internal/ent"
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 // TenantProvisioner handles automatic database creation and migration for tenants.
@@ -49,7 +49,7 @@ func (p *TenantProvisioner) ProvisionTenant(ctx context.Context, tenant *Tenant)
 	}
 
 	// Create new database
-	db, err := sql.Open("sqlite3", dsn)
+	db, err := sql.Open("sqlite", dsn)
 	if err != nil {
 		return "", fmt.Errorf("failed to create tenant database: %w", err)
 	}
@@ -62,7 +62,7 @@ func (p *TenantProvisioner) ProvisionTenant(ctx context.Context, tenant *Tenant)
 
 	// Run migrations if provided
 	if p.MigrationFunc != nil {
-		client, err := ent.Open("sqlite3", dsn)
+		client, err := ent.Open("sqlite", dsn)
 		if err != nil {
 			return "", fmt.Errorf("failed to open ent client for migrations: %w", err)
 		}
@@ -109,7 +109,7 @@ func (p *TenantProvisioner) GetTenantClient(tenant *Tenant) (*ent.Client, error)
 		return nil, fmt.Errorf("tenant %s has no database DSN", tenant.ID)
 	}
 
-	client, err := ent.Open("sqlite3", dsn)
+	client, err := ent.Open("sqlite", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open tenant database: %w", err)
 	}
