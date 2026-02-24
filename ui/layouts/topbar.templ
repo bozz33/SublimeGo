@@ -10,10 +10,11 @@ import (
 // Uses Material Icons Outlined exclusively (no SVG inline)
 templ Topbar(ctx context.Context) {
 	{{ 
-		userEmail := "admin@nourriture-solidaire.fr"
-		userName := "Admin User"
-		userRole := "Super Administrateur"
-		avatarURL := "https://ui-avatars.com/api/?name=Admin+User&background=22c55e&color=fff"
+		cfg := GetPanelConfigFromContext(ctx)
+		userEmail := "admin@example.com"
+		userName := "Admin"
+		userRole := "Administrator"
+		avatarURL := "https://ui-avatars.com/api/?name=Admin&background=22c55e&color=fff"
 		
 		// Get user from context
 		user := auth.UserFromContext(ctx)
@@ -64,7 +65,7 @@ templ Topbar(ctx context.Context) {
 
 				<!-- Notification Bell -->
 				<div
-					x-data="{ unread: 0, open: false, init() { const es = new EventSource('/api/notifications/stream'); es.onmessage = e => { const d = JSON.parse(e.data); if(d.unread_count !== undefined) this.unread = d.unread_count; }; } }"
+					x-data={ "{ unread: 0, open: false, init() { const es = new EventSource('" + assetPath(cfg.Path, "/api/notifications/stream") + "'); es.onmessage = e => { const d = JSON.parse(e.data); if(d.unread_count !== undefined) this.unread = d.unread_count; }; } }" }
 					class="relative"
 				>
 					<button
@@ -92,7 +93,7 @@ templ Topbar(ctx context.Context) {
 							<p class="px-4 py-6 text-sm text-center text-gray-400 dark:text-gray-500">Aucune notification</p>
 						</div>
 						<div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
-							<a href="/notifications" class="text-sm text-primary-600 hover:underline">Voir toutes les notifications</a>
+							<a href={ templ.SafeURL(navLink(cfg.Path, "notifications")) } class="text-sm text-primary-600 hover:underline">Voir toutes les notifications</a>
 						</div>
 					</div>
 				</div>
@@ -124,19 +125,19 @@ templ Topbar(ctx context.Context) {
 							<p class="text-xs text-gray-500">{ userEmail }</p>
 						</div>
 						<div class="py-2">
-							if GetPanelConfig().Profile {
-								<a href="/profile" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+							if cfg.Profile {
+								<a href={ templ.SafeURL(navLink(cfg.Path, "profile")) } class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
 									<span class="material-icons-outlined text-lg">person</span>
 									Mon Profil
 								</a>
 							}
-							<a href="/settings" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+							<a href={ templ.SafeURL(navLink(cfg.Path, "settings")) } class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
 								<span class="material-icons-outlined text-lg">settings</span>
 								Paramètres
 							</a>
 						</div>
 						<div class="py-2 border-t border-gray-200 dark:border-gray-700">
-							<a href="/logout" class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-gray-50 dark:hover:bg-gray-700">
+							<a href={ templ.SafeURL(navLink(cfg.Path, "logout")) } class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-gray-50 dark:hover:bg-gray-700">
 								<span class="material-icons-outlined text-lg">logout</span>
 								Déconnexion
 							</a>

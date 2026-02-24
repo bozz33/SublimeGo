@@ -3,6 +3,7 @@ package layouts
 import (
 	"context"
 	"fmt"
+	"strings"
 )
 
 // FooterLink represents a link in the footer
@@ -89,6 +90,25 @@ func GetPanelConfigFromContext(ctx context.Context) *PanelConfig {
 // Templates call this; for context-aware access use GetPanelConfigFromContext.
 func GetPanelConfig() *PanelConfig {
 	return panelConfig
+}
+
+// assetPath returns the full path for a local asset, prefixed with the panel's base path.
+// e.g. assetPath("/platform", "/assets/css/output.css") => "/platform/assets/css/output.css"
+func assetPath(basePath, asset string) string {
+	if basePath == "" || basePath == "/" {
+		return asset
+	}
+	return strings.TrimRight(basePath, "/") + asset
+}
+
+// navLink builds a navigation URL prefixed with the panel's base path.
+// e.g. navLink("/platform", "users") => "/platform/users"
+func navLink(basePath, slug string) string {
+	base := strings.TrimRight(basePath, "/")
+	if base == "" {
+		return "/" + slug
+	}
+	return base + "/" + slug
 }
 
 // initAppData returns the Alpine.js x-data string for the root html element,

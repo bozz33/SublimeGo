@@ -40,10 +40,10 @@ templ Auth(title string) {
 			<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
 			
 			<!-- Custom styles (local) -->
-			<link href="/assets/css/custom.css" rel="stylesheet"/>
+			<link href={ assetPath(GetPanelConfig().Path, "/assets/css/custom.css") } rel="stylesheet"/>
 		
 			<!-- Alpine.js (local) -->
-			<script src="/assets/js/alpine.min.js" defer></script>
+			<script src={ assetPath(GetPanelConfig().Path, "/assets/js/alpine.min.js") } defer></script>
 			<style>[x-cloak] { display: none !important; }</style>
 		</head>
 		<body class="font-sans bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased min-h-screen">

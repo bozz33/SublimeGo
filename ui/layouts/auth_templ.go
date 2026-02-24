@@ -80,7 +80,33 @@ func Auth(title string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<!-- Tailwind CSS CDN v4 --><script src=\"https://cdn.tailwindcss.com\"></script><script>\r\n\t\t\t\ttailwind.config = {\r\n\t\t\t\t\tdarkMode: 'class',\r\n\t\t\t\t\ttheme: {\r\n\t\t\t\t\t\textend: {\r\n\t\t\t\t\t\t\tcolors: {\r\n\t\t\t\t\t\t\t\tprimary: {\r\n\t\t\t\t\t\t\t\t\t50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac',\r\n\t\t\t\t\t\t\t\t\t400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d',\r\n\t\t\t\t\t\t\t\t\t800: '#166534', 900: '#14532d'\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\tfontFamily: { sans: ['Inter', 'sans-serif'] }\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t</script><!-- Fonts --><link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap\" rel=\"stylesheet\"><link href=\"https://fonts.googleapis.com/icon?family=Material+Icons+Outlined\" rel=\"stylesheet\"><!-- Custom styles (local) --><link href=\"/assets/css/custom.css\" rel=\"stylesheet\"><!-- Alpine.js (local) --><script src=\"/assets/js/alpine.min.js\" defer></script><style>[x-cloak] { display: none !important; }</style></head><body class=\"font-sans bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased min-h-screen\"><!-- Centered Container - Style Filament --><div class=\"min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<!-- Tailwind CSS CDN v4 --><script src=\"https://cdn.tailwindcss.com\"></script><script>\r\n\t\t\t\ttailwind.config = {\r\n\t\t\t\t\tdarkMode: 'class',\r\n\t\t\t\t\ttheme: {\r\n\t\t\t\t\t\textend: {\r\n\t\t\t\t\t\t\tcolors: {\r\n\t\t\t\t\t\t\t\tprimary: {\r\n\t\t\t\t\t\t\t\t\t50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac',\r\n\t\t\t\t\t\t\t\t\t400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d',\r\n\t\t\t\t\t\t\t\t\t800: '#166534', 900: '#14532d'\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\tfontFamily: { sans: ['Inter', 'sans-serif'] }\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t</script><!-- Fonts --><link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap\" rel=\"stylesheet\"><link href=\"https://fonts.googleapis.com/icon?family=Material+Icons+Outlined\" rel=\"stylesheet\"><!-- Custom styles (local) --><link href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var5 templ.SafeURL
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(assetPath(GetPanelConfig().Path, "/assets/css/custom.css"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/auth.templ`, Line: 43, Col: 74}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" rel=\"stylesheet\"><!-- Alpine.js (local) --><script src=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(assetPath(GetPanelConfig().Path, "/assets/js/alpine.min.js"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layouts/auth.templ`, Line: 46, Col: 77}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" defer></script><style>[x-cloak] { display: none !important; }</style></head><body class=\"font-sans bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased min-h-screen\"><!-- Centered Container - Style Filament --><div class=\"min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -88,7 +114,7 @@ func Auth(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div><!-- Dark mode toggle --><button @click=\"darkMode = !darkMode\" class=\"fixed bottom-4 right-4 p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors\"><span x-show=\"!darkMode\" class=\"material-icons-outlined\">dark_mode</span> <span x-show=\"darkMode\" x-cloak class=\"material-icons-outlined\">light_mode</span></button></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div><!-- Dark mode toggle --><button @click=\"darkMode = !darkMode\" class=\"fixed bottom-4 right-4 p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors\"><span x-show=\"!darkMode\" class=\"material-icons-outlined\">dark_mode</span> <span x-show=\"darkMode\" x-cloak class=\"material-icons-outlined\">light_mode</span></button></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

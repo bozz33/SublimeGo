@@ -163,6 +163,7 @@ templ Sidebar(ctx context.Context) {
 
 // SidebarNavItem - Desktop navigation item with Material Icons Outlined
 templ SidebarNavItem(item NavItem) {
+	{{ cfg := GetPanelConfig() }}
 	if len(item.Children) > 0 {
 		<!-- Item with submenu -->
 		<li x-data="{ open: false }">
@@ -192,7 +193,7 @@ templ SidebarNavItem(item NavItem) {
 				for _, child := range item.Children {
 					<li>
 						<a
-							href={ templ.SafeURL("/" + child.Slug) }
+							href={ templ.SafeURL(navLink(cfg.Path, child.Slug)) }
 							class={ "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors", templ.KV("bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 font-medium", child.Active), templ.KV("text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700", !child.Active) }
 						>
 							<span>{ child.Label }</span>
@@ -210,7 +211,7 @@ templ SidebarNavItem(item NavItem) {
 		<!-- Simple item -->
 		<li>
 			<a
-				href={ templ.SafeURL("/" + item.Slug) }
+				href={ templ.SafeURL(navLink(cfg.Path, item.Slug)) }
 				class={ "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors", templ.KV("bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 font-medium", item.Active), templ.KV("text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700", !item.Active) }
 			>
 				<span class="material-icons-outlined text-xl">{ item.Icon }</span>
@@ -231,6 +232,7 @@ templ SidebarNavItem(item NavItem) {
 
 // SidebarMobileNavItem - Mobile navigation item (always expanded)
 templ SidebarMobileNavItem(item NavItem) {
+	{{ cfg := GetPanelConfig() }}
 	if len(item.Children) > 0 {
 		<li x-data="{ open: false }">
 			<button
@@ -255,7 +257,7 @@ templ SidebarMobileNavItem(item NavItem) {
 				for _, child := range item.Children {
 					<li>
 						<a
-							href={ templ.SafeURL("/" + child.Slug) }
+							href={ templ.SafeURL(navLink(cfg.Path, child.Slug)) }
 							class={ "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors", templ.KV("bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 font-medium", child.Active), templ.KV("text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700", !child.Active) }
 						>
 							{ child.Label }
@@ -267,7 +269,7 @@ templ SidebarMobileNavItem(item NavItem) {
 	} else {
 		<li>
 			<a
-				href={ templ.SafeURL("/" + item.Slug) }
+				href={ templ.SafeURL(navLink(cfg.Path, item.Slug)) }
 				class={ "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors", templ.KV("bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 font-medium", item.Active), templ.KV("text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700", !item.Active) }
 			>
 				<span class="material-icons-outlined text-xl">{ item.Icon }</span>
