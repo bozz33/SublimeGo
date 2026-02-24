@@ -65,7 +65,7 @@ func (h *AuthHandler) showLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	templ.Handler(authtemplates.LoginPage()).ServeHTTP(w, r)
+	templ.Handler(authtemplates.LoginPage(h.basePath)).ServeHTTP(w, r)
 }
 
 // handleLogin handles login form submission.
@@ -128,7 +128,7 @@ func (h *AuthHandler) showRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	templ.Handler(authtemplates.RegisterPage()).ServeHTTP(w, r)
+	templ.Handler(authtemplates.RegisterPage(h.basePath)).ServeHTTP(w, r)
 }
 
 // handleRegister handles registration form submission.
@@ -202,11 +202,11 @@ func (h *AuthHandler) handleLogout(w http.ResponseWriter, r *http.Request) {
 // Helpers
 
 func (h *AuthHandler) showLoginWithError(w http.ResponseWriter, r *http.Request, message string) {
-	templ.Handler(authtemplates.LoginPage()).ServeHTTP(w, r)
+	templ.Handler(authtemplates.LoginPage(h.basePath)).ServeHTTP(w, r)
 }
 
 func (h *AuthHandler) showRegisterWithError(w http.ResponseWriter, r *http.Request, message string) {
-	templ.Handler(authtemplates.RegisterPage()).ServeHTTP(w, r)
+	templ.Handler(authtemplates.RegisterPage(h.basePath)).ServeHTTP(w, r)
 }
 
 func (h *AuthHandler) getIntendedURL(r *http.Request) string {

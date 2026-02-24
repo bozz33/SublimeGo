@@ -4,7 +4,7 @@ import "github.com/bozz33/sublimego/ui/layouts"
 
 // RegisterPage - Registration page with Filament-style design.
 // Clean design, centered form.
-templ RegisterPage() {
+templ RegisterPage(basePath ...string) {
 	@layouts.Auth("Create Account") {
 		<!-- Centered Logo -->
 		<div class="sm:mx-auto sm:w-full sm:max-w-md">
@@ -20,14 +20,14 @@ templ RegisterPage() {
 				Create an account
 			</h2>
 			<p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-				Already registered? <a href="/login" class="font-medium text-green-600 hover:text-green-500">Sign in</a>
+				Already registered? <a href={ templ.SafeURL(getBasePath(basePath...) + "/login") } class="font-medium text-green-600 hover:text-green-500">Sign in</a>
 			</p>
 		</div>
 
 		<!-- Form -->
 		<div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
 			<div class="bg-white dark:bg-gray-800 py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-200 dark:border-gray-700">
-				<form action="/register" method="POST" class="space-y-6" x-data="{ showPassword: false }">
+				<form action={ templ.SafeURL(getBasePath(basePath...) + "/register") } method="POST" class="space-y-6" x-data="{ showPassword: false }">
 					<!-- Name -->
 					<div>
 						<label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
