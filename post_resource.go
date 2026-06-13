@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/a-h/templ"
 	"github.com/bozz33/sublimeadmin/engine"
@@ -47,13 +48,97 @@ func NewPostResource(db *sql.DB) *PostResource {
 		table.Text("created_at").Using(func(it any) string { return it.(*Post).CreatedAt }),
 	)
 
-	r.SetListOperation(r.list)
+	// Status filter (appears in the list toolbar).
+	r.SetTypedFilters(
+		table.Select("status").WithLabel("Status").WithOptions([]table.FilterOption{
+			{Value: "draft", Label: "Draft"},
+			{Value: "published", Label: "Published"},
+		}),
+	)
+
+	// Multi-row selection + bulk delete.
+	r.EnableSelection()
+	r.SetTableBulkActions(engine.BulkActionDef{
+		Key:         "delete",
+		Label:       "Delete selected",
+		Icon:        "delete",
+		Color:       "danger",
+		URL:         "/posts/bulk-delete",
+		Method:      "POST",
+		RequireConf: true,
+		ConfTitle:   "Delete posts",
+		ConfDesc:    "This will permanently delete the selected posts.",
+	})
+
 	r.SetGetOperation(r.get)
 	r.SetCreateOperation(r.create)
 	r.SetUpdateOperation(r.update)
 	r.SetDeleteOperation(r.delete)
 	r.SetBulkDeleteOperation(r.bulkDelete)
 	return r
+}
+
+// ListQuery applies search, the status filter, sorting and pagination in SQL.
+// Implementing ResourceQueryable makes the toolbar controls actually filter data.
+func (r *PostResource) ListQuery(_ context.Context, q engine.ListQuery) ([]any, int, error) {
+	where := "WHERE 1=1"
+	args := []any{}
+	if s := strings.TrimSpace(q.Search); s != "" {
+		where += " AND title LIKE ?"
+		args = append(args, "%"+s+"%")
+	}
+	if st := q.Filters["status"]; st != "" {
+		where += " AND status = ?"
+		args = append(args, st)
+	}
+
+	var total int
+	if err := r.db.QueryRow("SELECT COUNT(*) FROM posts "+where, args...).Scan(&total); err != nil {
+		return nil, 0, err
+	}
+
+	order := "id DESC"
+	switch q.SortKey {
+	case "title":
+		order = "title " + sortDir(q.SortDir)
+	case "status":
+		order = "status " + sortDir(q.SortDir)
+	case "id":
+		order = "id " + sortDir(q.SortDir)
+	}
+
+	perPage := q.PerPage
+	if perPage <= 0 {
+		perPage = 15
+	}
+	page := q.Page
+	if page <= 0 {
+		page = 1
+	}
+
+	qArgs := append(append([]any{}, args...), perPage, (page-1)*perPage)
+	rows, err := r.db.Query("SELECT id, title, body, status, created_at FROM posts "+where+" ORDER BY "+order+" LIMIT ? OFFSET ?", qArgs...)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	var items []any
+	for rows.Next() {
+		p := &Post{}
+		if err := rows.Scan(&p.ID, &p.Title, &p.Body, &p.Status, &p.CreatedAt); err != nil {
+			return nil, 0, err
+		}
+		items = append(items, p)
+	}
+	return items, total, rows.Err()
+}
+
+func sortDir(d string) string {
+	if strings.EqualFold(d, "asc") {
+		return "ASC"
+	}
+	return "DESC"
 }
 
 // Table renders the resource list via the official generic table render.
@@ -85,24 +170,6 @@ func (r *PostResource) Form(_ context.Context, item any) templ.Component {
 }
 
 // --- CRUD operations (SQLite) ---------------------------------------------
-
-func (r *PostResource) list(_ context.Context) ([]any, error) {
-	rows, err := r.db.Query(`SELECT id, title, body, status, created_at FROM posts ORDER BY id DESC`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var items []any
-	for rows.Next() {
-		p := &Post{}
-		if err := rows.Scan(&p.ID, &p.Title, &p.Body, &p.Status, &p.CreatedAt); err != nil {
-			return nil, err
-		}
-		items = append(items, p)
-	}
-	return items, rows.Err()
-}
 
 func (r *PostResource) get(_ context.Context, id string) (any, error) {
 	p := &Post{}
