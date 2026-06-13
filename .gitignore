@@ -1,0 +1,28 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+SublimeGo
+sublimego
+
+# Test binary / coverage
+*.test
+*.out
+
+# Dependencies
+vendor/
+node_modules/
+
+# Local data / env
+*.db
+*.sqlite
+.env
+.env.local
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
