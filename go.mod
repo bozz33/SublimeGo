@@ -4,13 +4,13 @@ go 1.24.0
 
 require (
 	github.com/a-h/templ v0.3.977
+	github.com/alexedwards/scs/v2 v2.9.0
 	github.com/bozz33/sublimeadmin v0.0.0
 	golang.org/x/crypto v0.46.0
 	modernc.org/sqlite v1.46.1
 )
 
 require (
-	github.com/alexedwards/scs/v2 v2.9.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect

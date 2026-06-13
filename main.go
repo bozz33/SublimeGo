@@ -13,7 +13,10 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/alexedwards/scs/v2"
+	"github.com/bozz33/sublimeadmin/auth"
 	"github.com/bozz33/sublimeadmin/engine"
 	"github.com/bozz33/sublimeadmin/widget"
 	"golang.org/x/crypto/bcrypt"
@@ -26,10 +29,18 @@ func main() {
 	users := newMemoryUserRepo()
 	users.seed("Admin", "admin@example.com", "password")
 
+	// Session + authentication. Without these the auth routes (login/logout/
+	// profile/...) are not registered and the panel runs unauthenticated.
+	session := scs.New()
+	session.Lifetime = 24 * time.Hour
+	authManager := auth.NewManager(session)
+
 	panel := engine.NewPanel("sublimego").
 		WithPath("/").
 		WithBrandName("SublimeGo").
 		WithPrimaryColor("green").
+		WithSession(session).
+		WithAuthManager(authManager).
 		WithUsers(users)
 
 	// Dashboard widgets.
