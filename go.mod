@@ -3,12 +3,13 @@ module github.com/bozz33/SublimeGo
 go 1.24.0
 
 require (
+	github.com/a-h/templ v0.3.977
 	github.com/bozz33/sublimeadmin v0.0.0
 	golang.org/x/crypto v0.46.0
+	modernc.org/sqlite v1.46.1
 )
 
 require (
-	github.com/a-h/templ v0.3.977 // indirect
 	github.com/alexedwards/scs/v2 v2.9.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
@@ -39,7 +40,6 @@ require (
 	modernc.org/libc v1.67.6 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
-	modernc.org/sqlite v1.46.1 // indirect
 )
 
 // Use the local framework checkout during development.

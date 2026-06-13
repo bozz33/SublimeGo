@@ -20,6 +20,9 @@ import (
 )
 
 func main() {
+	db := openDB("sublimego.db")
+	defer db.Close()
+
 	users := newMemoryUserRepo()
 	users.seed("Admin", "admin@example.com", "password")
 
@@ -42,9 +45,8 @@ func main() {
 		}),
 	)
 
-	// Example resource. Replace NewAutoResource with your own resources that
-	// fetch data from your database (see docs/resources.md in the framework).
-	panel.AddResources(engine.NewAutoResource("Post"))
+	// Real, SQLite-backed resource (list/view/create/edit/delete).
+	panel.AddResources(NewPostResource(db))
 
 	addr := ":8080"
 	log.Printf("SublimeGo starter listening on http://localhost%s/ (login: admin@example.com / password)", addr)
