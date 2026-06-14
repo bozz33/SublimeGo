@@ -48,12 +48,15 @@ func NewPostResource(db *sql.DB) *PostResource {
 		table.Text("created_at").Using(func(it any) string { return it.(*Post).CreatedAt }),
 	)
 
-	// Status filter (appears in the list toolbar).
+	// Status filter + visual AND/OR query builder (both appear in the toolbar).
 	r.SetTypedFilters(
 		table.Select("status").WithLabel("Status").WithOptions([]table.FilterOption{
 			{Value: "draft", Label: "Draft"},
 			{Value: "published", Label: "Published"},
 		}),
+		table.QueryBuilder("conditions").WithLabel("Advanced").
+			Field("title", "Title").
+			Field("status", "Status"),
 	)
 
 	// Multi-row selection + bulk delete.
@@ -90,6 +93,13 @@ func (r *PostResource) ListQuery(_ context.Context, q engine.ListQuery) ([]any, 
 	if st := q.Filters["status"]; st != "" {
 		where += " AND status = ?"
 		args = append(args, st)
+	}
+	// Visual query builder: parse the submitted JSON conditions into SQL.
+	if b, ok := table.ParseQueryBuilderValue(q.Filters["conditions"]); ok {
+		if frag, qbArgs := b.ToSQL(); frag != "" {
+			where += " AND (" + frag + ")"
+			args = append(args, qbArgs...)
+		}
 	}
 
 	var total int

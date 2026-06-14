@@ -41,7 +41,12 @@ func main() {
 		WithPrimaryColor("green").
 		EnableNotifications(true).
 		WithSession(session).
-		WithAuth(users)
+		WithAuth(users).
+		// Demo multi-tenant switcher in the topbar (static list).
+		WithTenantSwitcherList(
+			engine.TenantSwitchEntry{ID: "acme", Label: "Acme Inc.", URL: "/"},
+			engine.TenantSwitchEntry{ID: "globex", Label: "Globex", URL: "/"},
+		)
 
 	// Dashboard widgets.
 	panel.WithWidgets(
