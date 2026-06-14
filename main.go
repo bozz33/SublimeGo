@@ -16,8 +16,8 @@ import (
 	"time"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/bozz33/sublimeadmin/auth"
 	"github.com/bozz33/sublimeadmin/engine"
+	"github.com/bozz33/sublimeadmin/notifications"
 	"github.com/bozz33/sublimeadmin/widget"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -29,19 +29,19 @@ func main() {
 	users := newMemoryUserRepo()
 	users.seed("Admin", "admin@example.com", "password")
 
-	// Session + authentication. Without these the auth routes (login/logout/
-	// profile/...) are not registered and the panel runs unauthenticated.
+	// Session + authentication. WithAuth wires the user repository, session and
+	// auth manager in one call; we set an explicit session first to customize
+	// its lifetime (WithAuth preserves an already-configured session).
 	session := scs.New()
 	session.Lifetime = 24 * time.Hour
-	authManager := auth.NewManager(session)
 
 	panel := engine.NewPanel("sublimego").
 		WithPath("/").
 		WithBrandName("SublimeGo").
 		WithPrimaryColor("green").
+		EnableNotifications(true).
 		WithSession(session).
-		WithAuthManager(authManager).
-		WithUsers(users)
+		WithAuth(users)
 
 	// Dashboard widgets.
 	panel.WithWidgets(
@@ -58,6 +58,15 @@ func main() {
 
 	// Real, SQLite-backed resource (list/view/create/edit/delete).
 	panel.AddResources(NewPostResource(db))
+
+	// Built-in notification center page (All / Unread filter). Pages appear in
+	// the sidebar automatically.
+	panel.AddPages(engine.NewNotificationsPage())
+
+	// Seed a couple of notifications for the admin user (id 1) so the center
+	// and the topbar bell show content on first run.
+	notifications.Success("Welcome to SublimeGo").SendTo("1")
+	notifications.Info("Your starter app is running").SendTo("1")
 
 	addr := ":8080"
 	log.Printf("SublimeGo starter listening on http://localhost%s/ (login: admin@example.com / password)", addr)

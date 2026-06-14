@@ -164,6 +164,10 @@ func (r *PostResource) Form(_ context.Context, item any) templ.Component {
 			"draft":     "Draft",
 			"published": "Published",
 		}).Default(p.Status)
+
+		// Display-only field (form.Placeholder) showing the creation date.
+		created := form.Placeholder("created_at").Label("Created").Content(p.CreatedAt)
+		return generics.Form(form.New().SetSchema(title, body, status, created))
 	}
 
 	return generics.Form(form.New().SetSchema(title, body, status))
