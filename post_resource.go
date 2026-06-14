@@ -8,8 +8,11 @@ import (
 	"strings"
 
 	"github.com/a-h/templ"
+	"github.com/bozz33/sublimeadmin/actions"
 	"github.com/bozz33/sublimeadmin/engine"
 	"github.com/bozz33/sublimeadmin/form"
+	"github.com/bozz33/sublimeadmin/infolist"
+	"github.com/bozz33/sublimeadmin/schema"
 	"github.com/bozz33/sublimeadmin/table"
 	"github.com/bozz33/sublimeadmin/views/generics"
 )
@@ -36,16 +39,19 @@ func NewPostResource(db *sql.DB) *PostResource {
 	r.SetIcon("article")
 
 	r.SetTableColumns(
-		table.Text("id").Using(func(it any) string { return strconv.Itoa(it.(*Post).ID) }),
+		table.Text("id").Using(func(it any) string { return strconv.Itoa(it.(*Post).ID) }).
+			Align(table.AlignEnd),
 		table.Text("title").Using(func(it any) string { return it.(*Post).Title }).Sortable().Searchable(),
 		table.Text("status").Using(func(it any) string { return it.(*Post).Status }).Badge().
+			Align(table.AlignCenter).
 			WithColorFunc(func(value string, _ any) string {
 				if value == "published" {
 					return "green"
 				}
 				return "gray"
 			}),
-		table.Text("created_at").Using(func(it any) string { return it.(*Post).CreatedAt }),
+		table.Text("created_at").Using(func(it any) string { return it.(*Post).CreatedAt }).
+			Align(table.AlignEnd),
 	)
 
 	// Status filter + visual AND/OR query builder (both appear in the toolbar).
@@ -59,19 +65,10 @@ func NewPostResource(db *sql.DB) *PostResource {
 			Field("status", "Status"),
 	)
 
-	// Multi-row selection + bulk delete.
+	// Multi-row selection + bulk delete, built from the actions package
+	// convenience constructor (URL, icon, color and confirmation preconfigured).
 	r.EnableSelection()
-	r.SetTableBulkActions(engine.BulkActionDef{
-		Key:         "delete",
-		Label:       "Delete selected",
-		Icon:        "delete",
-		Color:       "danger",
-		URL:         "/posts/bulk-delete",
-		Method:      "POST",
-		RequireConf: true,
-		ConfTitle:   "Delete posts",
-		ConfDesc:    "This will permanently delete the selected posts.",
-	})
+	r.SetTableBulkActionsFromActions(actions.BulkDeleteAction("/posts"))
 
 	r.SetGetOperation(r.get)
 	r.SetCreateOperation(r.create)
@@ -157,6 +154,34 @@ func (r *PostResource) Table(ctx context.Context) templ.Component {
 	return generics.List(state)
 }
 
+// View renders the read-only detail view (Infolist) for a post. Implementing
+// ResourceViewable enables GET /posts/{id} and the row View action.
+func (r *PostResource) View(_ context.Context, item any) templ.Component {
+	p, ok := item.(*Post)
+	if !ok || p == nil {
+		return templ.NopComponent
+	}
+	statusColor := "gray"
+	if p.Status == "published" {
+		statusColor = "green"
+	}
+	il := infolist.New().
+		AddSection(
+			infolist.NewSection("Details").WithColumns(2).Add(
+				infolist.TextEntry("id", "ID", p.ID).Align(infolist.AlignEnd),
+				infolist.BadgeEntry("status", "Status", p.Status, statusColor),
+				infolist.TextEntry("title", "Title", p.Title).WithCopy(),
+				infolist.DateEntry("created_at", "Created", p.CreatedAt, "2006-01-02 15:04"),
+			),
+		).
+		AddSection(
+			infolist.NewSection("Content").WithColumns(1).Add(
+				infolist.TextEntry("body", "Body", p.Body).WithPlaceholder("No content"),
+			),
+		)
+	return generics.Infolist(il)
+}
+
 // Form renders the create/edit form, pre-filled when editing an existing post.
 func (r *PostResource) Form(_ context.Context, item any) templ.Component {
 	title := form.Text("title").Required()
@@ -180,7 +205,14 @@ func (r *PostResource) Form(_ context.Context, item any) templ.Component {
 		return generics.Form(form.New().SetSchema(title, body, status, created))
 	}
 
-	return generics.Form(form.New().SetSchema(title, body, status))
+	// schema.Text is a static "prime" placed between fields (no input).
+	heading := schema.Text("Compose your post").WithWeight("semibold")
+	// form.View embeds an arbitrary component into the form (custom-UI escape
+	// hatch, equivalent to Filament's ViewField).
+	tip := form.View("tip", templ.Raw(
+		`<div class="rounded-lg bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 p-3 text-sm text-primary-800 dark:text-primary-200">Tip: published posts appear immediately in the public list.</div>`,
+	)).Label("")
+	return generics.Form(form.New().SetSchema(heading, title, body, status, tip))
 }
 
 // --- CRUD operations (SQLite) ---------------------------------------------

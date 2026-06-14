@@ -42,11 +42,9 @@ func main() {
 		EnableNotifications(true).
 		WithSession(session).
 		WithAuth(users).
-		// Demo multi-tenant switcher in the topbar (static list).
-		WithTenantSwitcherList(
-			engine.TenantSwitchEntry{ID: "acme", Label: "Acme Inc.", URL: "/"},
-			engine.TenantSwitchEntry{ID: "globex", Label: "Globex", URL: "/"},
-		)
+		// Demo multi-tenant switcher in the topbar, backed by a real cookie
+		// resolver (see tenant.go). The active workspace persists across requests.
+		WithTenantSwitcherList(tenantSwitcherEntries()...)
 
 	// Dashboard widgets.
 	panel.WithWidgets(
@@ -57,6 +55,12 @@ func main() {
 					widget.Stat{Label: "Sessions", Value: "0"},
 					widget.Stat{Label: "Uptime", Value: "100%"},
 				),
+				// Polar-area chart (chart type added for Filament parity).
+				widget.NewChart("posts-by-status", "Posts by status", widget.PolarArea).
+					SetLabels([]string{"Draft", "Published"}).
+					AddSeries("Draft", []int{42}).
+					AddSeries("Published", []int{62}).
+					WithDescription("Distribution of post statuses"),
 			}
 		}),
 	)
@@ -72,10 +76,15 @@ func main() {
 	// and the topbar bell show content on first run.
 	notifications.Success("Welcome to SublimeGo").SendTo("1")
 	notifications.Info("Your starter app is running").SendTo("1")
+	// Notification with a custom icon color and an action button.
+	notifications.Warning("Review your draft posts").
+		WithIconColor("primary").
+		WithAction("Open posts", "/posts").
+		SendTo("1")
 
 	addr := ":8080"
 	log.Printf("SublimeGo starter listening on http://localhost%s/ (login: admin@example.com / password)", addr)
-	if err := http.ListenAndServe(addr, panel.Router()); err != nil {
+	if err := http.ListenAndServe(addr, withTenancy(panel.Router())); err != nil {
 		log.Fatal(err)
 	}
 }

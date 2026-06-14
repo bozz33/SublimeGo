@@ -14,6 +14,21 @@ func openDB(path string) *sql.DB {
 	if err != nil {
 		log.Fatalf("open db: %v", err)
 	}
+	// SQLite allows many readers but only one writer. Keeping one pooled
+	// connection and using WAL avoids stale rollback journals after restarts.
+	db.SetMaxOpenConns(1)
+	if err := db.Ping(); err != nil {
+		log.Fatalf("connect db: %v", err)
+	}
+	for _, pragma := range []string{
+		"PRAGMA busy_timeout = 5000",
+		"PRAGMA journal_mode = WAL",
+		"PRAGMA synchronous = NORMAL",
+	} {
+		if _, err := db.Exec(pragma); err != nil {
+			log.Fatalf("configure db (%s): %v", pragma, err)
+		}
+	}
 	if _, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS posts (
 			id         INTEGER PRIMARY KEY AUTOINCREMENT,
