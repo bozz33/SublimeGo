@@ -51,7 +51,13 @@ func withTenancy(panelHandler http.Handler) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/switch-tenant", func(w http.ResponseWriter, r *http.Request) {
 		id := r.URL.Query().Get("id")
-		http.SetCookie(w, &http.Cookie{Name: "tenant", Value: id, Path: "/", HttpOnly: true})
+		// Only persist a known tenant id; ignore anything else.
+		for _, t := range demoTenants {
+			if t.ID == id {
+				http.SetCookie(w, &http.Cookie{Name: "tenant", Value: id, Path: "/", HttpOnly: true})
+				break
+			}
+		}
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	})
 	mux.Handle("/", engine.TenantMiddleware(cookieTenantResolver{}, false)(panelHandler))
