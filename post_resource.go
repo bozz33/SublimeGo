@@ -210,14 +210,18 @@ func (r *PostResource) Form(_ context.Context, item any) templ.Component {
 		return generics.Form(form.New().SetSchema(title, body, status, created))
 	}
 
-	// schema.Text is a static "prime" placed between fields (no input).
+	// schema primes are static content placed between fields (no input).
 	heading := schema.Text("Compose your post").WithWeight("semibold")
+	tips := schema.UnorderedList(
+		"Keep titles short and descriptive",
+		"Drafts are only visible to editors",
+	)
 	// form.View embeds an arbitrary component into the form (custom-UI escape
 	// hatch, equivalent to Filament's ViewField).
 	tip := form.View("tip", templ.Raw(
 		`<div class="rounded-lg bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 p-3 text-sm text-primary-800 dark:text-primary-200">Tip: published posts appear immediately in the public list.</div>`,
 	)).Label("")
-	return generics.Form(form.New().SetSchema(heading, title, body, status, tip))
+	return generics.Form(form.New().SetSchema(heading, tips, title, body, status, tip))
 }
 
 // --- CRUD operations (SQLite) ---------------------------------------------
