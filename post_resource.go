@@ -41,8 +41,9 @@ func NewPostResource(db *sql.DB) *PostResource {
 
 	r.SetTableColumns(
 		table.Text("id").Using(func(it any) string { return strconv.Itoa(it.(*Post).ID) }).
-			Align(table.AlignEnd),
-		table.Text("title").Using(func(it any) string { return it.(*Post).Title }).Sortable().Searchable(),
+			Align(table.AlignEnd).Width("w-20"),
+		table.Text("title").Using(func(it any) string { return it.(*Post).Title }).Sortable().Searchable().
+			Tooltip("The post title"),
 		table.Text("status").Using(func(it any) string { return it.(*Post).Status }).Badge().
 			Align(table.AlignCenter).
 			WithColorFunc(func(value string, _ any) string {
