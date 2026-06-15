@@ -53,22 +53,10 @@ func main() {
 		panel.EnableSecureCookies()
 	}
 
-	// Dashboard widgets.
+	// Dashboard widgets, computed live from the blog data.
 	panel.WithWidgets(
-		widget.NewProvider("overview").WithWidgets(func(context.Context) []widget.Widget {
-			return []widget.Widget{
-				widget.NewStats(
-					widget.Stat{Label: "Users", Value: "1"},
-					widget.Stat{Label: "Sessions", Value: "0"},
-					widget.Stat{Label: "Uptime", Value: "100%"},
-				),
-				// Polar-area chart (chart type added for Filament parity).
-				widget.NewChart("posts-by-status", "Posts by status", widget.PolarArea).
-					SetLabels([]string{"Draft", "Published"}).
-					AddSeries("Draft", []int{42}).
-					AddSeries("Published", []int{62}).
-					WithDescription("Distribution of post statuses"),
-			}
+		widget.NewProvider("overview").WithWidgets(func(ctx context.Context) []widget.Widget {
+			return blogWidgets(ctx, db)
 		}),
 	)
 
