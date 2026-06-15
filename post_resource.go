@@ -56,6 +56,12 @@ func NewPostResource(db *sql.DB) *PostResource {
 			Align(table.AlignEnd),
 	)
 
+	// Grouped two-tier header (Filament-style ColumnGroup).
+	r.SetTableColumnGroups(
+		table.NewColumnGroup("Details", "id", "title"),
+		table.NewColumnGroup("Publication", "status", "created_at"),
+	)
+
 	// Status filter + visual AND/OR query builder (both appear in the toolbar).
 	r.qbFilter = table.QueryBuilder("conditions").WithLabel("Advanced").
 		Field("title", "Title").
