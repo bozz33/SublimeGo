@@ -62,6 +62,17 @@ func NewPostResource(db *sql.DB) *PostResource {
 		table.NewColumnGroup("Publication", "status", "created_at"),
 	)
 
+	// Inline SelectAction in each row to change a post's status.
+	r.SetTableRowActions(
+		actions.SelectAction("status").
+			WithSelectParam("status").
+			SetUrl(func(it any) string { return "/posts/" + strconv.Itoa(it.(*Post).ID) }).
+			WithOptions(
+				actions.ActionSelectOption{Value: "draft", Label: "Set draft"},
+				actions.ActionSelectOption{Value: "published", Label: "Set published"},
+			),
+	)
+
 	// Status filter + visual AND/OR query builder (both appear in the toolbar).
 	r.qbFilter = table.QueryBuilder("conditions").WithLabel("Advanced").
 		TextField("title", "Title").
@@ -258,11 +269,25 @@ func (r *PostResource) create(_ context.Context, req *http.Request) error {
 	return err
 }
 
-func (r *PostResource) update(_ context.Context, id string, req *http.Request) error {
-	_, err := r.db.Exec(
-		`UPDATE posts SET title = ?, body = ?, status = ? WHERE id = ?`,
-		req.FormValue("title"), req.FormValue("body"), statusOrDefault(req.FormValue("status")), id,
-	)
+func (r *PostResource) update(ctx context.Context, id string, req *http.Request) error {
+	// Preserve fields the request did not submit, so a partial update (such as
+	// the inline status SelectAction) does not clobber title/body.
+	cur, err := r.get(ctx, id)
+	if err != nil || cur == nil {
+		return err
+	}
+	p := cur.(*Post)
+	title, body, status := p.Title, p.Body, p.Status
+	if req.Form.Has("title") {
+		title = req.FormValue("title")
+	}
+	if req.Form.Has("body") {
+		body = req.FormValue("body")
+	}
+	if req.Form.Has("status") {
+		status = statusOrDefault(req.FormValue("status"))
+	}
+	_, err = r.db.Exec(`UPDATE posts SET title = ?, body = ?, status = ? WHERE id = ?`, title, body, status, id)
 	return err
 }
 
