@@ -244,7 +244,30 @@ func (r *PostResource) Form(_ context.Context, item any) templ.Component {
 	tip := form.View("tip", templ.Raw(
 		`<div class="rounded-lg bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 p-3 text-sm text-primary-800 dark:text-primary-200">Tip: published posts appear immediately in the public list.</div>`,
 	)).Label("")
-	return generics.Form(form.New().SetSchema(heading, tips, title, body, status, tip))
+	// MorphToSelect: a polymorphic relationship picker (type + record), with
+	// the "post" options resolved live from the database.
+	related := form.MorphToSelect("related").Label("Related to").
+		Type("post", "Post", func(ctx context.Context) ([]form.SelectOption, error) {
+			rows, err := r.db.QueryContext(ctx, "SELECT id, title FROM posts ORDER BY id DESC LIMIT 5")
+			if err != nil {
+				return nil, err
+			}
+			defer rows.Close()
+			var opts []form.SelectOption
+			for rows.Next() {
+				var id int
+				var t string
+				if err := rows.Scan(&id, &t); err != nil {
+					return nil, err
+				}
+				opts = append(opts, form.SelectOption{Value: strconv.Itoa(id), Label: t})
+			}
+			return opts, rows.Err()
+		}).
+		Type("category", "Category", func(context.Context) ([]form.SelectOption, error) {
+			return []form.SelectOption{{Value: "news", Label: "News"}, {Value: "tech", Label: "Tech"}}, nil
+		})
+	return generics.Form(form.New().SetSchema(heading, tips, title, body, status, related, tip))
 }
 
 // --- CRUD operations (SQLite) ---------------------------------------------
