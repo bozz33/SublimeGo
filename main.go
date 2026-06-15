@@ -83,10 +83,11 @@ func main() {
 	// and the topbar bell show content on first run.
 	notifications.Success("Welcome to SublimeGo").SendTo("1")
 	notifications.Info("Your starter app is running").SendTo("1")
-	// Notification with a custom icon color and an action button.
+	// Notification with a custom icon color and an action that also marks the
+	// notification read when clicked.
 	notifications.Warning("Review your draft posts").
 		WithIconColor("primary").
-		WithAction("Open posts", "/posts").
+		WithActions(notifications.Action("Open posts", "/posts").MarkAsRead()).
 		SendTo("1")
 
 	addr := ":8080"

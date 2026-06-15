@@ -12,6 +12,7 @@ import (
 	"github.com/bozz33/sublimeadmin/engine"
 	"github.com/bozz33/sublimeadmin/form"
 	"github.com/bozz33/sublimeadmin/infolist"
+	"github.com/bozz33/sublimeadmin/notifications"
 	"github.com/bozz33/sublimeadmin/schema"
 	"github.com/bozz33/sublimeadmin/table"
 	"github.com/bozz33/sublimeadmin/views/generics"
@@ -261,11 +262,15 @@ func (r *PostResource) get(_ context.Context, id string) (any, error) {
 	return p, nil
 }
 
-func (r *PostResource) create(_ context.Context, req *http.Request) error {
+func (r *PostResource) create(ctx context.Context, req *http.Request) error {
 	_, err := r.db.Exec(
 		`INSERT INTO posts (title, body, status) VALUES (?, ?, ?)`,
 		req.FormValue("title"), req.FormValue("body"), statusOrDefault(req.FormValue("status")),
 	)
+	if err == nil {
+		// Send(ctx) resolves the current authenticated user automatically.
+		notifications.Success("Post created").Send(ctx)
+	}
 	return err
 }
 
