@@ -24,10 +24,10 @@ type Post struct {
 	Title        string
 	Body         string
 	Status       string
-	CategoryID   int
-	CategoryName string
-	TagIDs       []int  // current tag ids (loaded for the edit form)
-	TagsStr      string // comma-joined tag names (for the list column)
+	CategoryID   int    `export:"-"`
+	CategoryName string `export:"category"`
+	TagIDs       []int  `export:"-"` // current tag ids (loaded for the edit form)
+	TagsStr      string `export:"tags"` // comma-joined tag names (for the list column)
 	CreatedAt    string
 }
 
@@ -102,6 +102,7 @@ func NewPostResource(db *sql.DB) *PostResource {
 	// convenience constructor (URL, icon, color and confirmation preconfigured).
 	r.EnableSelection()
 	r.SetTableBulkActionsFromActions(actions.BulkDeleteAction("/posts"))
+	r.SetExportURL("/posts/export") // CSV/Excel export (route auto-mounted by the panel)
 
 	// Has-many relation: a post's comments, managed inline on the edit page.
 	r.SetRelationManagers(NewCommentsRelationManager(db))

@@ -45,6 +45,7 @@ func NewCategoryResource(db *sql.DB) *CategoryResource {
 
 	r.EnableSelection()
 	r.SetTableBulkActionsFromActions(actions.BulkDeleteAction("/categories"))
+	r.SetExportURL("/categories/export")
 
 	r.SetGetOperation(r.get)
 	r.SetCreateOperation(r.create)

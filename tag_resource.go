@@ -41,6 +41,7 @@ func NewTagResource(db *sql.DB) *TagResource {
 
 	r.EnableSelection()
 	r.SetTableBulkActionsFromActions(actions.BulkDeleteAction("/tags"))
+	r.SetExportURL("/tags/export")
 
 	r.SetGetOperation(r.get)
 	r.SetCreateOperation(r.create)
