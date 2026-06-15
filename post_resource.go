@@ -103,6 +103,9 @@ func NewPostResource(db *sql.DB) *PostResource {
 	r.EnableSelection()
 	r.SetTableBulkActionsFromActions(actions.BulkDeleteAction("/posts"))
 
+	// Has-many relation: a post's comments, managed inline on the edit page.
+	r.SetRelationManagers(NewCommentsRelationManager(db))
+
 	r.SetGetOperation(r.get)
 	r.SetCreateOperation(r.create)
 	r.SetUpdateOperation(r.update)
