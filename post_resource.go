@@ -399,7 +399,15 @@ func (r *PostResource) Form(ctx context.Context, item any) templ.Component {
 			}
 			return out, rows.Err()
 		})
-	return generics.Form(form.New().SetSchema(heading, tips, title, body, status, category, tags, related, relatedPost, tip))
+	// RelationshipRepeater: add initial comments inline while creating the post
+	// (on edit, comments are managed by the relation-manager sub-table).
+	comments := form.RelationshipRepeater("comments").Label("Initial comments").
+		AddButtonLabel("Add comment").
+		Fields(
+			form.RepeaterColumn{Key: "author", Label: "Author"},
+			form.RepeaterColumn{Key: "body", Label: "Comment", Type: "textarea"},
+		)
+	return generics.Form(form.New().SetSchema(heading, tips, title, body, status, category, tags, related, relatedPost, comments, tip))
 }
 
 // --- CRUD operations (SQLite) ---------------------------------------------
@@ -444,6 +452,14 @@ func (r *PostResource) create(ctx context.Context, req *http.Request) error {
 	if err == nil {
 		if id, e := res.LastInsertId(); e == nil {
 			r.syncPostTags(id, req.Form["tags"])
+			// Persist the initial comments from the RelationshipRepeater.
+			for _, row := range form.ParseRepeater(req, "comments") {
+				author := row["author"]
+				if author == "" {
+					author = "Anonymous"
+				}
+				_, _ = r.db.Exec(`INSERT INTO comments (post_id, author, body) VALUES (?, ?, ?)`, id, author, row["body"])
+			}
 		}
 		// Send(ctx) resolves the current authenticated user automatically.
 		notifications.Success("Post created").Send(ctx)
