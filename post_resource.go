@@ -64,8 +64,13 @@ func NewPostResource(db *sql.DB) *PostResource {
 
 	// Status filter + visual AND/OR query builder (both appear in the toolbar).
 	r.qbFilter = table.QueryBuilder("conditions").WithLabel("Advanced").
-		Field("title", "Title").
-		Field("status", "Status")
+		TextField("title", "Title").
+		SelectField("status", "Status", []table.FilterOption{
+			{Value: "draft", Label: "Draft"},
+			{Value: "published", Label: "Published"},
+		}).
+		NumberField("id", "ID").
+		DateField("created_at", "Created")
 	r.SetTypedFilters(
 		table.Select("status").WithLabel("Status").WithOptions([]table.FilterOption{
 			{Value: "draft", Label: "Draft"},
