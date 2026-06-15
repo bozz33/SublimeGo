@@ -30,7 +30,8 @@ type Post struct {
 // delete, with a declarative table and form.
 type PostResource struct {
 	*engine.BaseResource
-	db *sql.DB
+	db       *sql.DB
+	qbFilter *table.QueryBuilderFilter
 }
 
 // NewPostResource wires the resource to the database.
@@ -55,14 +56,15 @@ func NewPostResource(db *sql.DB) *PostResource {
 	)
 
 	// Status filter + visual AND/OR query builder (both appear in the toolbar).
+	r.qbFilter = table.QueryBuilder("conditions").WithLabel("Advanced").
+		Field("title", "Title").
+		Field("status", "Status")
 	r.SetTypedFilters(
 		table.Select("status").WithLabel("Status").WithOptions([]table.FilterOption{
 			{Value: "draft", Label: "Draft"},
 			{Value: "published", Label: "Published"},
 		}),
-		table.QueryBuilder("conditions").WithLabel("Advanced").
-			Field("title", "Title").
-			Field("status", "Status"),
+		r.qbFilter,
 	)
 
 	// Multi-row selection + bulk delete, built from the actions package
@@ -91,8 +93,10 @@ func (r *PostResource) ListQuery(_ context.Context, q engine.ListQuery) ([]any, 
 		where += " AND status = ?"
 		args = append(args, st)
 	}
-	// Visual query builder: parse the submitted JSON conditions into SQL.
-	if b, ok := table.ParseQueryBuilderValue(q.Filters["conditions"]); ok {
+	// Visual query builder: parse the submitted JSON conditions into SQL,
+	// restricted to the fields the filter actually exposes (ParseValue) so a
+	// crafted payload cannot probe other columns.
+	if b, ok := r.qbFilter.ParseValue(q.Filters["conditions"]); ok {
 		if frag, qbArgs := b.ToSQL(); frag != "" {
 			where += " AND (" + frag + ")"
 			args = append(args, qbArgs...)
