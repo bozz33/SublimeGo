@@ -267,7 +267,35 @@ func (r *PostResource) Form(_ context.Context, item any) templ.Component {
 		Type("category", "Category", func(context.Context) ([]form.SelectOption, error) {
 			return []form.SelectOption{{Value: "news", Label: "News"}, {Value: "tech", Label: "Tech"}}, nil
 		})
-	return generics.Form(form.New().SetSchema(heading, tips, title, body, status, related, tip))
+	// TableSelect: pick a related post from a searchable modal table.
+	relatedPost := form.TableSelect("related_post").Label("Related post (table picker)").
+		WithColumns(
+			form.TableSelectColumn{Key: "id", Label: "ID"},
+			form.TableSelectColumn{Key: "title", Label: "Title"},
+		).
+		Searchable().
+		Options(func(ctx context.Context) ([]form.TableSelectRow, error) {
+			rows, err := r.db.QueryContext(ctx, "SELECT id, title FROM posts ORDER BY id DESC LIMIT 50")
+			if err != nil {
+				return nil, err
+			}
+			defer rows.Close()
+			var out []form.TableSelectRow
+			for rows.Next() {
+				var id int
+				var t string
+				if err := rows.Scan(&id, &t); err != nil {
+					return nil, err
+				}
+				sid := strconv.Itoa(id)
+				out = append(out, form.TableSelectRow{
+					Value: sid, Label: t,
+					Cells: map[string]string{"id": sid, "title": t},
+				})
+			}
+			return out, rows.Err()
+		})
+	return generics.Form(form.New().SetSchema(heading, tips, title, body, status, related, relatedPost, tip))
 }
 
 // --- CRUD operations (SQLite) ---------------------------------------------
