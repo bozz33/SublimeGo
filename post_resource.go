@@ -26,6 +26,8 @@ type Post struct {
 	Status       string
 	CategoryID   int
 	CategoryName string
+	TagIDs       []int  // current tag ids (loaded for the edit form)
+	TagsStr      string // comma-joined tag names (for the list column)
 	CreatedAt    string
 }
 
@@ -56,6 +58,7 @@ func NewPostResource(db *sql.DB) *PostResource {
 				return "gray"
 			}),
 		table.Text("category").Using(func(it any) string { return it.(*Post).CategoryName }),
+		table.Text("tags").Using(func(it any) string { return it.(*Post).TagsStr }),
 		table.Text("created_at").Using(func(it any) string { return it.(*Post).CreatedAt }).
 			Align(table.AlignEnd),
 	)
@@ -63,7 +66,7 @@ func NewPostResource(db *sql.DB) *PostResource {
 	// Grouped two-tier header (Filament-style ColumnGroup).
 	r.SetTableColumnGroups(
 		table.NewColumnGroup("Details", "id", "title"),
-		table.NewColumnGroup("Publication", "status", "category", "created_at"),
+		table.NewColumnGroup("Publication", "status", "category", "tags", "created_at"),
 	)
 
 	// Inline SelectAction in each row to change a post's status.
@@ -161,7 +164,9 @@ func (r *PostResource) ListQuery(_ context.Context, q engine.ListQuery) ([]any, 
 
 	qArgs := append(append([]any{}, args...), perPage, (page-1)*perPage)
 	rows, err := r.db.Query(`
-		SELECT p.id, p.title, p.body, p.status, COALESCE(p.category_id, 0), COALESCE(c.name, ''), p.created_at
+		SELECT p.id, p.title, p.body, p.status, COALESCE(p.category_id, 0), COALESCE(c.name, ''),
+			COALESCE((SELECT GROUP_CONCAT(tg.name, ', ') FROM post_tags pt JOIN tags tg ON tg.id = pt.tag_id WHERE pt.post_id = p.id), ''),
+			p.created_at
 		FROM posts p LEFT JOIN categories c ON c.id = p.category_id
 		`+where+" ORDER BY "+order+" LIMIT ? OFFSET ?", qArgs...)
 	if err != nil {
@@ -172,7 +177,7 @@ func (r *PostResource) ListQuery(_ context.Context, q engine.ListQuery) ([]any, 
 	var items []any
 	for rows.Next() {
 		p := &Post{}
-		if err := rows.Scan(&p.ID, &p.Title, &p.Body, &p.Status, &p.CategoryID, &p.CategoryName, &p.CreatedAt); err != nil {
+		if err := rows.Scan(&p.ID, &p.Title, &p.Body, &p.Status, &p.CategoryID, &p.CategoryName, &p.TagsStr, &p.CreatedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, p)
@@ -215,6 +220,44 @@ func (r *PostResource) categorySelectOptions(ctx context.Context) ([]form.Select
 		opts = append(opts, form.SelectOption{Value: strconv.Itoa(id), Label: name})
 	}
 	return opts, rows.Err()
+}
+
+// tagSelectOptions loads tags as form select options.
+func (r *PostResource) tagSelectOptions(ctx context.Context) ([]form.SelectOption, error) {
+	rows, err := r.db.QueryContext(ctx, `SELECT id, name FROM tags ORDER BY name`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var opts []form.SelectOption
+	for rows.Next() {
+		var id int
+		var name string
+		if err := rows.Scan(&id, &name); err != nil {
+			return nil, err
+		}
+		opts = append(opts, form.SelectOption{Value: strconv.Itoa(id), Label: name})
+	}
+	return opts, rows.Err()
+}
+
+// syncPostTags replaces the tag links for a post with the given tag ids.
+func (r *PostResource) syncPostTags(postID int64, tagIDs []string) {
+	_, _ = r.db.Exec(`DELETE FROM post_tags WHERE post_id = ?`, postID)
+	for _, t := range tagIDs {
+		if id, err := strconv.Atoi(strings.TrimSpace(t)); err == nil && id > 0 {
+			_, _ = r.db.Exec(`INSERT OR IGNORE INTO post_tags (post_id, tag_id) VALUES (?, ?)`, postID, id)
+		}
+	}
+}
+
+// joinTagIDs joins tag ids into a comma-separated string for select pre-selection.
+func joinTagIDs(ids []int) string {
+	parts := make([]string, 0, len(ids))
+	for _, id := range ids {
+		parts = append(parts, strconv.Itoa(id))
+	}
+	return strings.Join(parts, ",")
 }
 
 func sortDir(d string) string {
@@ -260,7 +303,7 @@ func (r *PostResource) View(_ context.Context, item any) templ.Component {
 }
 
 // Form renders the create/edit form, pre-filled when editing an existing post.
-func (r *PostResource) Form(_ context.Context, item any) templ.Component {
+func (r *PostResource) Form(ctx context.Context, item any) templ.Component {
 	title := form.Text("title").Required()
 	body := form.Textarea("body")
 	status := form.Select("status").Options(map[string]string{
@@ -269,11 +312,15 @@ func (r *PostResource) Form(_ context.Context, item any) templ.Component {
 	})
 	// Category: a relation-backed select whose options are loaded from the DB.
 	category := form.RelationSelect("category_id").Label("Category").OptionsFrom(r.categorySelectOptions)
+	// Tags: a multi-select backed by the many-to-many post_tags relation.
+	tagOpts, _ := r.tagSelectOptions(ctx)
+	tags := form.Select("tags").Label("Tags").Multiple().OptionsOrdered(tagOpts)
 
 	if p, ok := item.(*Post); ok && p != nil {
 		if p.CategoryID > 0 {
 			category.SetValue(strconv.Itoa(p.CategoryID))
 		}
+		tags.SetValue(joinTagIDs(p.TagIDs))
 		title = form.Text("title").Default(p.Title).Required()
 		body = form.Textarea("body")
 		body.SetValue(p.Body)
@@ -284,7 +331,7 @@ func (r *PostResource) Form(_ context.Context, item any) templ.Component {
 
 		// Display-only field (form.Placeholder) showing the creation date.
 		created := form.Placeholder("created_at").Label("Created").Content(p.CreatedAt)
-		return generics.Form(form.New().SetSchema(title, body, status, category, created))
+		return generics.Form(form.New().SetSchema(title, body, status, category, tags, created))
 	}
 
 	// schema primes are static content placed between fields (no input).
@@ -349,7 +396,7 @@ func (r *PostResource) Form(_ context.Context, item any) templ.Component {
 			}
 			return out, rows.Err()
 		})
-	return generics.Form(form.New().SetSchema(heading, tips, title, body, status, category, related, relatedPost, tip))
+	return generics.Form(form.New().SetSchema(heading, tips, title, body, status, category, tags, related, relatedPost, tip))
 }
 
 // --- CRUD operations (SQLite) ---------------------------------------------
@@ -366,6 +413,15 @@ func (r *PostResource) get(_ context.Context, id string) (any, error) {
 	if err != nil {
 		return nil, err
 	}
+	if tagRows, terr := r.db.Query(`SELECT tag_id FROM post_tags WHERE post_id = ?`, p.ID); terr == nil {
+		defer tagRows.Close()
+		for tagRows.Next() {
+			var tid int
+			if tagRows.Scan(&tid) == nil {
+				p.TagIDs = append(p.TagIDs, tid)
+			}
+		}
+	}
 	return p, nil
 }
 
@@ -378,11 +434,14 @@ func nullableID(s string) any {
 }
 
 func (r *PostResource) create(ctx context.Context, req *http.Request) error {
-	_, err := r.db.Exec(
+	res, err := r.db.Exec(
 		`INSERT INTO posts (title, body, status, category_id) VALUES (?, ?, ?, ?)`,
 		req.FormValue("title"), req.FormValue("body"), statusOrDefault(req.FormValue("status")), nullableID(req.FormValue("category_id")),
 	)
 	if err == nil {
+		if id, e := res.LastInsertId(); e == nil {
+			r.syncPostTags(id, req.Form["tags"])
+		}
 		// Send(ctx) resolves the current authenticated user automatically.
 		notifications.Success("Post created").Send(ctx)
 	}
@@ -415,6 +474,16 @@ func (r *PostResource) update(ctx context.Context, id string, req *http.Request)
 		categoryID = nullableID(req.FormValue("category_id"))
 	}
 	_, err = r.db.Exec(`UPDATE posts SET title = ?, body = ?, status = ?, category_id = ? WHERE id = ?`, title, body, status, categoryID, id)
+	if err != nil {
+		return err
+	}
+	// Only the full edit form (which includes title) syncs tags, so the inline
+	// status SelectAction does not clear them.
+	if req.Form.Has("title") {
+		if pid, perr := strconv.ParseInt(id, 10, 64); perr == nil {
+			r.syncPostTags(pid, req.Form["tags"])
+		}
+	}
 	return err
 }
 

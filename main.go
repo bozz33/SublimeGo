@@ -76,6 +76,7 @@ func main() {
 	panel.AddResources(
 		NewPostResource(db),
 		NewCategoryResource(db),
+		NewTagResource(db),
 	)
 
 	// Built-in notification center page (All / Unread filter). Pages appear in
