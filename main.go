@@ -73,7 +73,10 @@ func main() {
 	)
 
 	// Real, SQLite-backed resource (list/view/create/edit/delete).
-	panel.AddResources(NewPostResource(db))
+	panel.AddResources(
+		NewPostResource(db),
+		NewCategoryResource(db),
+	)
 
 	// Built-in notification center page (All / Unread filter). Pages appear in
 	// the sidebar automatically.

@@ -20,11 +20,13 @@ import (
 
 // Post is the domain model backed by the posts table.
 type Post struct {
-	ID        int
-	Title     string
-	Body      string
-	Status    string
-	CreatedAt string
+	ID           int
+	Title        string
+	Body         string
+	Status       string
+	CategoryID   int
+	CategoryName string
+	CreatedAt    string
 }
 
 // PostResource is a real, SQLite-backed resource: list, view, create, edit,
@@ -53,6 +55,7 @@ func NewPostResource(db *sql.DB) *PostResource {
 				}
 				return "gray"
 			}),
+		table.Text("category").Using(func(it any) string { return it.(*Post).CategoryName }),
 		table.Text("created_at").Using(func(it any) string { return it.(*Post).CreatedAt }).
 			Align(table.AlignEnd),
 	)
@@ -60,7 +63,7 @@ func NewPostResource(db *sql.DB) *PostResource {
 	// Grouped two-tier header (Filament-style ColumnGroup).
 	r.SetTableColumnGroups(
 		table.NewColumnGroup("Details", "id", "title"),
-		table.NewColumnGroup("Publication", "status", "created_at"),
+		table.NewColumnGroup("Publication", "status", "category", "created_at"),
 	)
 
 	// Inline SelectAction in each row to change a post's status.
@@ -88,6 +91,7 @@ func NewPostResource(db *sql.DB) *PostResource {
 			{Value: "draft", Label: "Draft"},
 			{Value: "published", Label: "Published"},
 		}),
+		table.Select("category").WithLabel("Category").WithOptions(r.categoryFilterOptions()),
 		r.qbFilter,
 	)
 
@@ -117,6 +121,10 @@ func (r *PostResource) ListQuery(_ context.Context, q engine.ListQuery) ([]any, 
 		where += " AND status = ?"
 		args = append(args, st)
 	}
+	if cat := q.Filters["category"]; cat != "" {
+		where += " AND category_id = ?"
+		args = append(args, cat)
+	}
 	// Visual query builder: parse the submitted JSON conditions into SQL,
 	// restricted to the fields the filter actually exposes (ParseValue) so a
 	// crafted payload cannot probe other columns.
@@ -132,14 +140,14 @@ func (r *PostResource) ListQuery(_ context.Context, q engine.ListQuery) ([]any, 
 		return nil, 0, err
 	}
 
-	order := "id DESC"
+	order := "p.id DESC"
 	switch q.SortKey {
 	case "title":
-		order = "title " + sortDir(q.SortDir)
+		order = "p.title " + sortDir(q.SortDir)
 	case "status":
-		order = "status " + sortDir(q.SortDir)
+		order = "p.status " + sortDir(q.SortDir)
 	case "id":
-		order = "id " + sortDir(q.SortDir)
+		order = "p.id " + sortDir(q.SortDir)
 	}
 
 	perPage := q.PerPage
@@ -152,7 +160,10 @@ func (r *PostResource) ListQuery(_ context.Context, q engine.ListQuery) ([]any, 
 	}
 
 	qArgs := append(append([]any{}, args...), perPage, (page-1)*perPage)
-	rows, err := r.db.Query("SELECT id, title, body, status, created_at FROM posts "+where+" ORDER BY "+order+" LIMIT ? OFFSET ?", qArgs...)
+	rows, err := r.db.Query(`
+		SELECT p.id, p.title, p.body, p.status, COALESCE(p.category_id, 0), COALESCE(c.name, ''), p.created_at
+		FROM posts p LEFT JOIN categories c ON c.id = p.category_id
+		`+where+" ORDER BY "+order+" LIMIT ? OFFSET ?", qArgs...)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -161,12 +172,49 @@ func (r *PostResource) ListQuery(_ context.Context, q engine.ListQuery) ([]any, 
 	var items []any
 	for rows.Next() {
 		p := &Post{}
-		if err := rows.Scan(&p.ID, &p.Title, &p.Body, &p.Status, &p.CreatedAt); err != nil {
+		if err := rows.Scan(&p.ID, &p.Title, &p.Body, &p.Status, &p.CategoryID, &p.CategoryName, &p.CreatedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, p)
 	}
 	return items, total, rows.Err()
+}
+
+// categoryFilterOptions loads categories as table filter options.
+func (r *PostResource) categoryFilterOptions() []table.FilterOption {
+	rows, err := r.db.Query(`SELECT id, name FROM categories ORDER BY name`)
+	if err != nil {
+		return nil
+	}
+	defer rows.Close()
+	var opts []table.FilterOption
+	for rows.Next() {
+		var id int
+		var name string
+		if rows.Scan(&id, &name) == nil {
+			opts = append(opts, table.FilterOption{Value: strconv.Itoa(id), Label: name})
+		}
+	}
+	return opts
+}
+
+// categorySelectOptions loads categories as form select options (resolved live).
+func (r *PostResource) categorySelectOptions(ctx context.Context) ([]form.SelectOption, error) {
+	rows, err := r.db.QueryContext(ctx, `SELECT id, name FROM categories ORDER BY name`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	opts := []form.SelectOption{{Value: "", Label: "— None —"}}
+	for rows.Next() {
+		var id int
+		var name string
+		if err := rows.Scan(&id, &name); err != nil {
+			return nil, err
+		}
+		opts = append(opts, form.SelectOption{Value: strconv.Itoa(id), Label: name})
+	}
+	return opts, rows.Err()
 }
 
 func sortDir(d string) string {
@@ -199,6 +247,7 @@ func (r *PostResource) View(_ context.Context, item any) templ.Component {
 				infolist.TextEntry("id", "ID", p.ID).Align(infolist.AlignEnd),
 				infolist.BadgeEntry("status", "Status", p.Status, statusColor),
 				infolist.TextEntry("title", "Title", p.Title).WithCopy(),
+				infolist.TextEntry("category", "Category", p.CategoryName).WithPlaceholder("Uncategorized"),
 				infolist.DateEntry("created_at", "Created", p.CreatedAt, "2006-01-02 15:04"),
 			),
 		).
@@ -218,8 +267,13 @@ func (r *PostResource) Form(_ context.Context, item any) templ.Component {
 		"draft":     "Draft",
 		"published": "Published",
 	})
+	// Category: a relation-backed select whose options are loaded from the DB.
+	category := form.RelationSelect("category_id").Label("Category").OptionsFrom(r.categorySelectOptions)
 
 	if p, ok := item.(*Post); ok && p != nil {
+		if p.CategoryID > 0 {
+			category.SetValue(strconv.Itoa(p.CategoryID))
+		}
 		title = form.Text("title").Default(p.Title).Required()
 		body = form.Textarea("body")
 		body.SetValue(p.Body)
@@ -230,7 +284,7 @@ func (r *PostResource) Form(_ context.Context, item any) templ.Component {
 
 		// Display-only field (form.Placeholder) showing the creation date.
 		created := form.Placeholder("created_at").Label("Created").Content(p.CreatedAt)
-		return generics.Form(form.New().SetSchema(title, body, status, created))
+		return generics.Form(form.New().SetSchema(title, body, status, category, created))
 	}
 
 	// schema primes are static content placed between fields (no input).
@@ -295,15 +349,17 @@ func (r *PostResource) Form(_ context.Context, item any) templ.Component {
 			}
 			return out, rows.Err()
 		})
-	return generics.Form(form.New().SetSchema(heading, tips, title, body, status, related, relatedPost, tip))
+	return generics.Form(form.New().SetSchema(heading, tips, title, body, status, category, related, relatedPost, tip))
 }
 
 // --- CRUD operations (SQLite) ---------------------------------------------
 
 func (r *PostResource) get(_ context.Context, id string) (any, error) {
 	p := &Post{}
-	err := r.db.QueryRow(`SELECT id, title, body, status, created_at FROM posts WHERE id = ?`, id).
-		Scan(&p.ID, &p.Title, &p.Body, &p.Status, &p.CreatedAt)
+	err := r.db.QueryRow(`
+		SELECT p.id, p.title, p.body, p.status, COALESCE(p.category_id, 0), COALESCE(c.name, ''), p.created_at
+		FROM posts p LEFT JOIN categories c ON c.id = p.category_id WHERE p.id = ?`, id).
+		Scan(&p.ID, &p.Title, &p.Body, &p.Status, &p.CategoryID, &p.CategoryName, &p.CreatedAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -313,10 +369,18 @@ func (r *PostResource) get(_ context.Context, id string) (any, error) {
 	return p, nil
 }
 
+// nullableID converts a form value to a nullable category id (empty -> NULL).
+func nullableID(s string) any {
+	if n, err := strconv.Atoi(strings.TrimSpace(s)); err == nil && n > 0 {
+		return n
+	}
+	return nil
+}
+
 func (r *PostResource) create(ctx context.Context, req *http.Request) error {
 	_, err := r.db.Exec(
-		`INSERT INTO posts (title, body, status) VALUES (?, ?, ?)`,
-		req.FormValue("title"), req.FormValue("body"), statusOrDefault(req.FormValue("status")),
+		`INSERT INTO posts (title, body, status, category_id) VALUES (?, ?, ?, ?)`,
+		req.FormValue("title"), req.FormValue("body"), statusOrDefault(req.FormValue("status")), nullableID(req.FormValue("category_id")),
 	)
 	if err == nil {
 		// Send(ctx) resolves the current authenticated user automatically.
@@ -334,6 +398,10 @@ func (r *PostResource) update(ctx context.Context, id string, req *http.Request)
 	}
 	p := cur.(*Post)
 	title, body, status := p.Title, p.Body, p.Status
+	var categoryID any
+	if p.CategoryID > 0 {
+		categoryID = p.CategoryID
+	}
 	if req.Form.Has("title") {
 		title = req.FormValue("title")
 	}
@@ -343,7 +411,10 @@ func (r *PostResource) update(ctx context.Context, id string, req *http.Request)
 	if req.Form.Has("status") {
 		status = statusOrDefault(req.FormValue("status"))
 	}
-	_, err = r.db.Exec(`UPDATE posts SET title = ?, body = ?, status = ? WHERE id = ?`, title, body, status, id)
+	if req.Form.Has("category_id") {
+		categoryID = nullableID(req.FormValue("category_id"))
+	}
+	_, err = r.db.Exec(`UPDATE posts SET title = ?, body = ?, status = ?, category_id = ? WHERE id = ?`, title, body, status, categoryID, id)
 	return err
 }
 
