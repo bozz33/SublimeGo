@@ -13,6 +13,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
@@ -45,6 +46,12 @@ func main() {
 		// Demo multi-tenant switcher in the topbar, backed by a real cookie
 		// resolver (see tenant.go). The active workspace persists across requests.
 		WithTenantSwitcherList(tenantSwitcherEntries()...)
+
+	// In production behind HTTPS, mark all cookies Secure. Left off by default
+	// so cookies still work over plain HTTP during local development.
+	if os.Getenv("SUBLIMEGO_SECURE_COOKIES") == "1" {
+		panel.EnableSecureCookies()
+	}
 
 	// Dashboard widgets.
 	panel.WithWidgets(
